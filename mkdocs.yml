@@ -10,6 +10,9 @@ exclude_docs: |
 
 strict: true
 
+hooks:
+  - scripts/mkdocs_hooks.py
+
 theme:
   name: material
   language: en
@@ -70,6 +73,7 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets:
       base_path:

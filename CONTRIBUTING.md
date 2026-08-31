@@ -40,7 +40,7 @@ Build and lint the documentation exactly as CI does:
 
 ```bash
 npx --yes markdownlint-cli2@0.18.1
-uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' mkdocs build --strict
+uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' --with 'Pygments==2.19.2' mkdocs build --strict
 ```
 
 Lint and format Python changes:
