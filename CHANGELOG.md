@@ -24,8 +24,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - A build-time prose guard that rejects en and em dashes in repository Markdown.
 - Complete German suffix translations, localized navigation, and translated SVG diagrams.
 - Browser-language routing with a persistent manual German and English selector.
-- A collapsible desktop navigation rail with local Material icons and readable tooltips.
-- Source-level regression tests for locale coverage, disclosures, diagrams, task lists, and icons.
+- Source-level regression tests for locale coverage, disclosures, diagrams, task lists,
+  and bounded text-only navigation.
 
 ### Changed
 
@@ -40,8 +40,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Tutorial source and validation commands are collapsed by default, while
   remaining statically highlighted and available on demand.
 - All reader and reference source panels now stay closed until requested.
-- Documentation uses the full viewport for diagrams and cards while keeping prose
-  to a centered 72-character reading measure.
+- Documentation caps the main column at 800 pixels and aligns prose, headings,
+  diagrams, cards, and tables to one shared edge.
 - Publication task lists render as styled, accessible checkboxes.
 - Trusted local diagrams inherit the active light or dark site palette after
   safe site-level inlining, with static images as the no-script fallback.
@@ -51,6 +51,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Apple Pkl code fences now use a dedicated server-side lexer, including
   arbitrary-length custom string delimiters, and fail the docs build if they
   regress to unhighlighted plain text.
+- Dark-mode diagrams theme an explicit SVG canvas, including the gradient-backed
+  Start artwork.
+- Documentation typography and spacing remain stable at wide desktop breakpoints.
 - Definition-default validation no longer shadows the active ruleset document
   while binding.
 

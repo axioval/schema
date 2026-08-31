@@ -299,27 +299,6 @@ def _verify_svg_contract() -> None:
                         f"{path.name}: external references are not allowed"
                     )
 
-    icon_files = sorted((root / "docs" / "assets" / "icons").glob("*.svg"))
-    if not icon_files:
-        violations.append("no local Material icons")
-    for path in icon_files:
-        try:
-            icon = ET.parse(path).getroot()
-        except ET.ParseError as error:
-            violations.append(f"{path.name}: invalid icon XML ({error})")
-            continue
-        elements = list(icon.iter())
-        tags = {item.tag.rsplit("}", maxsplit=1)[-1] for item in elements}
-        if icon.tag.rsplit("}", maxsplit=1)[-1] != "svg" or not tags <= {"svg", "path"}:
-            violations.append(f"{path.name}: icon contains unsupported elements")
-
-        for element in elements:
-            tag = element.tag.rsplit("}", maxsplit=1)[-1]
-            attributes = {name.rsplit("}", maxsplit=1)[-1] for name in element.attrib}
-            allowed = {"viewBox"} if tag == "svg" else {"d"}
-            if not attributes <= allowed:
-                violations.append(f"{path.name}: icon contains unsupported attributes")
-
     if violations:
         raise RuntimeError("invalid documentation SVG: " + "; ".join(violations))
 

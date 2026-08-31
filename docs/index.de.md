@@ -27,7 +27,7 @@ Axioval hilft Menschen dabei, zu beschreiben, was in einem Gebäudemodell zutref
 
 <div class="grid cards" markdown>
 
--   :material-lightbulb-outline:{ .lg .middle } **Seite 1**
+-   **Seite 1**
 
     **Die Idee**
 
@@ -35,7 +35,7 @@ Axioval hilft Menschen dabei, zu beschreiben, was in einem Gebäudemodell zutref
 
     [Erste Seite öffnen](guide/the-idea.de.md)
 
--   :material-shape-outline:{ .lg .middle } **Seite 2**
+-   **Seite 2**
 
     **Vier Bausteine**
 
@@ -43,7 +43,7 @@ Axioval hilft Menschen dabei, zu beschreiben, was in einem Gebäudemodell zutref
 
     [Zweite Seite öffnen](guide/building-blocks.de.md)
 
--   :material-wall:{ .lg .middle } **Seite 3**
+-   **Seite 3**
 
     **Ein Wandbeispiel**
 
@@ -51,7 +51,7 @@ Axioval hilft Menschen dabei, zu beschreiben, was in einem Gebäudemodell zutref
 
     [Beispiel öffnen](tutorials/din-276-331.de.md)
 
--   :material-tools:{ .lg .middle } **Weitergehen**
+-   **Weitergehen**
 
     **Ein Werkzeug entwickeln oder anbinden**
 

@@ -27,7 +27,7 @@ Axioval helps people describe what should be true in a building model. The same 
 
 <div class="grid cards" markdown>
 
--   :material-lightbulb-outline:{ .lg .middle } **Page 1**
+-   **Page 1**
 
     **The idea**
 
@@ -35,7 +35,7 @@ Axioval helps people describe what should be true in a building model. The same 
 
     [Open the first page](guide/the-idea.md)
 
--   :material-shape-outline:{ .lg .middle } **Page 2**
+-   **Page 2**
 
     **Four building blocks**
 
@@ -43,7 +43,7 @@ Axioval helps people describe what should be true in a building model. The same 
 
     [Open the second page](guide/building-blocks.md)
 
--   :material-wall:{ .lg .middle } **Page 3**
+-   **Page 3**
 
     **A wall example**
 
@@ -51,7 +51,7 @@ Axioval helps people describe what should be true in a building model. The same 
 
     [Open the example](tutorials/din-276-331.md)
 
--   :material-tools:{ .lg .middle } **Go further**
+-   **Go further**
 
     **Build or connect a tool**
 

@@ -84,12 +84,22 @@ class DocumentationUxTests(unittest.TestCase):
         for original in originals:
             translated = original.with_name(f"{original.stem}.de.svg")
             self.assertTrue(translated.is_file(), translated.name)
+            for diagram in (original, translated):
+                svg = ET.parse(diagram).getroot()
+                self.assertEqual(svg.attrib.get("role"), "img")
+                self.assertTrue(svg.attrib.get("aria-labelledby"))
+                self.assertFalse(
+                    any(node.tag.rsplit("}", 1)[-1] == "script" for node in svg.iter())
+                )
+                self.assertEqual(
+                    sum(
+                        "diagram-canvas" in node.attrib.get("class", "").split()
+                        for node in svg.iter()
+                    ),
+                    1,
+                    f"{diagram.name} must identify exactly one themeable canvas",
+                )
             svg = ET.parse(translated).getroot()
-            self.assertEqual(svg.attrib.get("role"), "img")
-            self.assertTrue(svg.attrib.get("aria-labelledby"))
-            self.assertFalse(
-                any(node.tag.rsplit("}", 1)[-1] == "script" for node in svg.iter())
-            )
             visible_text = " ".join(
                 (node.text or "").strip()
                 for node in svg.iter()
@@ -144,7 +154,9 @@ class DocumentationUxTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "does not match"):
                 _verify_localized_diagram_output(site, sources)
 
-    def test_site_script_keeps_svg_and_locale_boundaries(self) -> None:
+    def test_site_script_keeps_svg_and_locale_boundaries_without_decoration(
+        self,
+    ) -> None:
         script = (DOCS / "assets" / "javascripts" / "site.js").read_text(
             encoding="utf-8"
         )
@@ -153,40 +165,39 @@ class DocumentationUxTests(unittest.TestCase):
             '!url.pathname.includes("/assets/images/")',
             'svg.querySelector("script, foreignObject")',
             "localStorage.getItem(languageKey)",
-            "localStorage.getItem(navKey)",
             "a[hreflang]",
-            ".md-content h1, .md-content h2",
         ):
             self.assertIn(contract, script)
+        for removed in (
+            "iconFor",
+            "applyIcon",
+            "decorateNavigation",
+            "decorateHeadings",
+            "nav-rail",
+            "section-icon",
+            "axioval.navigation-collapsed",
+        ):
+            self.assertNotIn(removed, script)
 
-    def test_material_icon_set_is_complete(self) -> None:
-        icon_dir = DOCS / "assets" / "icons"
-        required = {
-            "account-group",
-            "arrow-right",
-            "check-circle",
-            "close-circle",
-            "compass",
-            "file-document",
-            "help-circle",
-            "home",
-            "layers",
-            "license",
-            "lightbulb",
-            "map-marker",
-            "map-marker-path",
-            "package",
-            "shape",
-            "share",
-            "shield-check",
-            "source-repository",
-            "tools",
-            "wall",
-        }
-        missing = sorted(
-            name for name in required if not (icon_dir / f"{name}.svg").is_file()
+    def test_layout_is_bounded_aligned_and_undecorated(self) -> None:
+        css = (DOCS / "assets" / "stylesheets" / "extra.css").read_text(
+            encoding="utf-8"
         )
-        self.assertEqual(missing, [])
+        self.assertIn("--axioval-content-width: 800px;", css)
+        self.assertIn("max-width: var(--axioval-content-width);", css)
+        self.assertIn("font-size: clamp(2rem, 5vw, 48px);", css)
+        self.assertIn(
+            '[data-md-color-scheme="slate"] .axioval-diagram .diagram-canvas', css
+        )
+        for removed in (
+            ".nav-rail-icon",
+            ".nav-rail-toggle",
+            ".section-icon",
+            "max-width: 88rem",
+            "max-width: none",
+        ):
+            self.assertNotIn(removed, css)
+        self.assertFalse((DOCS / "assets" / "icons").exists())
 
     def test_task_list_controls_receive_static_accessible_names(self) -> None:
         source = (

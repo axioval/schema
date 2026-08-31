@@ -12,7 +12,7 @@
       .title{font:700 22px system-ui,sans-serif;fill:#172033}.copy{font:15px system-ui,sans-serif;fill:#536176}.step{font:700 13px system-ui,sans-serif;letter-spacing:.08em;fill:#3867b2}.card{fill:#fff;stroke:#cbd9ea;stroke-width:2}.icon{fill:#e7f0ff;stroke:#3867b2;stroke-width:2}.line{fill:none;stroke:#7c8ba1;stroke-width:3;marker-end:url(#arrow)}
     </style>
   </defs>
-  <rect width="1120" height="360" rx="28" fill="url(#bg)"/>
+  <rect class="diagram-canvas" width="1120" height="360" rx="28" fill="url(#bg)"/>
   <path class="line" d="M265 180H315"/><path class="line" d="M535 180H585"/><path class="line" d="M805 180H855"/>
   <g transform="translate(45 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><path d="M94 58h32M94 72h32M94 86h22" stroke="#3867b2" stroke-width="4" stroke-linecap="round"/><text class="step" x="24" y="135">STEP 1</text><text class="title" x="24" y="168">Name the things</text><text class="copy" x="24" y="198">Agree on clear names</text><text class="copy" x="24" y="220">for walls and facts.</text></g>
   <g transform="translate(315 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><path d="M94 72l10 10 23-26" fill="none" stroke="#3867b2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><text class="step" x="24" y="135">STEP 2</text><text class="title" x="24" y="168">Describe the check</text><text class="copy" x="24" y="198">Say what to look at</text><text class="copy" x="24" y="220">and what must be true.</text></g>
