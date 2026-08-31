@@ -1,0 +1,4 @@
+amends "pkl:Project"
+
+// This is a local development project. Package publication metadata will be
+// added with the first tagged release so published URLs and checksums are real.

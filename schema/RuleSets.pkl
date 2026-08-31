@@ -1,0 +1,34 @@
+module axioval.schema.RuleSets
+
+import "Types.pkl"
+import "Values.pkl"
+import "Selectors.pkl"
+
+class RuleInstance {
+  id: Types.Identifier
+  definitionId: Types.QualifiedIdentifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  enabled: Boolean = true
+  severity: Types.Severity = "error"
+  message: Types.LocalizedText?
+  parameters: Mapping<String, Values.ParameterValue> = new {}
+  applicability: Selectors.Selector = new Selectors.AllSelector {}
+  tags: Listing<String> = new {}
+}
+
+class RuleFolder {
+  id: Types.Identifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  rules: Listing<RuleInstance> = new {}
+  folders: Listing<RuleFolder> = new {}
+}
+
+/// Concrete ruleset package (ABox-like): instances reference definitions by
+/// stable ID. Definition and capability resolution happens in the consuming
+/// application and must fail closed when unavailable.
+schemaVersion: String = Types.schemaVersion
+package: Types.PackageMetadata
+definitionPackages: Listing<Types.QualifiedIdentifier>(length > 0)
+root: RuleFolder

@@ -1,0 +1,40 @@
+amends "../../schema/RuleSets.pkl"
+
+import "../../schema/Types.pkl"
+import "../../schema/Values.pkl"
+import "../../schema/Selectors.pkl"
+import "../../schema/RuleSets.pkl"
+
+package = new Types.PackageMetadata {
+  id = "axioval:example.ruleset"
+  name = "Example ruleset"
+  version = "0.1.0"
+  description = "Non-production example of a modular Axioval ruleset."
+  repository = "https://github.com/axioval/schema"
+}
+
+definitionPackages {
+  "axioval:example.definitions"
+}
+
+root = new RuleSets.RuleFolder {
+  id = "root"
+  name = new Types.LocalizedText { default = "Example checks" }
+  rules {
+    new RuleSets.RuleInstance {
+      id = "wall-reference-required"
+      definitionId = "axioval:example.property-exists"
+      name = new Types.LocalizedText { default = "Walls require a reference" }
+      severity = "error"
+      parameters {
+        ["propertySet"] = new Values.StringValue { value = "Pset_WallCommon" }
+        ["property"] = new Values.StringValue { value = "Reference" }
+      }
+      applicability = new Selectors.EntityTypeSelector {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        typeName = "IfcWall"
+      }
+      tags { "example" }
+    }
+  }
+}

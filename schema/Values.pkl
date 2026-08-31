@@ -1,0 +1,53 @@
+module axioval.schema.Values
+
+import "Types.pkl"
+
+abstract class ParameterValue {
+  type: String
+}
+
+class StringValue extends ParameterValue {
+  type: "string" = "string"
+  value: String
+}
+
+class BooleanValue extends ParameterValue {
+  type: "boolean" = "boolean"
+  value: Boolean
+}
+
+class IntegerValue extends ParameterValue {
+  type: "integer" = "integer"
+  value: Int
+}
+
+class NumberValue extends ParameterValue {
+  type: "number" = "number"
+  value: Number
+}
+
+class QuantityValue extends ParameterValue {
+  type: "quantity" = "quantity"
+  value: Number
+  unit: String
+}
+
+class EnumValue extends ParameterValue {
+  type: "enum" = "enum"
+  value: Types.Identifier
+}
+
+class ReferenceValue extends ParameterValue {
+  type: "reference" = "reference"
+  value: Types.QualifiedIdentifier
+}
+
+class StringListValue extends ParameterValue {
+  type: "stringList" = "stringList"
+  value: Listing<String>
+}
+
+class ReferenceListValue extends ParameterValue {
+  type: "referenceList" = "referenceList"
+  value: Listing<Types.QualifiedIdentifier>
+}

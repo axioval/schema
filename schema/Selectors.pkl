@@ -1,0 +1,55 @@
+module axioval.schema.Selectors
+
+import "Types.pkl"
+import "Values.pkl"
+
+abstract class Selector {
+  kind: String
+}
+
+/// Select every entity visible to the validation application.
+class AllSelector extends Selector {
+  kind: "all" = "all"
+}
+
+/// Select entities by a type name in a declared type system.
+class EntityTypeSelector extends Selector {
+  kind: "entityType" = "entityType"
+  typeSystem: Types.QualifiedIdentifier
+  typeName: String
+  includeSubtypes: Boolean = true
+}
+
+typealias ComparisonOperator = "equals" | "notEquals" | "lessThan" | "lessThanOrEquals" | "greaterThan" | "greaterThanOrEquals" | "matches" | "exists"
+
+/// Select entities using a typed property source.
+class PropertySelector extends Selector {
+  kind: "property" = "property"
+  propertySet: String?
+  property: String
+  operator: ComparisonOperator
+  value: Values.ParameterValue?
+}
+
+/// Select entities carrying a classification reference.
+class ClassificationSelector extends Selector {
+  kind: "classification" = "classification"
+  system: String
+  code: String
+  includeDescendants: Boolean = false
+}
+
+class AllOfSelector extends Selector {
+  kind: "allOf" = "allOf"
+  operands: Listing<Selector>(length > 0)
+}
+
+class AnyOfSelector extends Selector {
+  kind: "anyOf" = "anyOf"
+  operands: Listing<Selector>(length > 0)
+}
+
+class NotSelector extends Selector {
+  kind: "not" = "not"
+  operand: Selector
+}

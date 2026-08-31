@@ -1,0 +1,39 @@
+module axioval.schema.Definitions
+
+import "Types.pkl"
+import "Values.pkl"
+
+typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "stringList" | "referenceList"
+
+class ParameterDefinition {
+  id: Types.Identifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  kind: ParameterKind
+  required: Boolean = true
+  defaultValue: Values.ParameterValue?
+  allowedValues: Listing<Values.ParameterValue> = new {}
+  unitDimension: String?
+}
+
+/// Declares a rule template. `capability` is the stable semantic operation that
+/// an application must implement; it is not executable code supplied by the
+/// ruleset package.
+class RuleDefinition {
+  id: Types.QualifiedIdentifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  capability: Types.QualifiedIdentifier
+  parameters: Mapping<String, ParameterDefinition>(
+    toMap().every((key, value) -> key == value.id)
+  ) = new {}
+  tags: Listing<String> = new {}
+}
+
+/// Terminology package (TBox-like): definitions only, no rule instances.
+schemaVersion: String = Types.schemaVersion
+package: Types.PackageMetadata
+definitions: Mapping<String, RuleDefinition>(
+  length > 0,
+  toMap().every((key, value) -> key == value.id)
+)

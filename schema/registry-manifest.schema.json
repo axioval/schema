@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/axioval/schema/main/schema/registry-manifest.schema.json",
+  "title": "Axioval registry package manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "kind",
+    "id",
+    "version",
+    "schemaVersion",
+    "entrypoint",
+    "definitionEntrypoints"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "manifestVersion": {
+      "const": "0.1.0"
+    },
+    "kind": {
+      "const": "ruleset"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9+.-]*:.+$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "entrypoint": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.pkl$"
+    },
+    "definitionEntrypoints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.pkl$"
+      },
+      "uniqueItems": true
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
