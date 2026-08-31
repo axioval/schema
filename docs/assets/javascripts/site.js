@@ -66,9 +66,17 @@
     });
   }
 
+  function enhanceDiagrams() {
+    document.querySelectorAll(".diagram-frame img[src$='.svg']").forEach(enhanceDiagram);
+  }
+
   function init() {
     rememberLanguageChoice();
-    document.querySelectorAll(".diagram-frame img[src$='.svg']").forEach(enhanceDiagram);
+    if (document.readyState === "complete") {
+      enhanceDiagrams();
+    } else {
+      window.addEventListener("load", enhanceDiagrams, { once: true });
+    }
   }
 
   routeInitialLanguage();

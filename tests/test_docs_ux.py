@@ -166,6 +166,7 @@ class DocumentationUxTests(unittest.TestCase):
             'svg.querySelector("script, foreignObject")',
             "localStorage.getItem(languageKey)",
             "a[hreflang]",
+            'window.addEventListener("load", enhanceDiagrams, { once: true })',
         ):
             self.assertIn(contract, script)
         for removed in (
