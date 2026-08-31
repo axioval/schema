@@ -1,7 +1,17 @@
-# Mental model
+# How Axioval fits together
 
+This technical page maps the four booklet ideas to the exact schema concepts.
 Axioval separates reusable meaning from concrete validation policy. Mixing these
 layers creates packages that cannot be shared safely.
+
+<div class="diagram-frame" markdown>
+
+<picture class="responsive-diagram">
+  <source media="(max-width: 44rem)" srcset="../../assets/images/building-blocks-mobile.svg">
+  <img src="../../assets/images/building-blocks.svg" alt="The dictionary, recipe, filled card, and bundle used by Axioval">
+</picture>
+
+</div>
 
 ## 1. Vocabulary
 
@@ -57,7 +67,7 @@ bound to a string property.
 ## 3. Instance
 
 A `RuleInstance` binds a known definition to concrete values and an applicability
-selector. Instances are policy—the ABox-like layer—and belong in external
+selector. Instances are policy, the ABox-like layer, and belong in external
 ruleset repositories. This schema repository contains them only under
 `examples/`.
 
@@ -67,19 +77,11 @@ ruleset repositories. This schema repository contains them only under
 Only after all entrypoints are repository-confined and all candidate JSON is
 semantically bound does the output become normalized interchange.
 
-```mermaid
-sequenceDiagram
-  participant R as Registry
-  participant M as Manifest validator
-  participant P as Pkl sandbox
-  participant B as Contract binder
-  R->>M: inspect axioval.json
-  M->>M: resolve every local entrypoint
-  M->>P: evaluate constrained modules
-  P-->>B: candidate JSON
-  B->>B: bind packages, concepts, templates, values, selectors
-  B-->>R: validated normalized JSON or refusal
-```
+<div class="diagram-frame" markdown>
+
+![A package is inspected, opened safely, checked completely, and handed to a compatible tool](../assets/images/trust-path.svg)
+
+</div>
 
 ## What Axioval deliberately does not own
 

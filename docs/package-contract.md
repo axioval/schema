@@ -1,8 +1,14 @@
-# Ruleset repository contract
+# Safe package acceptance
 
-A registry submission represents a package—not a privileged publication
+A registry submission represents a package, not a privileged publication
 channel. Axioval-owned and third-party repositories follow the same contract and
 receive no extra capabilities or trust.
+
+<div class="diagram-frame" markdown>
+
+![A package is inspected, opened safely, checked completely, and handed to a compatible tool](assets/images/trust-path.svg)
+
+</div>
 
 ## Required files
 
@@ -43,16 +49,6 @@ The order is part of the security contract:
 Pkl source may use imports, local values, and authoring helpers. Evaluation must
 lower all of that to declarative data. Applications execute only capabilities
 they already implement; they never execute package-supplied model-checking code.
-
-```mermaid
-graph TD
-  M[Static manifest] --> R[Repository-confined modules]
-  R --> E[Sandboxed Pkl evaluation]
-  E --> C[Candidate JSON]
-  C --> B[Fail-closed semantic binding]
-  B --> N[Normalized JSON]
-  N --> A[Application typed IR]
-```
 
 ## Property-resolution contract
 

@@ -5,7 +5,11 @@ This directory is the source for the public MkDocs Material site configured by
 
 ## Conventions
 
-- Explain the vocabulary → template → instance → package journey before details.
+- Explain the dictionary, recipe, filled card, and bundle journey before technical details.
+- Keep the homepage free of programmer jargon and route tool builders to a separate reference path.
+- Keep tutorial source blocks collapsed by default with `??? example` panels.
+- Use repository-owned SVG diagrams with useful alt text and mobile variants when wide artwork becomes unreadable.
+- Do not use en or em dashes in repository Markdown; the strict MkDocs hook enforces this.
 - Use checked repository examples; do not invent unsupported fields or capabilities.
 - Treat property-set identity as an optional exact qualifier, never property ownership.
 - Link public authoritative sources for IFC and standards claims; mark instructional examples as non-normative.

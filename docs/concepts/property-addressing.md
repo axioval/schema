@@ -1,9 +1,17 @@
-# Property addressing without folder semantics
+# When property location matters
 
-Property sets are real relationship objects in IFC, but treating their names as
-the universal identity of a property causes the same problem as mandatory file
-folders: one hierarchy must answer several unrelated organizational questions.
-Axioval therefore separates **property identity** from **container qualification**.
+The same fact can appear in different places in a building model. Sometimes a
+requirement only cares about the fact. Sometimes it also requires one exact
+place. Axioval supports both choices.
+
+Think of it like asking for a book:
+
+- **Any shelf is fine:** find this book wherever the library stores it.
+- **One shelf is required:** find this book in the reference section.
+
+In technical terms, Axioval separates **property identity** from **container
+qualification**. Property sets are real relationship objects in IFC, but their
+names do not need to become the universal identity of a property.
 
 ## Canonical property identity
 
@@ -39,7 +47,7 @@ relationships. The property may be found in any supported container.
 
 Implementations must define deterministic conflict behavior. If the same
 canonical property resolves more than once with incompatible values, they should
-return a conflict—not choose one silently.
+return a conflict. They must not choose one silently.
 
 ## Strict reference: membership is part of the requirement
 

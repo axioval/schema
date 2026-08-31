@@ -1,5 +1,5 @@
-site_name: Axioval Schema
-site_description: Vendor-neutral typed authoring and interchange for validation rules
+site_name: Axioval
+site_description: A shared way to describe and exchange building checks
 site_url: https://axioval.github.io/schema/
 copyright: Copyright &copy; Axioval contributors · AGPL-3.0-or-later
 
@@ -19,8 +19,10 @@ theme:
   features:
     - navigation.instant
     - navigation.sections
+    - navigation.path
     - navigation.top
     - navigation.footer
+    - toc.follow
     - content.code.copy
     - content.tabs.link
     - search.highlight
@@ -41,24 +43,27 @@ theme:
         icon: material/weather-sunny
         name: Use light mode
   icon:
+    logo: material/check-decagram-outline
     repo: fontawesome/brands/github
 
 nav:
   - Home: index.md
-  - Start here:
-      - Mental model: concepts/layers.md
-      - Property addressing: concepts/property-addressing.md
-      - Author a package: authoring.md
-  - Tutorial:
-      - DIN 276 KG 331 wall: tutorials/din-276-331.md
-  - Reference:
-      - Schema surface: reference/schema.md
-      - Package contract: package-contract.md
-  - Project:
-      - GitHub repository: https://github.com/axioval/schema
-      - Contributing: community/contributing.md
-      - Changelog: community/changelog.md
-      - Roadmap: community/roadmap.md
+  - Meet Axioval:
+      - The idea: guide/the-idea.md
+      - Four building blocks: guide/building-blocks.md
+      - A wall example: tutorials/din-276-331.md
+  - Make and share:
+      - When location matters: concepts/property-addressing.md
+      - Make a bundle: authoring.md
+  - For tool builders:
+      - How Axioval fits together: concepts/layers.md
+      - Safe sharing checks: package-contract.md
+      - Full reference: reference/schema.md
+  - Source and community:
+      - GitHub home: https://github.com/axioval/schema
+      - How to help: community/contributing.md
+      - What changed: community/changelog.md
+      - What comes next: community/roadmap.md
       - License: community/license.md
 
 markdown_extensions:
@@ -71,6 +76,9 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
       pygments_lang_class: true
@@ -79,16 +87,15 @@ markdown_extensions:
       base_path:
         - .
       check_paths: true
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
 
 plugins:
   - search
+
+extra_css:
+  - assets/stylesheets/extra.css
 
 extra:
   social:

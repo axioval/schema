@@ -6,7 +6,7 @@ executable or privileging one vendor, model format, or repository owner.
 This roadmap describes intent, not a compatibility guarantee. Milestone contents
 may move as conformance tests expose missing foundations.
 
-## Now — trustworthy authoring substrate (`0.1.x`)
+## Now: trustworthy authoring substrate (`0.1.x`)
 
 - [x] Typed Pkl authoring modules and deterministic normalized JSON.
 - [x] Static-first manifest inspection and repository-confined evaluation.
@@ -16,17 +16,17 @@ may move as conformance tests expose missing foundations.
 - [x] Rich public documentation and a complete vocabulary-to-instance tutorial.
 - [ ] Publish immutable `v0.1.0` after external consumer review.
 
-## Next — portable capability governance (`0.2.x`)
+## Next: portable capability governance (`0.2.x`)
 
 - Define a capability registry with stable semantic contracts and conformance
-  vectors—not engine implementations.
+  vectors, not engine implementations.
 - Specify deterministic diagnostic/result interchange.
 - Add unit/quantity system identifiers and conversion contracts.
 - Define conflict, missing, unsupported, and invalid fact states explicitly.
 - Add package dependency identities, checksums, and lock data.
 - Publish migration tooling for normalized schema changes.
 
-## Then — ecosystem and registry (`0.3.x`)
+## Then: ecosystem and registry (`0.3.x`)
 
 - Launch `axioval/registry` submission and discovery workflows.
 - Validate immutable repository revisions in isolated workers.

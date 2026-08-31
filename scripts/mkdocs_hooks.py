@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import ClassVar
@@ -258,11 +259,80 @@ def _verify_audit_contract() -> None:
             raise RuntimeError(f"Pkl highlight audit contract failed for {fragment!r}")
 
 
+def _verify_svg_contract() -> None:
+    """Require local diagrams to carry accessible, self-contained metadata."""
+
+    root = Path(__file__).resolve().parent.parent
+    svg_files = sorted((root / "docs" / "assets" / "images").glob("*.svg"))
+    if not svg_files:
+        raise RuntimeError("documentation contains no local SVG diagrams")
+
+    violations: list[str] = []
+    for path in svg_files:
+        try:
+            document = ET.parse(path)
+        except ET.ParseError as error:
+            violations.append(f"{path.name}: invalid XML ({error})")
+            continue
+
+        svg = document.getroot()
+        labels = set(svg.attrib.get("aria-labelledby", "").split())
+        if svg.attrib.get("role") != "img":
+            violations.append(f"{path.name}: missing role=img")
+
+        for tag_name in ("title", "desc"):
+            element = svg.find(f"{{*}}{tag_name}")
+            if element is None or not "".join(element.itertext()).strip():
+                violations.append(f"{path.name}: missing {tag_name}")
+            elif element.attrib.get("id") not in labels:
+                violations.append(f"{path.name}: {tag_name} is not aria-labelledby")
+
+        for element in svg.iter():
+            if element.tag.rsplit("}", maxsplit=1)[-1] == "script":
+                violations.append(f"{path.name}: scripts are not allowed")
+            for attribute, value in element.attrib.items():
+                attribute_name = attribute.rsplit("}", maxsplit=1)[-1]
+                if attribute_name == "href" and not value.startswith("#"):
+                    violations.append(
+                        f"{path.name}: external references are not allowed"
+                    )
+
+    if violations:
+        raise RuntimeError("invalid documentation SVG: " + "; ".join(violations))
+
+
+def _verify_prose_contract() -> None:
+    """Keep public and repository documentation free of en and em dashes."""
+
+    root = Path(__file__).resolve().parent.parent
+    markdown_files = sorted(
+        {
+            *root.glob("*.md"),
+            *(root / "docs").rglob("*.md"),
+            *(root / "examples").rglob("*.md"),
+        }
+    )
+    violations: list[str] = []
+    for path in markdown_files:
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            if "\N{EN DASH}" in line or "\N{EM DASH}" in line:
+                violations.append(f"{path.relative_to(root)}:{line_number}")
+
+    if violations:
+        raise RuntimeError(
+            "documentation contains en or em dashes: " + ", ".join(violations)
+        )
+
+
 def on_config(config, **_kwargs):
     """Register and verify the lexer before Markdown renders code fences."""
 
     _verify_lexer_contract()
     _verify_audit_contract()
+    _verify_svg_contract()
+    _verify_prose_contract()
     LEXERS["PklLexer"] = (
         "scripts.mkdocs_hooks",
         PklLexer.name,

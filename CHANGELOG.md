@@ -20,6 +20,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
   `LoadBearing`, and container-agnostic `IsExternal` requirements.
 - Negative tests for unknown concepts and property-kind mismatches.
 - Contributor guide, roadmap, AGPL license, and GitHub Sponsors configuration.
+- Accessible local SVG diagrams with separate wide and mobile compositions.
+- A build-time prose guard that rejects en and em dashes in repository Markdown.
 
 ### Changed
 
@@ -29,6 +31,10 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
   treating `propertySet` and `property` as peer string parameters.
 - Definition-package normalized output now includes object, property, and
   property-set catalogs.
+- The public site now opens with a plain-language, three-page picture tour and
+  keeps tool-builder reference material in a separate path.
+- Tutorial source and validation commands are collapsed by default, while
+  remaining statically highlighted and available on demand.
 
 ### Fixed
 

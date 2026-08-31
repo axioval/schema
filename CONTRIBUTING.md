@@ -2,7 +2,7 @@
 
 Thank you for improving the vendor-neutral authoring and interchange contract.
 Contract changes affect package authors, registries, and checking applications,
-so contributions need executable evidence—not only prose.
+so contributions need executable evidence, not only prose.
 
 ## Before opening a change
 
@@ -82,6 +82,10 @@ Prefer stable canonical concepts plus explicit external bindings.
 The Pages site is built from `docs/` with MkDocs Material. Use:
 
 - short task-oriented pages;
+- plain language on the homepage and first-time reader journey;
+- local accessible SVG diagrams with readable mobile variants;
+- collapsed source panels in step-by-step tutorials;
+- no en or em dashes in repository Markdown;
 - callouts for trust boundaries and normative caveats;
 - complete checked examples rather than pseudo-APIs;
 - links to authoritative specifications for domain claims; and

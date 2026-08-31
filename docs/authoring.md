@@ -1,7 +1,12 @@
-# Author a package
+# Author a bundle
 
-A ruleset package lives in its own repository. The schema repository contains
-concrete instances only as examples.
+This guide is for people creating Axioval source files. A ruleset bundle lives in
+its own repository. The schema repository contains concrete instances only as
+checked examples.
+
+!!! tip "New to Axioval?"
+    Read the [four building blocks](guide/building-blocks.md) and the
+    [wall example](tutorials/din-276-331.md) before starting here.
 
 ## 1. Create the package boundary
 

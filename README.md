@@ -126,7 +126,7 @@ compatibility milestones, and unsupported capabilities are tracked in the
 ## Contributing and governance
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing contract changes.
-- Concrete production rulesets belong in independent repositories—not here.
+- Concrete production rulesets belong in independent repositories, not here.
 - Axioval-owned and third-party packages receive identical registry treatment.
 - Package-specific executable checking logic is never trusted or distributed.
 
