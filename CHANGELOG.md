@@ -32,8 +32,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Fixed
 
-- Apple Pkl code fences now use a dedicated server-side lexer and fail the docs
-  build if they regress to unhighlighted plain text.
+- Apple Pkl code fences now use a dedicated server-side lexer, including
+  arbitrary-length custom string delimiters, and fail the docs build if they
+  regress to unhighlighted plain text.
 - Definition-default validation no longer shadows the active ruleset document
   while binding.
 

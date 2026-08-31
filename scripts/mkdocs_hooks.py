@@ -102,13 +102,15 @@ class PklLexer(RegexLexer):
             (r"///.*$", Comment.Special),
             (r"//.*$", Comment.Single),
             (r"/\*", Comment.Multiline, "comment"),
-            (r'###"""', String.Multiline, "raw3-multiline"),
-            (r'##"""', String.Multiline, "raw2-multiline"),
-            (r'#"""', String.Multiline, "raw1-multiline"),
+            (
+                r'(?P<raw_multiline>#+)"""[\s\S]*?"""(?P=raw_multiline)',
+                String.Multiline,
+            ),
+            (
+                r'(?P<raw_string>#+)"(?:[^"\n]|"(?!(?P=raw_string)))*"(?P=raw_string)',
+                String,
+            ),
             (r'"""', String.Multiline, "multiline"),
-            (r'###"', String, "raw3-string"),
-            (r'##"', String, "raw2-string"),
-            (r'#"', String, "raw1-string"),
             (r'"', String, "string"),
             (r"@[A-Za-z_][A-Za-z0-9_]*", Name.Decorator),
             (r"\b(?:import\*|read\*|read\?)", Keyword),
@@ -147,21 +149,6 @@ class PklLexer(RegexLexer):
         "multiline": [
             (r'"""', String.Multiline, "#pop"),
             (r"\\(?:[0tnr\"']|u\{[0-9A-Fa-f]{1,8}\})", String.Escape),
-            (r".|\n", String.Multiline),
-        ],
-        "raw1-string": [(r'"#', String, "#pop"), (r".|\n", String)],
-        "raw2-string": [(r'"##', String, "#pop"), (r".|\n", String)],
-        "raw3-string": [(r'"###', String, "#pop"), (r".|\n", String)],
-        "raw1-multiline": [
-            (r'"""#', String.Multiline, "#pop"),
-            (r".|\n", String.Multiline),
-        ],
-        "raw2-multiline": [
-            (r'"""##', String.Multiline, "#pop"),
-            (r".|\n", String.Multiline),
-        ],
-        "raw3-multiline": [
-            (r'"""###', String.Multiline, "#pop"),
             (r".|\n", String.Multiline),
         ],
     }
@@ -236,9 +223,46 @@ class _PklBlockAudit(HTMLParser):
                 self.blocks.append(self._has_token)
 
 
-def on_config(config, **_kwargs):
-    """Register the lexer before Markdown extensions render code fences."""
+def _verify_lexer_contract() -> None:
+    """Exercise delimiter lengths that cannot be represented by fixed lexer states."""
 
+    cases = (
+        '####"plain"####',
+        '########"embedded "#### delimiter"########',
+        '######"""\nmultiline\nwith """##### inside\n"""######',
+    )
+    lexer = PklLexer()
+    for source in cases:
+        tokens = list(lexer.get_tokens_unprocessed(source))
+        if len(tokens) != 1 or tokens[0][1] not in String or tokens[0][2] != source:
+            raise RuntimeError(f"Pkl raw-string lexer contract failed for {source!r}")
+
+
+def _verify_audit_contract() -> None:
+    """Prove layout/UI spans cannot masquerade as syntax highlighting."""
+
+    cases = (
+        (
+            '<div class="language-pkl"><code><span class="non-token">new</span></code></div>',
+            False,
+        ),
+        (
+            '<div class="language-pkl"><code><span class="k">new</span></code></div>',
+            True,
+        ),
+    )
+    for fragment, expected in cases:
+        parser = _PklBlockAudit()
+        parser.feed(fragment)
+        if parser.blocks != [expected]:
+            raise RuntimeError(f"Pkl highlight audit contract failed for {fragment!r}")
+
+
+def on_config(config, **_kwargs):
+    """Register and verify the lexer before Markdown renders code fences."""
+
+    _verify_lexer_contract()
+    _verify_audit_contract()
     LEXERS["PklLexer"] = (
         "scripts.mkdocs_hooks",
         PklLexer.name,
