@@ -3,13 +3,49 @@ module axioval.schema.Definitions
 import "Types.pkl"
 import "Values.pkl"
 
-typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "stringList" | "referenceList"
+typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "objectTypeReference" | "propertyReference" | "stringList" | "referenceList"
+typealias PropertyValueKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "stringList" | "referenceList"
+
+/// One external-schema name for a canonical property or container concept.
+class ExternalName {
+  typeSystem: Types.QualifiedIdentifier
+  name: String
+}
+
+/// A reusable external object type such as IFC's IfcWall.
+class ObjectTypeDefinition {
+  id: Types.QualifiedIdentifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  externalNames: Listing<ExternalName>(length > 0)
+}
+
+/// A reusable semantic property. It is not owned by any property set.
+class PropertyDefinition {
+  id: Types.QualifiedIdentifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  valueKind: PropertyValueKind
+  unitDimension: Types.QualifiedIdentifier?
+  externalNames: Listing<ExternalName>(length > 0)
+}
+
+/// A reusable external container qualifier. This does not own properties;
+/// rules opt into exact membership by referencing it explicitly.
+class PropertySetDefinition {
+  id: Types.QualifiedIdentifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  externalNames: Listing<ExternalName>(length > 0)
+}
 
 class ParameterDefinition {
   id: Types.Identifier
   name: Types.LocalizedText
   description: Types.LocalizedText?
   kind: ParameterKind
+  /// For `propertyReference`, optionally constrain the referenced property's value kind.
+  referencedValueKind: PropertyValueKind?
   required: Boolean = true
   defaultValue: Values.ParameterValue?
   allowedValues: Listing<Values.ParameterValue> = new {}
@@ -33,7 +69,15 @@ class RuleDefinition {
 /// Terminology package (TBox-like): definitions only, no rule instances.
 schemaVersion: String = Types.schemaVersion
 package: Types.PackageMetadata
-definitions: Mapping<String, RuleDefinition>(
-  length > 0,
+objectTypes: Mapping<String, ObjectTypeDefinition>(
   toMap().every((key, value) -> key == value.id)
-)
+) = new {}
+properties: Mapping<String, PropertyDefinition>(
+  toMap().every((key, value) -> key == value.id)
+) = new {}
+propertySets: Mapping<String, PropertySetDefinition>(
+  toMap().every((key, value) -> key == value.id)
+) = new {}
+definitions: Mapping<String, RuleDefinition>(
+  toMap().every((key, value) -> key == value.id)
+) = new {}

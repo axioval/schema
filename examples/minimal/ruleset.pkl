@@ -27,12 +27,13 @@ root = new RuleSets.RuleFolder {
       name = new Types.LocalizedText { default = "Walls require a reference" }
       severity = "error"
       parameters {
-        ["propertySet"] = new Values.StringValue { value = "Pset_WallCommon" }
-        ["property"] = new Values.StringValue { value = "Reference" }
+        ["property"] = new Values.PropertyReferenceValue {
+          property = "axioval:example.ifc.reference"
+          propertySet = "axioval:example.ifc.pset-wall-common"
+        }
       }
       applicability = new Selectors.EntityTypeSelector {
-        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-        typeName = "IfcWall"
+        objectType = "axioval:example.ifc.wall"
       }
       tags { "example" }
     }

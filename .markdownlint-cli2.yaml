@@ -1,0 +1,13 @@
+config:
+  MD013: false # Long URLs, badges, and tables are more readable unwrapped.
+  MD024:
+    siblings_only: true # Changelog sections repeat across releases.
+  MD030: false # Material grid cards require three-space list indentation.
+  MD033: false # GitHub centering and collapsible details use intentional HTML.
+  MD041: false # README centering and snippet-proxy pages precede included H1s.
+  MD046: false # Material content tabs require indented fenced blocks.
+
+globs:
+  - "**/*.md"
+ignores:
+  - "site/**"

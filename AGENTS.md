@@ -4,7 +4,8 @@ This repository owns the vendor-neutral authoring schema and normalized intercha
 
 ## Boundaries
 
-- `schema/` contains Pkl types, constraints, abstract package modules, and the static registry manifest schema.
+- `schema/` contains reusable object/property vocabularies, typed Pkl contracts, selectors, definitions, rulesets, and the static registry manifest schema.
+- `docs/` is the MkDocs Material source; root community files are included into the site rather than duplicated.
 - `examples/` is the only place in this repository where concrete rule instances may appear.
 - `tests/` verifies successful evaluation, rejection of invalid input, and deterministic JSON output.
 - Do not add production rulesets here. Official and community rulesets live in separate repositories and have the same trust level.
@@ -16,4 +17,6 @@ Pkl is the authoring frontend. Evaluation produces candidate JSON; `scripts/vali
 
 ## Validation
 
-Run `./scripts/check.sh`. The repository pins Pkl in `.pkl-version` and CI uses the same version.
+Run `./scripts/check.sh` for schema, binder, and snapshot validation. The repository pins Pkl in `.pkl-version` and CI uses the same version.
+
+Run `npx --yes markdownlint-cli2@0.18.1` and `uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' mkdocs build --strict` for documentation. GitHub Pages deploys only the linted, strict build from `main`.

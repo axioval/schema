@@ -1,0 +1,11 @@
+{
+  "$schema": "../../schema/registry-manifest.schema.json",
+  "manifestVersion": "0.1.0",
+  "kind": "ruleset",
+  "id": "axioval:example.din-276-331",
+  "version": "0.1.0",
+  "schemaVersion": "0.1.0",
+  "entrypoint": "ruleset.pkl",
+  "definitionEntrypoints": ["definitions.pkl"],
+  "description": "Instructional DIN 276 KG 331 package; not a normative ruleset."
+}

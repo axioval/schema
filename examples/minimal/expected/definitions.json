@@ -8,6 +8,52 @@
     "repository": "https://github.com/axioval/schema",
     "authors": []
   },
+  "objectTypes": {
+    "axioval:example.ifc.wall": {
+      "id": "axioval:example.ifc.wall",
+      "name": {
+        "default": "Wall",
+        "translations": {}
+      },
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "IfcWall"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "axioval:example.ifc.reference": {
+      "id": "axioval:example.ifc.reference",
+      "name": {
+        "default": "Reference",
+        "translations": {}
+      },
+      "valueKind": "string",
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "Reference"
+        }
+      ]
+    }
+  },
+  "propertySets": {
+    "axioval:example.ifc.pset-wall-common": {
+      "id": "axioval:example.ifc.pset-wall-common",
+      "name": {
+        "default": "Pset_WallCommon",
+        "translations": {}
+      },
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "Pset_WallCommon"
+        }
+      ]
+    }
+  },
   "definitions": {
     "axioval:example.property-exists": {
       "id": "axioval:example.property-exists",
@@ -21,23 +67,13 @@
       },
       "capability": "axioval:capability.property-exists",
       "parameters": {
-        "propertySet": {
-          "id": "propertySet",
-          "name": {
-            "default": "Property set",
-            "translations": {}
-          },
-          "kind": "string",
-          "required": true,
-          "allowedValues": []
-        },
         "property": {
           "id": "property",
           "name": {
-            "default": "Property",
+            "default": "Property reference",
             "translations": {}
           },
-          "kind": "string",
+          "kind": "propertyReference",
           "required": true,
           "allowedValues": []
         }

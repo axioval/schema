@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "0.1.0",
+  "package": {
+    "id": "axioval:example.din-276-331-definitions",
+    "name": "DIN 276 KG 331 example definitions",
+    "version": "0.1.0",
+    "description": "Instructional property vocabulary and reusable rule definition.",
+    "repository": "https://github.com/axioval/schema",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+      "Axioval contributors"
+    ]
+  },
+  "objectTypes": {
+    "axioval:example.ifc.wall": {
+      "id": "axioval:example.ifc.wall",
+      "name": {
+        "default": "Wall",
+        "translations": {}
+      },
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "IfcWall"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "axioval:example.ifc.load-bearing": {
+      "id": "axioval:example.ifc.load-bearing",
+      "name": {
+        "default": "Load bearing",
+        "translations": {}
+      },
+      "description": {
+        "default": "Whether an object is intended to carry loads.",
+        "translations": {}
+      },
+      "valueKind": "boolean",
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "LoadBearing"
+        }
+      ]
+    },
+    "axioval:example.ifc.is-external": {
+      "id": "axioval:example.ifc.is-external",
+      "name": {
+        "default": "Is external",
+        "translations": {}
+      },
+      "description": {
+        "default": "Whether an object is designed for exterior use.",
+        "translations": {}
+      },
+      "valueKind": "boolean",
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "IsExternal"
+        }
+      ]
+    }
+  },
+  "propertySets": {
+    "axioval:example.ifc.pset-wall-common": {
+      "id": "axioval:example.ifc.pset-wall-common",
+      "name": {
+        "default": "Wall common properties",
+        "translations": {}
+      },
+      "externalNames": [
+        {
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "name": "Pset_WallCommon"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "axioval:example.entity-type-equals": {
+      "id": "axioval:example.entity-type-equals",
+      "name": {
+        "default": "Entity type equals",
+        "translations": {}
+      },
+      "description": {
+        "default": "Require the selected object to have a canonical object type.",
+        "translations": {}
+      },
+      "capability": "axioval:capability.entity-type-equals",
+      "parameters": {
+        "objectType": {
+          "id": "objectType",
+          "name": {
+            "default": "Required object type",
+            "translations": {}
+          },
+          "kind": "objectTypeReference",
+          "required": true,
+          "allowedValues": []
+        }
+      },
+      "tags": [
+        "object-type"
+      ]
+    },
+    "axioval:example.boolean-property-equals": {
+      "id": "axioval:example.boolean-property-equals",
+      "name": {
+        "default": "Boolean property equals",
+        "translations": {}
+      },
+      "description": {
+        "default": "Require a canonical boolean property to equal an expected value.",
+        "translations": {}
+      },
+      "capability": "axioval:capability.property-value-equals",
+      "parameters": {
+        "property": {
+          "id": "property",
+          "name": {
+            "default": "Property reference",
+            "translations": {}
+          },
+          "kind": "propertyReference",
+          "referencedValueKind": "boolean",
+          "required": true,
+          "allowedValues": []
+        },
+        "expected": {
+          "id": "expected",
+          "name": {
+            "default": "Expected value",
+            "translations": {}
+          },
+          "kind": "boolean",
+          "required": true,
+          "allowedValues": []
+        }
+      },
+      "tags": [
+        "property",
+        "boolean"
+      ]
+    }
+  }
+}

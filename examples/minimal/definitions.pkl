@@ -11,6 +11,46 @@ package = new Types.PackageMetadata {
   repository = "https://github.com/axioval/schema"
 }
 
+objectTypes {
+  ["axioval:example.ifc.wall"] = new Definitions.ObjectTypeDefinition {
+    id = "axioval:example.ifc.wall"
+    name = new Types.LocalizedText { default = "Wall" }
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "IfcWall"
+      }
+    }
+  }
+}
+
+properties {
+  ["axioval:example.ifc.reference"] = new Definitions.PropertyDefinition {
+    id = "axioval:example.ifc.reference"
+    name = new Types.LocalizedText { default = "Reference" }
+    valueKind = "string"
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "Reference"
+      }
+    }
+  }
+}
+
+propertySets {
+  ["axioval:example.ifc.pset-wall-common"] = new Definitions.PropertySetDefinition {
+    id = "axioval:example.ifc.pset-wall-common"
+    name = new Types.LocalizedText { default = "Pset_WallCommon" }
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "Pset_WallCommon"
+      }
+    }
+  }
+}
+
 definitions {
   ["axioval:example.property-exists"] = new Definitions.RuleDefinition {
     id = "axioval:example.property-exists"
@@ -22,15 +62,10 @@ definitions {
     }
     capability = "axioval:capability.property-exists"
     parameters {
-      ["propertySet"] = new Definitions.ParameterDefinition {
-        id = "propertySet"
-        name = new Types.LocalizedText { default = "Property set" }
-        kind = "string"
-      }
       ["property"] = new Definitions.ParameterDefinition {
         id = "property"
-        name = new Types.LocalizedText { default = "Property" }
-        kind = "string"
+        name = new Types.LocalizedText { default = "Property reference" }
+        kind = "propertyReference"
       }
     }
     tags {

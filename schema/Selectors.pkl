@@ -12,21 +12,21 @@ class AllSelector extends Selector {
   kind: "all" = "all"
 }
 
-/// Select entities by a type name in a declared type system.
+/// Select entities by a reusable object-type concept.
 class EntityTypeSelector extends Selector {
   kind: "entityType" = "entityType"
-  typeSystem: Types.QualifiedIdentifier
-  typeName: String
+  objectType: Types.QualifiedIdentifier
   includeSubtypes: Boolean = true
 }
 
 typealias ComparisonOperator = "equals" | "notEquals" | "lessThan" | "lessThanOrEquals" | "greaterThan" | "greaterThanOrEquals" | "matches" | "exists"
 
-/// Select entities using a typed property source.
+/// Select entities using a canonical property concept. `propertySet` is an
+/// optional exact container qualifier, never an ownership hierarchy.
 class PropertySelector extends Selector {
   kind: "property" = "property"
-  propertySet: String?
-  property: String
+  propertySet: Types.QualifiedIdentifier?
+  property: Types.QualifiedIdentifier
   operator: ComparisonOperator
   value: Values.ParameterValue?
 }

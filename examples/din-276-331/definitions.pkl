@@ -1,0 +1,112 @@
+amends "../../schema/Definitions.pkl"
+
+import "../../schema/Types.pkl"
+import "../../schema/Definitions.pkl"
+
+package = new Types.PackageMetadata {
+  id = "axioval:example.din-276-331-definitions"
+  version = "0.1.0"
+  name = "DIN 276 KG 331 example definitions"
+  description = "Instructional property vocabulary and reusable rule definition."
+  repository = "https://github.com/axioval/schema"
+  license = "AGPL-3.0-or-later"
+  authors { "Axioval contributors" }
+}
+
+objectTypes {
+  ["axioval:example.ifc.wall"] = new Definitions.ObjectTypeDefinition {
+    id = "axioval:example.ifc.wall"
+    name = new Types.LocalizedText { default = "Wall" }
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "IfcWall"
+      }
+    }
+  }
+}
+
+properties {
+  ["axioval:example.ifc.load-bearing"] = new Definitions.PropertyDefinition {
+    id = "axioval:example.ifc.load-bearing"
+    name = new Types.LocalizedText { default = "Load bearing" }
+    description = new Types.LocalizedText {
+      default = "Whether an object is intended to carry loads."
+    }
+    valueKind = "boolean"
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "LoadBearing"
+      }
+    }
+  }
+  ["axioval:example.ifc.is-external"] = new Definitions.PropertyDefinition {
+    id = "axioval:example.ifc.is-external"
+    name = new Types.LocalizedText { default = "Is external" }
+    description = new Types.LocalizedText {
+      default = "Whether an object is designed for exterior use."
+    }
+    valueKind = "boolean"
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "IsExternal"
+      }
+    }
+  }
+}
+
+propertySets {
+  ["axioval:example.ifc.pset-wall-common"] = new Definitions.PropertySetDefinition {
+    id = "axioval:example.ifc.pset-wall-common"
+    name = new Types.LocalizedText { default = "Wall common properties" }
+    externalNames {
+      new Definitions.ExternalName {
+        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+        name = "Pset_WallCommon"
+      }
+    }
+  }
+}
+
+definitions {
+  ["axioval:example.entity-type-equals"] = new Definitions.RuleDefinition {
+    id = "axioval:example.entity-type-equals"
+    name = new Types.LocalizedText { default = "Entity type equals" }
+    description = new Types.LocalizedText {
+      default = "Require the selected object to have a canonical object type."
+    }
+    capability = "axioval:capability.entity-type-equals"
+    tags { "object-type" }
+    parameters {
+      ["objectType"] = new Definitions.ParameterDefinition {
+        id = "objectType"
+        name = new Types.LocalizedText { default = "Required object type" }
+        kind = "objectTypeReference"
+      }
+    }
+  }
+  ["axioval:example.boolean-property-equals"] = new Definitions.RuleDefinition {
+    id = "axioval:example.boolean-property-equals"
+    name = new Types.LocalizedText { default = "Boolean property equals" }
+    description = new Types.LocalizedText {
+      default = "Require a canonical boolean property to equal an expected value."
+    }
+    capability = "axioval:capability.property-value-equals"
+    tags { "property"; "boolean" }
+    parameters {
+      ["property"] = new Definitions.ParameterDefinition {
+        id = "property"
+        name = new Types.LocalizedText { default = "Property reference" }
+        kind = "propertyReference"
+        referencedValueKind = "boolean"
+      }
+      ["expected"] = new Definitions.ParameterDefinition {
+        id = "expected"
+        name = new Types.LocalizedText { default = "Expected value" }
+        kind = "boolean"
+      }
+    }
+  }
+}

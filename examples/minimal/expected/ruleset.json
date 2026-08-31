@@ -28,19 +28,15 @@
         "enabled": true,
         "severity": "error",
         "parameters": {
-          "propertySet": {
-            "type": "string",
-            "value": "Pset_WallCommon"
-          },
           "property": {
-            "type": "string",
-            "value": "Reference"
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.reference",
+            "propertySet": "axioval:example.ifc.pset-wall-common"
           }
         },
         "applicability": {
           "kind": "entityType",
-          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
-          "typeName": "IfcWall",
+          "objectType": "axioval:example.ifc.wall",
           "includeSubtypes": true
         },
         "tags": [

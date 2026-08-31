@@ -42,6 +42,21 @@ class ReferenceValue extends ParameterValue {
   value: Types.QualifiedIdentifier
 }
 
+class ObjectTypeReferenceValue extends ParameterValue {
+  type: "objectTypeReference" = "objectTypeReference"
+  objectType: Types.QualifiedIdentifier
+  includeSubtypes: Boolean = true
+}
+
+/// A canonical property concept with an optional container qualifier.
+/// Omit `propertySet` to resolve the property regardless of container. Supply it
+/// when membership in that exact property set is part of the requirement.
+class PropertyReferenceValue extends ParameterValue {
+  type: "propertyReference" = "propertyReference"
+  property: Types.QualifiedIdentifier
+  propertySet: Types.QualifiedIdentifier?
+}
+
 class StringListValue extends ParameterValue {
   type: "stringList" = "stringList"
   value: Listing<String>

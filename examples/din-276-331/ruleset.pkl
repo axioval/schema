@@ -1,0 +1,90 @@
+amends "../../schema/RuleSets.pkl"
+
+import "../../schema/Types.pkl"
+import "../../schema/Values.pkl"
+import "../../schema/Selectors.pkl"
+import "../../schema/RuleSets.pkl"
+
+package = new Types.PackageMetadata {
+  id = "axioval:example.din-276-331"
+  version = "0.1.0"
+  name = "DIN 276 KG 331 load-bearing external wall example"
+  description = "Instructional DIN 276 KG 331 rule instances."
+  repository = "https://github.com/axioval/schema"
+  license = "AGPL-3.0-or-later"
+  authors { "Axioval contributors" }
+}
+
+definitionPackages {
+  "axioval:example.din-276-331-definitions"
+}
+
+local kg331Objects = new Selectors.ClassificationSelector {
+  system = "DIN 276:2018-12"
+  code = "331"
+  includeDescendants = false
+}
+
+root = new RuleSets.RuleFolder {
+  id = "din-276-331"
+  name = new Types.LocalizedText {
+    default = "DIN 276 KG 331 — load-bearing external walls"
+  }
+  description = new Types.LocalizedText {
+    default = "Example requirements for wall objects classified as KG 331."
+  }
+  rules {
+    new RuleSets.RuleInstance {
+      id = "kg331-is-wall"
+      definitionId = "axioval:example.entity-type-equals"
+      name = new Types.LocalizedText { default = "KG 331 objects are walls" }
+      message = new Types.LocalizedText {
+        default = "DIN 276 KG 331 object must be an IfcWall."
+      }
+      severity = "error"
+      parameters {
+        ["objectType"] = new Values.ObjectTypeReferenceValue {
+          objectType = "axioval:example.ifc.wall"
+          includeSubtypes = true
+        }
+      }
+      applicability = kg331Objects
+      tags { "din-276"; "cost-group-331"; "object-type" }
+    }
+    new RuleSets.RuleInstance {
+      id = "kg331-load-bearing"
+      definitionId = "axioval:example.boolean-property-equals"
+      name = new Types.LocalizedText { default = "KG 331 walls are load bearing" }
+      message = new Types.LocalizedText {
+        default = "DIN 276 KG 331 wall must have LoadBearing = TRUE in Pset_WallCommon."
+      }
+      severity = "error"
+      parameters {
+        ["property"] = new Values.PropertyReferenceValue {
+          property = "axioval:example.ifc.load-bearing"
+          propertySet = "axioval:example.ifc.pset-wall-common"
+        }
+        ["expected"] = new Values.BooleanValue { value = true }
+      }
+      applicability = kg331Objects
+      tags { "din-276"; "cost-group-331"; "strict-container" }
+    }
+    new RuleSets.RuleInstance {
+      id = "kg331-is-external"
+      definitionId = "axioval:example.boolean-property-equals"
+      name = new Types.LocalizedText { default = "KG 331 walls are external" }
+      message = new Types.LocalizedText {
+        default = "DIN 276 KG 331 wall must have IsExternal = TRUE."
+      }
+      severity = "error"
+      parameters {
+        ["property"] = new Values.PropertyReferenceValue {
+          property = "axioval:example.ifc.is-external"
+        }
+        ["expected"] = new Values.BooleanValue { value = true }
+      }
+      applicability = kg331Objects
+      tags { "din-276"; "cost-group-331"; "container-agnostic" }
+    }
+  }
+}

@@ -51,6 +51,11 @@ class BindingTests(unittest.TestCase):
         expected = validate.ROOT / "examples/minimal/expected"
         cls.definitions = json.loads((expected / "definitions.json").read_text())
         cls.ruleset = json.loads((expected / "ruleset.json").read_text())
+        din_expected = validate.ROOT / "examples/din-276-331/expected"
+        cls.din_definitions = json.loads(
+            (din_expected / "definitions.json").read_text()
+        )
+        cls.din_ruleset = json.loads((din_expected / "ruleset.json").read_text())
 
     def copies(self) -> tuple[dict, dict]:
         return copy.deepcopy(self.ruleset), copy.deepcopy(self.definitions)
@@ -80,7 +85,10 @@ class BindingTests(unittest.TestCase):
         ruleset, definitions = self.copies()
         definitions["definitions"]["axioval:example.property-exists"]["parameters"][
             "property"
-        ]["defaultValue"] = {"type": "string", "value": "Reference"}
+        ]["defaultValue"] = {
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.reference",
+        }
         del ruleset["root"]["rules"][0]["parameters"]["property"]
         with self.assertRaises(SystemExit):
             validate.bind_ruleset(ruleset, [definitions], "test")
@@ -91,6 +99,91 @@ class BindingTests(unittest.TestCase):
             "type": "boolean",
             "value": True,
         }
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_quantity_property_requires_unit_dimension(self) -> None:
+        ruleset, definitions = self.copies()
+        property_definition = definitions["properties"]["axioval:example.ifc.reference"]
+        property_definition["valueKind"] = "quantity"
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+        property_definition["unitDimension"] = "axioval:dimension.length"
+        validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_component_id_reused_across_kinds(self) -> None:
+        ruleset, definitions = self.copies()
+        property_definition = definitions["properties"].pop(
+            "axioval:example.ifc.reference"
+        )
+        property_definition["id"] = "axioval:example.ifc.wall"
+        definitions["properties"]["axioval:example.ifc.wall"] = property_definition
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_din_fixture_encodes_all_three_requirements(self) -> None:
+        rules = self.din_ruleset["root"]["rules"]
+        self.assertEqual(
+            [rule["id"] for rule in rules],
+            ["kg331-is-wall", "kg331-load-bearing", "kg331-is-external"],
+        )
+        self.assertTrue(
+            all(rule["applicability"]["kind"] == "classification" for rule in rules)
+        )
+        self.assertTrue(all(rule["applicability"]["code"] == "331" for rule in rules))
+        self.assertEqual(
+            rules[0]["parameters"]["objectType"]["objectType"],
+            "axioval:example.ifc.wall",
+        )
+        strict = rules[1]["parameters"]["property"]
+        loose = rules[2]["parameters"]["property"]
+        self.assertEqual(strict["propertySet"], "axioval:example.ifc.pset-wall-common")
+        self.assertNotIn("propertySet", loose)
+        self.assertTrue(
+            all(rule["parameters"]["expected"]["value"] for rule in rules[1:])
+        )
+
+    def test_rejects_unknown_object_type_reference(self) -> None:
+        ruleset = copy.deepcopy(self.din_ruleset)
+        definitions = copy.deepcopy(self.din_definitions)
+        ruleset["root"]["rules"][0]["parameters"]["objectType"]["objectType"] = (
+            "axioval:unknown.object-type"
+        )
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_unknown_object_type_concept(self) -> None:
+        ruleset, definitions = self.copies()
+        ruleset["root"]["rules"][0]["applicability"]["objectType"] = (
+            "axioval:unknown.object-type"
+        )
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_property_set_qualifier_is_optional_but_exact_when_present(self) -> None:
+        ruleset, definitions = self.copies()
+        strict = ruleset["root"]["rules"][0]["parameters"]["property"]
+        self.assertIn("propertySet", strict)
+        validate.bind_ruleset(ruleset, [definitions], "test")
+
+        loose_ruleset, loose_definitions = self.copies()
+        del loose_ruleset["root"]["rules"][0]["parameters"]["property"]["propertySet"]
+        validate.bind_ruleset(loose_ruleset, [loose_definitions], "test")
+
+    def test_rejects_unknown_property_and_property_set_concepts(self) -> None:
+        for field in ("property", "propertySet"):
+            ruleset, definitions = self.copies()
+            ruleset["root"]["rules"][0]["parameters"]["property"][field] = (
+                f"axioval:unknown.{field}"
+            )
+            with self.subTest(field=field), self.assertRaises(SystemExit):
+                validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_referenced_value_kind_is_enforced(self) -> None:
+        ruleset, definitions = self.copies()
+        definitions["definitions"]["axioval:example.property-exists"]["parameters"][
+            "property"
+        ]["referencedValueKind"] = "boolean"
         with self.assertRaises(SystemExit):
             validate.bind_ruleset(ruleset, [definitions], "test")
 
@@ -111,8 +204,12 @@ class BindingTests(unittest.TestCase):
         parameter = definitions["definitions"]["axioval:example.property-exists"][
             "parameters"
         ]["property"]
-        parameter["defaultValue"] = {"type": "string", "value": "Reference"}
-        parameter["allowedValues"] = [{"type": "string", "value": "Reference"}]
+        reference = {
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.reference",
+        }
+        parameter["defaultValue"] = copy.deepcopy(reference)
+        parameter["allowedValues"] = [reference]
         validate.validate_definition_document(definitions, "test")
 
     def test_rejects_incompatible_definition_default(self) -> None:
@@ -131,7 +228,12 @@ class BindingTests(unittest.TestCase):
         ruleset, definitions = self.copies()
         definitions["definitions"]["axioval:example.property-exists"]["parameters"][
             "property"
-        ]["allowedValues"] = [{"type": "string", "value": "Other"}]
+        ]["allowedValues"] = [
+            {
+                "type": "propertyReference",
+                "property": "axioval:example.ifc.reference",
+            }
+        ]
         with self.assertRaises(SystemExit):
             validate.bind_ruleset(ruleset, [definitions], "test")
 
@@ -192,7 +294,7 @@ class SelectorTests(unittest.TestCase):
             validate_selector(
                 {
                     "kind": "property",
-                    "property": "Reference",
+                    "property": "axioval:example.ifc.reference",
                     "operator": "exists",
                     "value": {"type": "string", "value": "x"},
                 },
@@ -200,7 +302,11 @@ class SelectorTests(unittest.TestCase):
             )
         with self.assertRaises(SystemExit):
             validate_selector(
-                {"kind": "property", "property": "Reference", "operator": "equals"},
+                {
+                    "kind": "property",
+                    "property": "axioval:example.ifc.reference",
+                    "operator": "equals",
+                },
                 "test",
             )
 

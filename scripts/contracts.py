@@ -18,11 +18,16 @@ VALUE_KINDS = {
     "quantity",
     "enum",
     "reference",
+    "objectTypeReference",
+    "propertyReference",
     "stringList",
     "referenceList",
 }
 VALUE_KEYS = {kind: {"type", "value"} for kind in VALUE_KINDS}
 VALUE_KEYS["quantity"] = {"type", "value", "unit"}
+VALUE_KEYS["objectTypeReference"] = {"type", "objectType", "includeSubtypes"}
+VALUE_KEYS["propertyReference"] = {"type", "property"}
+PROPERTY_VALUE_KINDS = VALUE_KINDS - {"objectTypeReference", "propertyReference"}
 SELECTOR_OPERATORS = {
     "equals",
     "notEquals",
@@ -116,7 +121,24 @@ def parameter_value(
         fail(
             context, f"expected {expected_kind or 'known'} value variant, got {kind!r}"
         )
-    exact_keys(value, VALUE_KEYS[kind], set(), context)
+    optional = {"propertySet"} if kind == "propertyReference" else set()
+    exact_keys(value, VALUE_KEYS[kind], optional, context)
+    if kind == "objectTypeReference":
+        if (
+            type(value["objectType"]) is not str
+            or not QUALIFIED_ID.fullmatch(value["objectType"])
+            or type(value["includeSubtypes"]) is not bool
+        ):
+            fail(context, "invalid object-type reference")
+        return value
+    if kind == "propertyReference":
+        for field in ("property", "propertySet"):
+            if field in value and (
+                type(value[field]) is not str
+                or not QUALIFIED_ID.fullmatch(value[field])
+            ):
+                fail(context, f"{field} must be a qualified identifier")
+        return value
     item = value["value"]
     if kind in {"string", "enum", "reference"}:
         if type(item) is not str:
@@ -146,12 +168,45 @@ def parameter_value(
     return value
 
 
+def resolve_object_type_reference(
+    value: dict[str, Any], object_types: dict[str, dict[str, Any]], context: str
+) -> None:
+    if (
+        value["type"] == "objectTypeReference"
+        and value["objectType"] not in object_types
+    ):
+        fail(context, f"unknown object-type concept {value['objectType']!r}")
+
+
+def resolve_property_reference(
+    value: dict[str, Any],
+    properties: dict[str, dict[str, Any]],
+    property_sets: dict[str, dict[str, Any]],
+    context: str,
+    expected_value_kind: str | None = None,
+) -> None:
+    if value["type"] != "propertyReference":
+        return
+    if value["property"] not in properties:
+        fail(context, f"unknown property concept {value['property']!r}")
+    if (
+        expected_value_kind is not None
+        and properties[value["property"]]["valueKind"] != expected_value_kind
+    ):
+        fail(
+            context,
+            f"property concept has value kind {properties[value['property']]['valueKind']!r}, expected {expected_value_kind!r}",
+        )
+    if "propertySet" in value and value["propertySet"] not in property_sets:
+        fail(context, f"unknown property-set concept {value['propertySet']!r}")
+
+
 def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
     value = object_value(value, context)
     exact_keys(
         value,
         {"id", "name", "kind", "required", "allowedValues"},
-        {"defaultValue", "unitDimension", "description"},
+        {"defaultValue", "unitDimension", "description", "referencedValueKind"},
         context,
     )
     if type(value["id"]) is not str or not IDENTIFIER.fullmatch(value["id"]):
@@ -172,6 +227,14 @@ def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
             fail(context, "quantity parameters require unitDimension")
     elif "unitDimension" in value:
         fail(context, "unitDimension is only valid for quantity parameters")
+    referenced_kind = value.get("referencedValueKind")
+    if referenced_kind is not None and (
+        kind != "propertyReference" or referenced_kind not in PROPERTY_VALUE_KINDS
+    ):
+        fail(
+            context,
+            "referencedValueKind requires a propertyReference parameter and valid value kind",
+        )
     if "defaultValue" in value:
         parameter_value(value["defaultValue"], kind, f"{context}.defaultValue")
     allowed = list_value(value["allowedValues"], f"{context}.allowedValues")
@@ -189,15 +252,108 @@ def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
     return value
 
 
+def external_names(value: Any, context: str) -> None:
+    entries = list_value(value, context)
+    if not entries:
+        fail(context, "at least one external name is required")
+    systems: set[str] = set()
+    for index, entry in enumerate(entries):
+        entry_context = f"{context}[{index}]"
+        entry = object_value(entry, entry_context)
+        exact_keys(entry, {"typeSystem", "name"}, set(), entry_context)
+        system = entry["typeSystem"]
+        if type(system) is not str or not QUALIFIED_ID.fullmatch(system):
+            fail(entry_context, "invalid type system")
+        if type(entry["name"]) is not str or not entry["name"]:
+            fail(entry_context, "external name must be non-empty")
+        if system in systems:
+            fail(entry_context, "duplicate type-system binding")
+        systems.add(system)
+
+
+def validate_concept(
+    value: Any, expected_id: str, context: str, *, property_definition: bool
+) -> dict[str, Any]:
+    value = object_value(value, context)
+    required = {"id", "name", "externalNames"}
+    if property_definition:
+        required.add("valueKind")
+    optional = (
+        {"description", "unitDimension"} if property_definition else {"description"}
+    )
+    exact_keys(value, required, optional, context)
+    if value["id"] != expected_id or not QUALIFIED_ID.fullmatch(expected_id):
+        fail(context, "map key and concept id must match")
+    localized_text(value["name"], f"{context}.name")
+    if "description" in value:
+        localized_text(value["description"], f"{context}.description")
+    if property_definition:
+        value_kind = value["valueKind"]
+        if value_kind not in PROPERTY_VALUE_KINDS:
+            fail(context, "invalid property value kind")
+        unit_dimension = value.get("unitDimension")
+        if value_kind == "quantity":
+            if type(unit_dimension) is not str or not QUALIFIED_ID.fullmatch(
+                unit_dimension
+            ):
+                fail(context, "quantity properties require a qualified unitDimension")
+        elif unit_dimension is not None:
+            fail(context, "unitDimension is only valid for quantity properties")
+    external_names(value["externalNames"], f"{context}.externalNames")
+    return value
+
+
 def validate_definition_document(
     value: Any, context: str
-) -> tuple[str, dict[str, dict[str, Any]]]:
+) -> tuple[
+    str,
+    dict[str, dict[str, Any]],
+    dict[str, dict[str, Any]],
+    dict[str, dict[str, Any]],
+    dict[str, dict[str, Any]],
+]:
     value = object_value(value, context)
-    exact_keys(value, {"schemaVersion", "package", "definitions"}, set(), context)
+    exact_keys(
+        value,
+        {
+            "schemaVersion",
+            "package",
+            "objectTypes",
+            "properties",
+            "propertySets",
+            "definitions",
+        },
+        set(),
+        context,
+    )
     package_id = package_metadata(value["package"], f"{context}.package")
+    object_types = object_value(value["objectTypes"], f"{context}.objectTypes")
+    properties = object_value(value["properties"], f"{context}.properties")
+    property_sets = object_value(value["propertySets"], f"{context}.propertySets")
     definitions = object_value(value["definitions"], f"{context}.definitions")
-    if not definitions:
+    if not (object_types or properties or property_sets or definitions):
         fail(context, "definition package is empty")
+    for object_type_id, object_type in object_types.items():
+        validate_concept(
+            object_type,
+            object_type_id,
+            f"{context}.objectTypes[{object_type_id!r}]",
+            property_definition=False,
+        )
+    for property_id, property_definition in properties.items():
+        validate_concept(
+            property_definition,
+            property_id,
+            f"{context}.properties[{property_id!r}]",
+            property_definition=True,
+        )
+    for property_set_id, property_set in property_sets.items():
+        validate_concept(
+            property_set,
+            property_set_id,
+            f"{context}.propertySets[{property_set_id!r}]",
+            property_definition=False,
+        )
     for definition_id, definition in definitions.items():
         definition_context = f"{context}.definitions[{definition_id!r}]"
         definition = object_value(definition, definition_context)
@@ -230,10 +386,16 @@ def validate_definition_document(
             if parameter_id != validated["id"]:
                 fail(definition_context, "parameter map key and id must match")
         string_list(definition["tags"], f"{definition_context}.tags")
-    return package_id, definitions
+    return package_id, definitions, object_types, properties, property_sets
 
 
-def validate_selector(value: Any, context: str) -> None:
+def validate_selector(
+    value: Any,
+    context: str,
+    object_types: dict[str, dict[str, Any]] | None = None,
+    properties: dict[str, dict[str, Any]] | None = None,
+    property_sets: dict[str, dict[str, Any]] | None = None,
+) -> None:
     value = object_value(value, context)
     kind = value.get("kind")
     if type(kind) is not str:
@@ -241,17 +403,15 @@ def validate_selector(value: Any, context: str) -> None:
     if kind == "all":
         exact_keys(value, {"kind"}, set(), context)
     elif kind == "entityType":
-        exact_keys(
-            value, {"kind", "typeSystem", "typeName", "includeSubtypes"}, set(), context
-        )
+        exact_keys(value, {"kind", "objectType", "includeSubtypes"}, set(), context)
         if (
-            type(value["typeSystem"]) is not str
-            or not QUALIFIED_ID.fullmatch(value["typeSystem"])
-            or type(value["typeName"]) is not str
-            or not value["typeName"]
+            type(value["objectType"]) is not str
+            or not QUALIFIED_ID.fullmatch(value["objectType"])
             or type(value["includeSubtypes"]) is not bool
         ):
             fail(context, "invalid entity type selector")
+        if object_types is not None and value["objectType"] not in object_types:
+            fail(context, "unknown object-type concept")
     elif kind == "property":
         exact_keys(
             value, {"kind", "property", "operator"}, {"propertySet", "value"}, context
@@ -261,19 +421,33 @@ def validate_selector(value: Any, context: str) -> None:
             type(operator) is not str
             or operator not in SELECTOR_OPERATORS
             or type(value["property"]) is not str
-            or not value["property"]
+            or not QUALIFIED_ID.fullmatch(value["property"])
         ):
             fail(context, "invalid property selector")
+        if properties is not None and value["property"] not in properties:
+            fail(context, "unknown property concept")
         if "propertySet" in value and (
-            type(value["propertySet"]) is not str or not value["propertySet"]
+            type(value["propertySet"]) is not str
+            or not QUALIFIED_ID.fullmatch(value["propertySet"])
         ):
-            fail(context, "propertySet must be a non-empty string")
+            fail(context, "propertySet must be a qualified identifier")
+        if (
+            property_sets is not None
+            and "propertySet" in value
+            and value["propertySet"] not in property_sets
+        ):
+            fail(context, "unknown property-set concept")
         if operator == "exists" and "value" in value:
             fail(context, "exists selector must not have a value")
         if operator != "exists" and "value" not in value:
             fail(context, "comparison selector requires a value")
         if "value" in value:
-            checked = parameter_value(value["value"], None, f"{context}.value")
+            expected_kind = (
+                properties[value["property"]]["valueKind"]
+                if properties is not None and value["property"] in properties
+                else None
+            )
+            checked = parameter_value(value["value"], expected_kind, f"{context}.value")
             if operator == "matches" and checked["type"] != "string":
                 fail(context, "matches requires a string value")
     elif kind == "classification":
@@ -294,10 +468,22 @@ def validate_selector(value: Any, context: str) -> None:
         if not operands:
             fail(context, "compound selector requires operands")
         for index, operand in enumerate(operands):
-            validate_selector(operand, f"{context}.operands[{index}]")
+            validate_selector(
+                operand,
+                f"{context}.operands[{index}]",
+                object_types,
+                properties,
+                property_sets,
+            )
     elif kind == "not":
         exact_keys(value, {"kind", "operand"}, set(), context)
-        validate_selector(value["operand"], f"{context}.operand")
+        validate_selector(
+            value["operand"],
+            f"{context}.operand",
+            object_types,
+            properties,
+            property_sets,
+        )
     else:
         fail(context, f"unknown selector kind {kind!r}")
 
@@ -323,9 +509,18 @@ def bind_ruleset(
     ):
         fail(context, "definitionPackages must be non-empty, qualified, and unique")
     definitions: dict[str, dict[str, Any]] = {}
+    object_types: dict[str, dict[str, Any]] = {}
+    properties: dict[str, dict[str, Any]] = {}
+    property_sets: dict[str, dict[str, Any]] = {}
     loaded_packages: set[str] = set()
     for index, document in enumerate(definition_documents):
-        package_id, package_definitions = validate_definition_document(
+        (
+            package_id,
+            package_definitions,
+            package_object_types,
+            package_properties,
+            package_property_sets,
+        ) = validate_definition_document(
             document, f"{context}.definitionDocuments[{index}]"
         )
         if package_id in loaded_packages:
@@ -335,6 +530,62 @@ def bind_ruleset(
         if overlap:
             fail(context, f"duplicate definition ids {sorted(overlap)}")
         definitions.update(package_definitions)
+        object_type_overlap = object_types.keys() & package_object_types.keys()
+        if object_type_overlap:
+            fail(
+                context, f"duplicate object-type concepts {sorted(object_type_overlap)}"
+            )
+        object_types.update(package_object_types)
+        property_overlap = properties.keys() & package_properties.keys()
+        property_set_overlap = property_sets.keys() & package_property_sets.keys()
+        if property_overlap or property_set_overlap:
+            fail(
+                context,
+                "duplicate property concepts "
+                f"{sorted(property_overlap | property_set_overlap)}",
+            )
+        properties.update(package_properties)
+        property_sets.update(package_property_sets)
+    component_kinds: dict[str, str] = {}
+    for kind, components in (
+        ("rule definition", definitions),
+        ("object type", object_types),
+        ("property", properties),
+        ("property set", property_sets),
+    ):
+        for component_id in components:
+            if component_id in component_kinds:
+                fail(
+                    context,
+                    f"component id {component_id!r} is both {component_kinds[component_id]} and {kind}",
+                )
+            component_kinds[component_id] = kind
+    for definition_id, definition in definitions.items():
+        for parameter_id, parameter in definition["parameters"].items():
+            for field in ("defaultValue",):
+                if field in parameter:
+                    candidate = parameter[field]
+                    value_context = f"{context}.definitions[{definition_id!r}].parameters[{parameter_id!r}].{field}"
+                    resolve_object_type_reference(
+                        candidate, object_types, value_context
+                    )
+                    resolve_property_reference(
+                        candidate,
+                        properties,
+                        property_sets,
+                        value_context,
+                        parameter.get("referencedValueKind"),
+                    )
+            for index, allowed in enumerate(parameter["allowedValues"]):
+                allowed_context = f"{context}.definitions[{definition_id!r}].parameters[{parameter_id!r}].allowedValues[{index}]"
+                resolve_object_type_reference(allowed, object_types, allowed_context)
+                resolve_property_reference(
+                    allowed,
+                    properties,
+                    property_sets,
+                    allowed_context,
+                    parameter.get("referencedValueKind"),
+                )
     if set(declared_list) != loaded_packages:
         fail(
             context,
@@ -422,6 +673,18 @@ def bind_ruleset(
                     parameter["kind"],
                     f"{rule_context}.parameters[{parameter_id!r}]",
                 )
+                resolve_object_type_reference(
+                    checked,
+                    object_types,
+                    f"{rule_context}.parameters[{parameter_id!r}]",
+                )
+                resolve_property_reference(
+                    checked,
+                    properties,
+                    property_sets,
+                    f"{rule_context}.parameters[{parameter_id!r}]",
+                    parameter.get("referencedValueKind"),
+                )
                 if (
                     parameter["allowedValues"]
                     and checked not in parameter["allowedValues"]
@@ -430,7 +693,13 @@ def bind_ruleset(
                         rule_context,
                         f"parameter {parameter_id!r} is outside allowedValues",
                     )
-            validate_selector(rule["applicability"], f"{rule_context}.applicability")
+            validate_selector(
+                rule["applicability"],
+                f"{rule_context}.applicability",
+                object_types,
+                properties,
+                property_sets,
+            )
         for index, child in enumerate(
             list_value(folder["folders"], f"{folder_context}.folders")
         ):
