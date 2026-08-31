@@ -1,9 +1,6 @@
 site_name: Axioval Schema
 site_description: Vendor-neutral typed authoring and interchange for validation rules
 site_url: https://axioval.github.io/schema/
-repo_url: https://github.com/axioval/schema
-repo_name: axioval/schema
-edit_uri: edit/main/docs/
 copyright: Copyright &copy; Axioval contributors · AGPL-3.0-or-later
 
 docs_dir: docs
@@ -21,7 +18,6 @@ theme:
     - navigation.sections
     - navigation.top
     - navigation.footer
-    - content.action.edit
     - content.code.copy
     - content.tabs.link
     - search.highlight
@@ -56,6 +52,7 @@ nav:
       - Schema surface: reference/schema.md
       - Package contract: package-contract.md
   - Project:
+      - GitHub repository: https://github.com/axioval/schema
       - Contributing: community/contributing.md
       - Changelog: community/changelog.md
       - Roadmap: community/roadmap.md
