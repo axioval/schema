@@ -1,0 +1,20 @@
+module selectorValue
+
+import "../../schema/Selectors.pkl"
+import "../../schema/SelectorValues.pkl"
+
+value = new SelectorValues.SelectorValue {
+  value = new Selectors.AllOfSelector {
+    operands {
+      new Selectors.EntityTypeSelector {
+        objectType = "axioval:example.ifc.wall"
+      }
+      new Selectors.NotSelector {
+        operand = new Selectors.ClassificationSelector {
+          system = "Uniclass"
+          code = "Ss_25"
+        }
+      }
+    }
+  }
+}

@@ -20,6 +20,7 @@ VALUE_KINDS = {
     "reference",
     "objectTypeReference",
     "propertyReference",
+    "selector",
     "stringList",
     "referenceList",
 }
@@ -27,7 +28,11 @@ VALUE_KEYS = {kind: {"type", "value"} for kind in VALUE_KINDS}
 VALUE_KEYS["quantity"] = {"type", "value", "unit"}
 VALUE_KEYS["objectTypeReference"] = {"type", "objectType", "includeSubtypes"}
 VALUE_KEYS["propertyReference"] = {"type", "property"}
-PROPERTY_VALUE_KINDS = VALUE_KINDS - {"objectTypeReference", "propertyReference"}
+PROPERTY_VALUE_KINDS = VALUE_KINDS - {
+    "objectTypeReference",
+    "propertyReference",
+    "selector",
+}
 SELECTOR_OPERATORS = {
     "equals",
     "notEquals",
@@ -140,6 +145,9 @@ def parameter_value(
                 fail(context, f"{field} must be a qualified identifier")
         return value
     item = value["value"]
+    if kind == "selector":
+        validate_selector(item, f"{context}.value")
+        return value
     if kind in {"string", "enum", "reference"}:
         if type(item) is not str:
             fail(context, "value must be a string")
@@ -199,6 +207,17 @@ def resolve_property_reference(
         )
     if "propertySet" in value and value["propertySet"] not in property_sets:
         fail(context, f"unknown property-set concept {value['propertySet']!r}")
+
+
+def resolve_selector_value(
+    value: dict[str, Any],
+    object_types: dict[str, dict[str, Any]],
+    properties: dict[str, dict[str, Any]],
+    property_sets: dict[str, dict[str, Any]],
+    context: str,
+) -> None:
+    if value["type"] == "selector":
+        validate_selector(value["value"], context, object_types, properties, property_sets)
 
 
 def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
@@ -566,6 +585,13 @@ def bind_ruleset(
                 if field in parameter:
                     candidate = parameter[field]
                     value_context = f"{context}.definitions[{definition_id!r}].parameters[{parameter_id!r}].{field}"
+                    resolve_selector_value(
+                        candidate,
+                        object_types,
+                        properties,
+                        property_sets,
+                        value_context,
+                    )
                     resolve_object_type_reference(
                         candidate, object_types, value_context
                     )
@@ -578,6 +604,13 @@ def bind_ruleset(
                     )
             for index, allowed in enumerate(parameter["allowedValues"]):
                 allowed_context = f"{context}.definitions[{definition_id!r}].parameters[{parameter_id!r}].allowedValues[{index}]"
+                resolve_selector_value(
+                    allowed,
+                    object_types,
+                    properties,
+                    property_sets,
+                    allowed_context,
+                )
                 resolve_object_type_reference(allowed, object_types, allowed_context)
                 resolve_property_reference(
                     allowed,
@@ -672,6 +705,13 @@ def bind_ruleset(
                     binding,
                     parameter["kind"],
                     f"{rule_context}.parameters[{parameter_id!r}]",
+                )
+                resolve_selector_value(
+                    checked,
+                    object_types,
+                    properties,
+                    property_sets,
+                    f"{rule_context}.parameters[{parameter_id!r}].value",
                 )
                 resolve_object_type_reference(
                     checked,

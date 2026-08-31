@@ -3,7 +3,7 @@ module axioval.schema.Definitions
 import "Types.pkl"
 import "Values.pkl"
 
-typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "objectTypeReference" | "propertyReference" | "stringList" | "referenceList"
+typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "objectTypeReference" | "propertyReference" | "selector" | "stringList" | "referenceList"
 typealias PropertyValueKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "stringList" | "referenceList"
 
 /// One external-schema name for a canonical property or container concept.

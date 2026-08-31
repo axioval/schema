@@ -108,7 +108,7 @@ Install [Pkl 0.32.1](https://pkl-lang.org/) and run:
 ```bash
 PATH="$HOME/.local/bin:$PATH" ./scripts/check.sh
 npx --yes markdownlint-cli2@0.18.1
-uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' --with 'Pygments==2.19.2' mkdocs build --strict
+uvx --with-requirements requirements-docs.txt mkdocs build --strict
 ```
 
 The first command validates every example manifest, evaluates all declared

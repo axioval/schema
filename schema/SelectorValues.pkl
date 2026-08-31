@@ -1,0 +1,14 @@
+module axioval.schema.SelectorValues
+
+import "Selectors.pkl"
+import "Values.pkl"
+
+/// A full source-neutral selector carried as a rule parameter.
+///
+/// Keep this extension separate from `Values.pkl`: selectors already consume
+/// scalar parameter values for property predicates, so importing selectors
+/// back into that module would create a schema cycle.
+class SelectorValue extends Values.ParameterValue {
+  type: "selector" = "selector"
+  value: Selectors.Selector
+}

@@ -57,6 +57,38 @@ Eine Eigenschaftsreferenz benennt immer eine kanonische `PropertyDefinition`.
 
 Property-Set-Qualifizierer besitzen keine Eigenschaften und sind keine Ausführungsordner.
 
+## Selektorwerte als Parameter
+
+Eine Fähigkeit mit einem zweiten Objektbereich deklariert einen Parameter mit
+`kind = "selector"`. Die Regel bindet über
+`SelectorValues.SelectorValue` einen vollständigen Selektor. Sie darf den
+Bereich nicht auf einen rohen Typnamen oder einen ausführbaren Rückruf
+reduzieren.
+
+??? example "Selektorwertigen Parameter anzeigen"
+    ```pkl
+    import "Selectors.pkl"
+    import "SelectorValues.pkl"
+
+    parameters {
+      ["compared"] = new SelectorValues.SelectorValue {
+        value = new Selectors.AllOfSelector {
+          operands {
+            new Selectors.EntityTypeSelector {
+              objectType = "axioval:example.ifc.wall"
+            }
+          }
+        }
+      }
+    }
+    ```
+
+Der normalisierte Wert hat `type: "selector"` und enthält ein
+Selektorobjekt. Der Binder prüft dieses Objekt rekursiv und löst alle Objekt-
+typen und Eigenschaftskonzepte über die geladenen Definitionspakete auf.
+Unbekannte Konzepte, fehlerhafte Operanden und nicht unterstützte
+Wertkombinationen werden geschlossen abgelehnt.
+
 ## Quell- und kompilierte Formen
 
 Pkl-Quelltext ist für die Bearbeitung maßgeblich. Eine Registry kann validiertes normalisiertes JSON zwischenspeichern, aber generierte Ausgabe allein beweist nicht, dass die Quelle sicher oder gültig ist. Cache-Schlüssel sollen die unveränderliche Quellrevision, Schemaversion, Pkl-Version und Validator-Version enthalten.

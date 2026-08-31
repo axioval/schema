@@ -14,6 +14,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Reusable `ObjectTypeDefinition`, `PropertyDefinition`, and independent
   `PropertySetDefinition` vocabulary components.
 - Canonical `ObjectTypeReferenceValue` and `PropertyReferenceValue` variants.
+- Boxed `SelectorValue` parameters for capabilities that require an independent
+  secondary object scope, with recursive fail-closed concept binding.
 - Optional exact property-set qualification without property ownership.
 - `referencedValueKind` constraints for typed property-reference parameters.
 - Full DIN 276 KG 331 instructional fixture covering object type, strict

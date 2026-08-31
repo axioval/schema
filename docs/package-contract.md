@@ -66,6 +66,36 @@ A property reference always names a canonical `PropertyDefinition`.
 
 Property-set qualifiers do not own properties and are not execution folders.
 
+## Selector-valued parameters
+
+A capability that needs a second object scope declares a parameter with
+`kind = "selector"`. The rule binds a complete selector using
+`SelectorValues.SelectorValue`; it must not reduce the scope to a raw type name
+or an executable callback.
+
+??? example "Show a selector-valued parameter"
+    ```pkl
+    import "Selectors.pkl"
+    import "SelectorValues.pkl"
+
+    parameters {
+      ["compared"] = new SelectorValues.SelectorValue {
+        value = new Selectors.AllOfSelector {
+          operands {
+            new Selectors.EntityTypeSelector {
+              objectType = "axioval:example.ifc.wall"
+            }
+          }
+        }
+      }
+    }
+    ```
+
+The normalized value has `type: "selector"` and a nested selector object. The
+binder recursively validates that object and resolves every object-type and
+property concept through the loaded definition packages. Unknown concepts,
+malformed operands, and unsupported value combinations fail closed.
+
 ## Source and compiled forms
 
 Pkl source is authoritative for editing. A registry may cache validated
