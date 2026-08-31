@@ -19,4 +19,4 @@ Pkl is the authoring frontend. Evaluation produces candidate JSON; `scripts/vali
 
 Run `./scripts/check.sh` for schema, binder, and snapshot validation. The repository pins Pkl in `.pkl-version` and CI uses the same version.
 
-Run `npx --yes markdownlint-cli2@0.18.1` and `uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' --with 'Pygments==2.19.2' mkdocs build --strict` for documentation. GitHub Pages deploys only the linted, strict build from `main`; the build hook verifies that every Pkl fence contains syntax tokens.
+Run `npx --yes markdownlint-cli2@0.18.1`, install `requirements-docs.txt`, and run `mkdocs build --strict` for documentation. GitHub Pages deploys only the linted, strict bilingual build from `main`; the build hook verifies that every Pkl fence contains syntax tokens.

@@ -22,6 +22,10 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Contributor guide, roadmap, AGPL license, and GitHub Sponsors configuration.
 - Accessible local SVG diagrams with separate wide and mobile compositions.
 - A build-time prose guard that rejects en and em dashes in repository Markdown.
+- Complete German suffix translations, localized navigation, and translated SVG diagrams.
+- Browser-language routing with a persistent manual German and English selector.
+- A collapsible desktop navigation rail with local Material icons and readable tooltips.
+- Source-level regression tests for locale coverage, disclosures, diagrams, task lists, and icons.
 
 ### Changed
 
@@ -35,6 +39,12 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
   keeps tool-builder reference material in a separate path.
 - Tutorial source and validation commands are collapsed by default, while
   remaining statically highlighted and available on demand.
+- All reader and reference source panels now stay closed until requested.
+- Documentation uses the full viewport for diagrams and cards while keeping prose
+  to a centered 72-character reading measure.
+- Publication task lists render as styled, accessible checkboxes.
+- Trusted local diagrams inherit the active light or dark site palette after
+  safe site-level inlining, with static images as the no-script fallback.
 
 ### Fixed
 

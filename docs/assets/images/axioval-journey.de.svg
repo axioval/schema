@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 360" role="img" aria-labelledby="title desc">
+  <title id="title">Vier Schritte zum Teilen einer Bauprüfung</title>
+  <desc id="desc">Begriffe benennen, Prüfung festlegen, Paket teilen und in einem Prüfwerkzeug nutzen.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#eef6ff"/><stop offset="1" stop-color="#f2fbf7"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0 0L9 3L0 6Z" fill="#7c8ba1"/>
+    </marker>
+    <style>
+      .title{font:700 18px system-ui,sans-serif;fill:#172033}.copy{font:14px system-ui,sans-serif;fill:#536176}.step{font:700 13px system-ui,sans-serif;letter-spacing:.08em;fill:#3867b2}.card{fill:#fff;stroke:#cbd9ea;stroke-width:2}.icon{fill:#e7f0ff;stroke:#3867b2;stroke-width:2}.line{fill:none;stroke:#7c8ba1;stroke-width:3;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1120" height="360" rx="28" fill="url(#bg)"/>
+  <path class="line" d="M265 180H315"/><path class="line" d="M535 180H585"/><path class="line" d="M805 180H855"/>
+  <g transform="translate(45 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><path d="M94 58h32M94 72h32M94 86h22" stroke="#3867b2" stroke-width="4" stroke-linecap="round"/><text class="step" x="24" y="135">SCHRITT 1</text><text class="title" x="24" y="168">Begriffe benennen</text><text class="copy" x="24" y="198">Begriffe für Wände und</text><text class="copy" x="24" y="220">Merkmale vereinbaren.</text></g>
+  <g transform="translate(315 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><path d="M94 72l10 10 23-26" fill="none" stroke="#3867b2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><text class="step" x="24" y="135">SCHRITT 2</text><text class="title" x="24" y="168">Prüfung festlegen</text><text class="copy" x="24" y="198">Festlegen, was geprüft</text><text class="copy" x="24" y="220">und erfüllt sein muss.</text></g>
+  <g transform="translate(585 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><path d="M92 60h36v30H92zM102 52h36v30" fill="none" stroke="#3867b2" stroke-width="3" stroke-linejoin="round"/><text class="step" x="24" y="135">SCHRITT 3</text><text class="title" x="24" y="168">Paket teilen</text><text class="copy" x="24" y="198">Begriffe und Prüfungen</text><text class="copy" x="24" y="220">zusammenhalten.</text></g>
+  <g transform="translate(855 55)"><rect class="card" width="220" height="250" rx="22"/><circle class="icon" cx="110" cy="72" r="38"/><rect x="87" y="52" width="46" height="36" rx="4" fill="none" stroke="#3867b2" stroke-width="3"/><path d="M101 96h18M110 88v8" stroke="#3867b2" stroke-width="3" stroke-linecap="round"/><text class="step" x="24" y="135">SCHRITT 4</text><text class="title" x="24" y="168">Im Werkzeug</text><text class="copy" x="24" y="198">Ein Werkzeug wendet</text><text class="copy" x="24" y="220">dieselbe Bedeutung an.</text></g>
+</svg>

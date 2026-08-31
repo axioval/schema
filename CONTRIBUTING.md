@@ -32,23 +32,27 @@ Requirements:
 
 Run the schema gate:
 
-```bash
-PATH="$HOME/.local/bin:$PATH" ./scripts/check.sh
-```
+??? example "Show source or commands"
+    ```bash
+    PATH="$HOME/.local/bin:$PATH" ./scripts/check.sh
+    ```
 
 Build and lint the documentation exactly as CI does:
 
-```bash
-npx --yes markdownlint-cli2@0.18.1
-uvx --from 'mkdocs==1.6.1' --with 'mkdocs-material==9.6.20' --with 'Pygments==2.19.2' mkdocs build --strict
-```
+??? example "Show source or commands"
+    ```bash
+    npx --yes markdownlint-cli2@0.18.1
+    python -m pip install --disable-pip-version-check -r requirements-docs.txt
+    mkdocs build --strict
+    ```
 
 Lint and format Python changes:
 
-```bash
-uvx ruff format scripts tests
-uvx ruff check scripts tests
-```
+??? example "Show source or commands"
+    ```bash
+    uvx ruff format scripts tests
+    uvx ruff check scripts tests
+    ```
 
 ## Contract-change checklist
 

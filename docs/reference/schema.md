@@ -1,7 +1,12 @@
 # Schema surface
 
-The Pkl modules are the typed authoring API. The Python binder defines the
-fail-closed semantic acceptance boundary for normalized JSON.
+This is the precise reference for people connecting software to Axioval. If you
+only want to understand or prepare a check, start with the
+[four building blocks](../guide/building-blocks.md) instead.
+
+The Pkl modules define what authors may write. The Python binder is the final
+safety gate before checked information becomes normalized JSON. All examples are
+folded by default so you can scan the concepts first.
 
 ## Modules
 
@@ -17,16 +22,17 @@ fail-closed semantic acceptance boundary for normalized JSON.
 
 A normalized definition document has these top-level fields:
 
-```json
-{
-  "schemaVersion": "0.1.0",
-  "package": {},
-  "objectTypes": {},
-  "properties": {},
-  "propertySets": {},
-  "definitions": {}
-}
-```
+??? example "Show the normalized document shape"
+    ```json
+    {
+      "schemaVersion": "0.1.0",
+      "package": {},
+      "objectTypes": {},
+      "properties": {},
+      "propertySets": {},
+      "definitions": {}
+    }
+    ```
 
 At least one reusable component must be present. Map keys must equal component
 IDs. Duplicate component IDs across loaded packages are rejected.
@@ -57,32 +63,35 @@ catalogued type.
 
 === "Object type"
 
-    ```json
-    {
-      "type": "objectTypeReference",
-      "objectType": "axioval:example.ifc.wall",
-      "includeSubtypes": true
-    }
-    ```
+    ??? example "Show JSON"
+        ```json
+        {
+          "type": "objectTypeReference",
+          "objectType": "axioval:example.ifc.wall",
+          "includeSubtypes": true
+        }
+        ```
 
 === "Property, loose"
 
-    ```json
-    {
-      "type": "propertyReference",
-      "property": "axioval:example.ifc.is-external"
-    }
-    ```
+    ??? example "Show JSON"
+        ```json
+        {
+          "type": "propertyReference",
+          "property": "axioval:example.ifc.is-external"
+        }
+        ```
 
 === "Property, strict"
 
-    ```json
-    {
-      "type": "propertyReference",
-      "property": "axioval:example.ifc.load-bearing",
-      "propertySet": "axioval:example.ifc.pset-wall-common"
-    }
-    ```
+    ??? example "Show JSON"
+        ```json
+        {
+          "type": "propertyReference",
+          "property": "axioval:example.ifc.load-bearing",
+          "propertySet": "axioval:example.ifc.pset-wall-common"
+        }
+        ```
 
 ## Selectors
 

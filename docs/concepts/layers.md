@@ -1,8 +1,9 @@
 # How Axioval fits together
 
-This technical page maps the four booklet ideas to the exact schema concepts.
-Axioval separates reusable meaning from concrete validation policy. Mixing these
-layers creates packages that cannot be shared safely.
+This page opens the booklet's four ideas and shows what sits behind each one.
+The simple picture remains the same: shared names, reusable check recipes,
+completed checks, and a bundle that carries them safely. Technical names appear
+only where a tool builder needs them.
 
 <div class="diagram-frame" markdown>
 
@@ -40,26 +41,27 @@ A `RuleDefinition` declares:
 - a stable `capability` that applications explicitly implement; and
 - typed parameter definitions.
 
-```pkl
-["axioval:example.boolean-property-equals"] = new Definitions.RuleDefinition {
-  id = "axioval:example.boolean-property-equals"
-  capability = "axioval:capability.property-value-equals"
-  name = new Types.LocalizedText { default = "Boolean property equals" }
-  parameters {
-    ["property"] = new Definitions.ParameterDefinition {
-      id = "property"
-      name = new Types.LocalizedText { default = "Property" }
-      kind = "propertyReference"
-      referencedValueKind = "boolean"
+??? example "Show the Pkl template"
+    ```pkl
+    ["axioval:example.boolean-property-equals"] = new Definitions.RuleDefinition {
+      id = "axioval:example.boolean-property-equals"
+      capability = "axioval:capability.property-value-equals"
+      name = new Types.LocalizedText { default = "Boolean property equals" }
+      parameters {
+        ["property"] = new Definitions.ParameterDefinition {
+          id = "property"
+          name = new Types.LocalizedText { default = "Property" }
+          kind = "propertyReference"
+          referencedValueKind = "boolean"
+        }
+        ["expected"] = new Definitions.ParameterDefinition {
+          id = "expected"
+          name = new Types.LocalizedText { default = "Expected" }
+          kind = "boolean"
+        }
+      }
     }
-    ["expected"] = new Definitions.ParameterDefinition {
-      id = "expected"
-      name = new Types.LocalizedText { default = "Expected" }
-      kind = "boolean"
-    }
-  }
-}
-```
+    ```
 
 `referencedValueKind` closes a subtle type hole: this boolean template cannot be
 bound to a string property.
@@ -83,10 +85,24 @@ semantically bound does the output become normalized interchange.
 
 </div>
 
+## What Axioval does own
+
+<ul class="scope-list scope-list--included">
+  <li>Shared, stable names for building facts</li>
+  <li>Typed, reusable descriptions of checks</li>
+  <li>Declarative filled checks that can be shared as data</li>
+  <li>A package contract that rejects incomplete or inconsistent input</li>
+</ul>
+
 ## What Axioval deliberately does not own
 
-- model parsing and IFC relationship traversal;
-- geometric algorithms;
-- executable rule logic supplied by packages;
-- an application's canonical runtime IR;
-- registry trust based on repository ownership.
+<ul class="scope-list scope-list--excluded">
+  <li>Opening model files or following IFC relationships</li>
+  <li>Calculating geometry</li>
+  <li>Running executable rule logic supplied by a package</li>
+  <li>Replacing an application's trusted internal model</li>
+  <li>Trusting a package merely because of who owns its repository</li>
+</ul>
+
+Axioval describes meaning at the exchange boundary. Each application remains in
+control of model access, algorithms, execution, and trust decisions.

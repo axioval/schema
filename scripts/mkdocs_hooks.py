@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import re
 import xml.etree.ElementTree as ET
+from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import ClassVar
@@ -297,6 +299,27 @@ def _verify_svg_contract() -> None:
                         f"{path.name}: external references are not allowed"
                     )
 
+    icon_files = sorted((root / "docs" / "assets" / "icons").glob("*.svg"))
+    if not icon_files:
+        violations.append("no local Material icons")
+    for path in icon_files:
+        try:
+            icon = ET.parse(path).getroot()
+        except ET.ParseError as error:
+            violations.append(f"{path.name}: invalid icon XML ({error})")
+            continue
+        elements = list(icon.iter())
+        tags = {item.tag.rsplit("}", maxsplit=1)[-1] for item in elements}
+        if icon.tag.rsplit("}", maxsplit=1)[-1] != "svg" or not tags <= {"svg", "path"}:
+            violations.append(f"{path.name}: icon contains unsupported elements")
+
+        for element in elements:
+            tag = element.tag.rsplit("}", maxsplit=1)[-1]
+            attributes = {name.rsplit("}", maxsplit=1)[-1] for name in element.attrib}
+            allowed = {"viewBox"} if tag == "svg" else {"d"}
+            if not attributes <= allowed:
+                violations.append(f"{path.name}: icon contains unsupported attributes")
+
     if violations:
         raise RuntimeError("invalid documentation SVG: " + "; ".join(violations))
 
@@ -326,6 +349,37 @@ def _verify_prose_contract() -> None:
         )
 
 
+_TASK_LIST_ITEM = re.compile(
+    r'(<li class="task-list-item">.*?<input\b)([^>]*\btype="checkbox"[^>]*?)(/?>)'
+    r"(.*?</label>)(.*?)(</li>)",
+    re.DOTALL,
+)
+
+
+def _label_task_inputs(rendered: str) -> str:
+    """Give generated disabled task controls the adjacent item text as a name."""
+
+    def add_label(match: re.Match[str]) -> str:
+        attributes = match.group(2)
+        if "aria-label=" in attributes:
+            return match.group(0)
+        label = " ".join(unescape(re.sub(r"<[^>]+>", " ", match.group(5))).split())
+        if not label:
+            return match.group(0)
+        return (
+            f'{match.group(1)}{attributes} aria-label="{escape(label, quote=True)}"'
+            f"{match.group(3)}{match.group(4)}{match.group(5)}{match.group(6)}"
+        )
+
+    return _TASK_LIST_ITEM.sub(add_label, rendered)
+
+
+def on_page_content(html, **_kwargs) -> str:
+    """Add static accessibility names to generated task-list controls."""
+
+    return _label_task_inputs(html)
+
+
 def on_config(config, **_kwargs):
     """Register and verify the lexer before Markdown renders code fences."""
 
@@ -342,6 +396,50 @@ def on_config(config, **_kwargs):
     )
     _lexer_cache[PklLexer.name] = PklLexer
     return config
+
+
+def _verify_localized_diagram_output(
+    site_dir: Path, source_images: Path | None = None
+) -> None:
+    """Require generated German diagram URLs to resolve to locale-owned assets."""
+
+    german_root = site_dir / "de"
+    if not german_root.is_dir():
+        return
+    image_root = (german_root / "assets" / "images").resolve()
+    violations: list[str] = []
+    references = 0
+
+    pattern = re.compile(r'(?:src|srcset)="([^"]*assets/images/[^"]+\.svg)"')
+    for page in sorted(german_root.rglob("*.html")):
+        for reference in pattern.findall(page.read_text(encoding="utf-8")):
+            references += 1
+            if reference.endswith(".de.svg"):
+                violations.append(f"{page.relative_to(site_dir)}: leaked {reference}")
+                continue
+            if "://" in reference or reference.startswith("//"):
+                violations.append(f"{page.relative_to(site_dir)}: external {reference}")
+                continue
+            target = (page.parent / reference).resolve()
+            if not target.is_relative_to(image_root) or not target.is_file():
+                violations.append(f"{page.relative_to(site_dir)}: missing {reference}")
+
+    source_images = source_images or (
+        Path(__file__).resolve().parent.parent / "docs" / "assets" / "images"
+    )
+    translated_sources = sorted(source_images.glob("*.de.svg"))
+    for translated in translated_sources:
+        published = image_root / translated.name.replace(".de.svg", ".svg")
+        if not published.is_file() or published.read_bytes() != translated.read_bytes():
+            violations.append(f"German asset does not match {translated.name}")
+
+    if not references:
+        violations.append("German build contains no local SVG diagrams")
+    if violations:
+        raise RuntimeError("invalid German diagram output: " + "; ".join(violations))
+    logging.getLogger("mkdocs").info(
+        "Verified %d localized German diagram references", references
+    )
 
 
 def on_post_build(config, **_kwargs) -> None:
@@ -367,3 +465,4 @@ def on_post_build(config, **_kwargs) -> None:
     logging.getLogger("mkdocs").info(
         "Verified syntax highlighting for %d Pkl blocks", len(blocks)
     )
+    _verify_localized_diagram_output(Path(config.site_dir))

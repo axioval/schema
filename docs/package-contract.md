@@ -1,8 +1,12 @@
 # Safe package acceptance
 
-A registry submission represents a package, not a privileged publication
-channel. Axioval-owned and third-party repositories follow the same contract and
-receive no extra capabilities or trust.
+Before a shared bundle reaches a checking tool, Axioval opens it through a fixed
+series of safety gates. Each gate answers one plain question: are the files where
+they should be, can they be opened safely, do all references make sense, and does
+the result match the reviewed snapshot?
+
+Every package follows the same path. A package owned by Axioval receives no extra
+permissions or trust.
 
 <div class="diagram-frame" markdown>
 
@@ -12,12 +16,13 @@ receive no extra capabilities or trust.
 
 ## Required files
 
-```text
-axioval.json      # static discovery manifest
-PklProject        # pinned Pkl project boundary
-<entry>.pkl       # ruleset module named by axioval.json
-<definition>.pkl  # one or more definition modules named by axioval.json
-```
+??? example "Show the required files"
+    ```text
+    axioval.json      # static discovery manifest
+    PklProject        # pinned Pkl project boundary
+    <entry>.pkl       # ruleset module named by axioval.json
+    <definition>.pkl  # definition modules named by axioval.json
+    ```
 
 The manifest **must** validate against
 `schema/registry-manifest.schema.json`. Entrypoints are repository-relative Pkl

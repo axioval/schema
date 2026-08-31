@@ -1,8 +1,12 @@
-# Author a bundle
+# Make a bundle
 
-This guide is for people creating Axioval source files. A ruleset bundle lives in
-its own repository. The schema repository contains concrete instances only as
-checked examples.
+A bundle keeps all names, checks, and version information together so another
+team can review and use them. Follow these seven steps in order. You do not need
+to read source code unless you want to: every technical example is folded away
+by default.
+
+This guide is for package authors. Concrete project rules live in their own
+repository; this schema repository carries only checked teaching examples.
 
 !!! tip "New to Axioval?"
     Read the [four building blocks](guide/building-blocks.md) and the
@@ -10,16 +14,17 @@ checked examples.
 
 ## 1. Create the package boundary
 
-```text
-my-rules/
-├── axioval.json
-├── PklProject
-├── definitions.pkl
-├── ruleset.pkl
-└── expected/
-    ├── definitions.json
-    └── ruleset.json
-```
+??? example "Show the folder layout"
+    ```text
+    my-rules/
+    ├── axioval.json
+    ├── PklProject
+    ├── definitions.pkl
+    ├── ruleset.pkl
+    └── expected/
+        ├── definitions.json
+        └── ruleset.json
+    ```
 
 Pin the supported Pkl version and keep every manifest-selected module inside the
 repository root.
@@ -29,10 +34,11 @@ repository root.
 Use qualified IDs for package, vocabulary, template, and capability identity.
 Do not encode mutable labels or folder paths into IDs.
 
-```text
-https://example.org/axioval/property/fire-rating
-https://example.org/axioval/rule/property-exists
-```
+??? example "Show example IDs"
+    ```text
+    https://example.org/axioval/property/fire-rating
+    https://example.org/axioval/rule/property-exists
+    ```
 
 Local folder and rule IDs use the smaller repository-local identifier syntax.
 
@@ -63,18 +69,19 @@ violations.
 
 ## 6. Declare the static manifest
 
-```json
-{
-  "$schema": "schema/registry-manifest.schema.json",
-  "manifestVersion": "0.1.0",
-  "kind": "ruleset",
-  "id": "https://example.org/axioval/my-rules",
-  "version": "0.1.0",
-  "schemaVersion": "0.1.0",
-  "entrypoint": "ruleset.pkl",
-  "definitionEntrypoints": ["definitions.pkl"]
-}
-```
+??? example "Show the manifest"
+    ```json
+    {
+      "$schema": "schema/registry-manifest.schema.json",
+      "manifestVersion": "0.1.0",
+      "kind": "ruleset",
+      "id": "https://example.org/axioval/my-rules",
+      "version": "0.1.0",
+      "schemaVersion": "0.1.0",
+      "entrypoint": "ruleset.pkl",
+      "definitionEntrypoints": ["definitions.pkl"]
+    }
+    ```
 
 Registry implementations inspect this file completely before invoking Pkl.
 Absolute paths, traversal, non-Pkl entrypoints, unknown fields, and missing
@@ -84,9 +91,10 @@ definition modules are rejected.
 
 Run the same gate locally and in CI:
 
-```bash
-PATH="$HOME/.local/bin:$PATH" ./scripts/check.sh
-```
+??? example "Show the validation command"
+    ```bash
+    PATH="$HOME/.local/bin:$PATH" ./scripts/check.sh
+    ```
 
 Commit Pkl source, manifest, and deterministic normalized snapshots together.
 Use semantic package versions and explain compatibility changes in a changelog.

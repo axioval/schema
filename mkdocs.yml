@@ -17,7 +17,6 @@ theme:
   name: material
   language: en
   features:
-    - navigation.instant
     - navigation.sections
     - navigation.path
     - navigation.top
@@ -88,14 +87,51 @@ markdown_extensions:
         - .
       check_paths: true
   - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - pymdownx.tabbed:
       alternate_style: true
 
 plugins:
   - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: false
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: de
+          name: Deutsch
+          build: true
+          nav_translations:
+            Home: Start
+            Meet Axioval: Axioval kennenlernen
+            The idea: Die Idee
+            Four building blocks: Vier Bausteine
+            A wall example: Ein Wandbeispiel
+            Make and share: Erstellen und teilen
+            When location matters: Wenn der Ablageort wichtig ist
+            Make a bundle: Ein Paket erstellen
+            For tool builders: Für Werkzeugentwickler
+            How Axioval fits together: So hängt Axioval zusammen
+            Safe sharing checks: Sicheres Teilen
+            Full reference: Vollständige Referenz
+            Source and community: Quellcode und Gemeinschaft
+            GitHub home: GitHub-Startseite
+            How to help: Mithelfen
+            What changed: Änderungen
+            What comes next: Ausblick
+            License: Lizenz
 
 extra_css:
   - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/site.js
 
 extra:
   social:

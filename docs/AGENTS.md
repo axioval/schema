@@ -7,8 +7,13 @@ This directory is the source for the public MkDocs Material site configured by
 
 - Explain the dictionary, recipe, filled card, and bundle journey before technical details.
 - Keep the homepage free of programmer jargon and route tool builders to a separate reference path.
-- Keep tutorial source blocks collapsed by default with `??? example` panels.
+- Keep all reader-facing source blocks collapsed by default with `??? example` panels.
+- Add a `page.de.md` sibling for every public `page.md`; do not rely on English fallback.
+- Translate navigation and reader prose, but preserve exact identifiers, source, machine formats, and URLs.
 - Use repository-owned SVG diagrams with useful alt text and mobile variants when wide artwork becomes unreadable.
+- Add a `.de.svg` sibling for every diagram that contains text.
+- Keep SVGs script-free. `assets/javascripts/site.js` may inline only build-verified local diagrams so the site palette can style them.
+- Use the vendored Material icons in `assets/icons/` for navigation and section meaning; visible labels remain mandatory.
 - Do not use en or em dashes in repository Markdown; the strict MkDocs hook enforces this.
 - Use checked repository examples; do not invent unsupported fields or capabilities.
 - Treat property-set identity as an optional exact qualifier, never property ownership.

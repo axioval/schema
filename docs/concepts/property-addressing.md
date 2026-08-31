@@ -17,30 +17,32 @@ names do not need to become the universal identity of a property.
 
 A vocabulary defines the property once:
 
-```pkl
-["axioval:example.ifc.load-bearing"] = new Definitions.PropertyDefinition {
-  id = "axioval:example.ifc.load-bearing"
-  name = new Types.LocalizedText { default = "Load bearing" }
-  valueKind = "boolean"
-  externalNames {
-    new Definitions.ExternalName {
-      typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-      name = "LoadBearing"
+??? example "Show the property definition"
+    ```pkl
+    ["axioval:example.ifc.load-bearing"] = new Definitions.PropertyDefinition {
+      id = "axioval:example.ifc.load-bearing"
+      name = new Types.LocalizedText { default = "Load bearing" }
+      valueKind = "boolean"
+      externalNames {
+        new Definitions.ExternalName {
+          typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+          name = "LoadBearing"
+        }
+      }
     }
-  }
-}
-```
+    ```
 
 The definition is not nested in a property set. Its stable ID can be reused by
 selectors, templates, and instances.
 
 ## Loose reference: property matters, container does not
 
-```pkl
-new Values.PropertyReferenceValue {
-  property = "axioval:example.ifc.is-external"
-}
-```
+??? example "Show the loose reference"
+    ```pkl
+    new Values.PropertyReferenceValue {
+      property = "axioval:example.ifc.is-external"
+    }
+    ```
 
 An adapter resolves the external name and traverses the model's native
 relationships. The property may be found in any supported container.
@@ -51,12 +53,13 @@ return a conflict. They must not choose one silently.
 
 ## Strict reference: membership is part of the requirement
 
-```pkl
-new Values.PropertyReferenceValue {
-  property = "axioval:example.ifc.load-bearing"
-  propertySet = "axioval:example.ifc.pset-wall-common"
-}
-```
+??? example "Show the strict reference"
+    ```pkl
+    new Values.PropertyReferenceValue {
+      property = "axioval:example.ifc.load-bearing"
+      propertySet = "axioval:example.ifc.pset-wall-common"
+    }
+    ```
 
 Now both facts are normative:
 
