@@ -1,0 +1,40 @@
+module axioval.schema.Citations
+
+import "Types.pkl"
+
+typealias SourceKind = "standard" | "regulation" | "technicalSpecification" | "contract" | "projectPolicy" | "guidance" | "other"
+typealias LocatorKind = "part" | "chapter" | "section" | "clause" | "paragraph" | "annex" | "table" | "figure" | "page" | "item" | "other"
+
+/// One bibliographic source. Sources provide provenance only: declaring one
+/// neither makes its content executable nor asserts compliance or legal force.
+class Source {
+  id: Types.QualifiedIdentifier
+  kind: SourceKind
+  designation: String(length > 0)
+  title: Types.LocalizedText
+  publisher: String(length > 0)?
+  edition: String(length > 0)?
+  publicationDate: String(length > 0)?
+  url: String(length > 0)?
+}
+
+/// One pinpoint within a source. Multiple entries can express a nested location,
+/// for example part 1, clause 4.3.2, paragraph 2, and table 1.
+class Locator {
+  kind: LocatorKind
+  value: String(length > 0)
+}
+
+/// A declarative bibliographic reference to one package source.
+class Citation {
+  id: Types.Identifier
+  sourceId: Types.QualifiedIdentifier
+  locators: Listing<Locator> = new {}
+  note: Types.LocalizedText?
+}
+
+/// Applies one citation to an explicit set of bound rule parameters.
+class ParameterCitation {
+  parameterIds: Listing<Types.Identifier>(length > 0)
+  citation: Citation
+}

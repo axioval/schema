@@ -2,15 +2,34 @@ amends "../../schema/Definitions.pkl"
 
 import "../../schema/Types.pkl"
 import "../../schema/Definitions.pkl"
+import "../../schema/Citations.pkl"
 
 package = new Types.PackageMetadata {
   id = "axioval:example.din-276-331-definitions"
   version = "0.1.0"
-  name = "DIN 276 KG 331 example definitions"
-  description = "Instructional property vocabulary and reusable rule definition."
+  name = new Types.LocalizedText {
+    default = "DIN 276 KG 331 example definitions"
+    translations { ["de"] = "Beispieldefinitionen für DIN 276 KG 331" }
+  }
+  description = new Types.LocalizedText {
+    default = "Instructional property vocabulary and reusable rule definition."
+    translations { ["de"] = "Lehrvokabular für Eigenschaften und wiederverwendbare Regeldefinitionen." }
+  }
   repository = "https://github.com/axioval/schema"
   license = "AGPL-3.0-or-later"
   authors { "Axioval contributors" }
+}
+
+sources {
+  ["https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"] = new Citations.Source {
+    id = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
+    kind = "technicalSpecification"
+    designation = "IFC 4.3"
+    title = new Types.LocalizedText { default = "Industry Foundation Classes 4.3" }
+    publisher = "buildingSMART International"
+    edition = "4.3"
+    url = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
+  }
 }
 
 objectTypes {

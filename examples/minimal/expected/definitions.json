@@ -2,11 +2,37 @@
   "schemaVersion": "0.1.0",
   "package": {
     "id": "axioval:example.definitions",
-    "name": "Example definitions",
+    "name": {
+      "default": "Example definitions",
+      "translations": {
+        "de": "Beispieldefinitionen"
+      }
+    },
     "version": "0.1.0",
-    "description": "Non-production terminology used by the schema examples.",
+    "description": {
+      "default": "Non-production terminology used by the schema examples.",
+      "translations": {
+        "de": "Nicht produktive Terminologie für die Schemabeispiele."
+      }
+    },
     "repository": "https://github.com/axioval/schema",
     "authors": []
+  },
+  "sources": {
+    "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/": {
+      "id": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/",
+      "kind": "technicalSpecification",
+      "designation": "IFC 4.3",
+      "title": {
+        "default": "Industry Foundation Classes 4.3",
+        "translations": {
+          "de": "Industry Foundation Classes 4.3"
+        }
+      },
+      "publisher": "buildingSMART International",
+      "edition": "4.3",
+      "url": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
+    }
   },
   "objectTypes": {
     "axioval:example.ifc.wall": {
@@ -19,6 +45,18 @@
         {
           "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "IfcWall"
+        }
+      ],
+      "citations": [
+        {
+          "id": "ifc-wall-definition",
+          "sourceId": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/",
+          "locators": [
+            {
+              "kind": "section",
+              "value": "IfcWall"
+            }
+          ]
         }
       ]
     }
@@ -36,6 +74,18 @@
           "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "Reference"
         }
+      ],
+      "citations": [
+        {
+          "id": "wall-reference-property",
+          "sourceId": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/",
+          "locators": [
+            {
+              "kind": "section",
+              "value": "Pset_WallCommon.Reference"
+            }
+          ]
+        }
       ]
     }
   },
@@ -50,6 +100,18 @@
         {
           "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "Pset_WallCommon"
+        }
+      ],
+      "citations": [
+        {
+          "id": "wall-common-property-set",
+          "sourceId": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/",
+          "locators": [
+            {
+              "kind": "section",
+              "value": "Pset_WallCommon"
+            }
+          ]
         }
       ]
     }
@@ -75,9 +137,11 @@
           },
           "kind": "propertyReference",
           "required": true,
-          "allowedValues": []
+          "allowedValues": [],
+          "citations": []
         }
       },
+      "citations": [],
       "tags": [
         "example",
         "property"

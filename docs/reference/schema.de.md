@@ -11,10 +11,29 @@ Die Quelltextbeispiele bleiben eingeklappt, bis Sie sie bewusst öffnen.
 | Modul | Zuständig für |
 | --- | --- |
 | `Types.pkl` | Bezeichner, semantische Versionen, lokalisierter Text, Paketmetadaten |
+| `Citations.pkl` | bibliografische Quellen, Fundstellen, Zitate und Parameterziele |
 | `Values.pkl` | Markierte Skalar- und Listenwerte sowie Objekt- und Eigenschaftsreferenzen |
 | `Selectors.pkl` | Selektoren für Objekttyp, Eigenschaft, Klassifikation und boolesche Zusammensetzung |
 | `Definitions.pkl` | Vokabulare und wiederverwendbare Fähigkeitsvorlagen |
 | `RuleSets.pkl` | Konkrete Regelinstanzen und rein kosmetische Ordner |
+
+## Paketmetadaten und Zitate
+
+`PackageMetadata.name` und `description` verwenden `LocalizedText`. Autoren
+verbinden Sprachen nicht mehr in einer Zeichenkette. Jedes Definitions- oder
+Regelsatzdokument besitzt einen `sources`-Katalog. Eine Quelle enthält Art,
+formale Bezeichnung, lokalisierten Titel sowie optional Herausgeber, Ausgabe,
+ISO-Veröffentlichungsdatum und HTTPS-URL.
+
+Ein `Citation` verweist auf eine Quelle und kann geordnete Fundstellen wie Teil,
+Klausel, Absatz, Tabelle, Abbildung oder Seite angeben. Definitionskomponenten,
+Regeln und Anforderungen können Zitate tragen. `parameterCitations` ordnet ein
+Zitat ausdrücklich Parametern zu, die diese Regel tatsächlich bindet. Unbekannte
+Quellen-IDs, unsichere URLs, ungültige Daten, doppelte Zitat-IDs oder Fundstellen
+und unbekannte Parameterziele werden geschlossen abgelehnt.
+
+Zitate sind ausschließlich Herkunftsmetadaten. Sie ändern weder Anwendbarkeit,
+Nachweise, Auswertung, Ergebnis, Rechtswirkung noch Konformitätsaussagen.
 
 ## Definitionspaket
 
@@ -25,6 +44,7 @@ Ein normalisiertes Definitionsdokument hat diese Felder der obersten Ebene:
     {
       "schemaVersion": "0.1.0",
       "package": {},
+      "sources": {},
       "objectTypes": {},
       "properties": {},
       "propertySets": {},

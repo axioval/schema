@@ -3,6 +3,7 @@ module axioval.schema.RuleSets
 import "Types.pkl"
 import "Values.pkl"
 import "Selectors.pkl"
+import "Citations.pkl"
 
 typealias ImageMediaType = "image/png" | "image/jpeg" | "image/webp" | "image/svg+xml"
 
@@ -30,6 +31,7 @@ class Requirement {
   statement: Types.LocalizedText
   description: Types.LocalizedText?
   targetGroups: Listing<Types.Identifier>(length > 0)
+  citations: Listing<Citations.Citation> = new {}
 }
 
 /// A package-contained explanatory image. `path` is validated after evaluation
@@ -57,6 +59,8 @@ class RuleInstance {
   parameters: Mapping<String, Values.ParameterValue> = new {}
   applicability: RuleApplicability = new Selectors.AllSelector {}
   requirements: Listing<Requirement> = new {}
+  citations: Listing<Citations.Citation> = new {}
+  parameterCitations: Listing<Citations.ParameterCitation> = new {}
   explanatoryImages: Listing<ExplanatoryImage> = new {}
   tags: Listing<String> = new {}
 }
@@ -74,5 +78,8 @@ class RuleFolder {
 /// application and must fail closed when unavailable.
 schemaVersion: String = Types.schemaVersion
 package: Types.PackageMetadata
+sources: Mapping<String, Citations.Source>(
+  toMap().every((key, value) -> key == value.id)
+) = new {}
 definitionPackages: Listing<Types.QualifiedIdentifier>(length > 0)
 root: RuleFolder

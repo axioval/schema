@@ -59,13 +59,110 @@ class BindingTests(unittest.TestCase):
 
     def copies(self) -> tuple[dict, dict]:
         ruleset = copy.deepcopy(self.ruleset)
+        definitions = copy.deepcopy(self.definitions)
         for rule in ruleset["root"]["rules"]:
             rule.pop("explanatoryImages", None)
-        return ruleset, copy.deepcopy(self.definitions)
+        return ruleset, definitions
+
+    def cited_documents(self) -> tuple[dict, dict]:
+        ruleset, definitions = self.copies()
+        source_id = "https://example.com/standards/example-1"
+        ruleset["sources"][source_id] = {
+            "id": source_id,
+            "kind": "standard",
+            "designation": "EXAMPLE 1:2026",
+            "title": {"default": "Example standard", "translations": {}},
+            "publisher": "Example Standards Body",
+            "edition": "2026",
+            "publicationDate": "2026-01",
+            "url": source_id,
+        }
+        rule = ruleset["root"]["rules"][0]
+        rule["parameterCitations"] = [
+            {
+                "parameterIds": ["property"],
+                "citation": {
+                    "id": "property-source",
+                    "sourceId": source_id,
+                    "locators": [
+                        {"kind": "clause", "value": "4.3.2"},
+                        {"kind": "paragraph", "value": "2"},
+                    ],
+                    "note": {"default": "Parameter provenance.", "translations": {}},
+                },
+            }
+        ]
+        rule["requirements"][0]["citations"] = [
+            {
+                "id": "requirement-source",
+                "sourceId": source_id,
+                "locators": [{"kind": "clause", "value": "4.3.2"}],
+            }
+        ]
+        return ruleset, definitions
 
     def test_accepts_fully_bound_ruleset(self) -> None:
-        ruleset, definitions = self.copies()
+        ruleset, definitions = self.cited_documents()
         validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_invalid_source_and_citation_contracts(self) -> None:
+        cases = []
+
+        ruleset, definitions = self.cited_documents()
+        ruleset["root"]["rules"][0]["parameterCitations"][0]["citation"]["sourceId"] = (
+            "axioval:missing.source"
+        )
+        cases.append(("unknown source", ruleset, definitions))
+
+        ruleset, definitions = self.cited_documents()
+        ruleset["root"]["rules"][0]["parameterCitations"][0]["parameterIds"] = [
+            "missing"
+        ]
+        cases.append(("unknown parameter", ruleset, definitions))
+
+        ruleset, definitions = self.cited_documents()
+        citation = ruleset["root"]["rules"][0]["requirements"][0]["citations"][0]
+        citation["id"] = "property-source"
+        cases.append(("duplicate citation id", ruleset, definitions))
+
+        ruleset, definitions = self.cited_documents()
+        citation = ruleset["root"]["rules"][0]["parameterCitations"][0]["citation"]
+        citation["locators"].append(copy.deepcopy(citation["locators"][0]))
+        cases.append(("duplicate locator", ruleset, definitions))
+
+        ruleset, definitions = self.cited_documents()
+        _source_id, source = ruleset["sources"].popitem()
+        ruleset["sources"]["axioval:wrong-key"] = source
+        cases.append(("source key mismatch", ruleset, definitions))
+
+        for unsafe_url in (
+            "javascript:x",
+            "https://exa mple.com",
+            "https://example.com:bad",
+            "https://example.com\\x",
+            "https://[bad",
+        ):
+            ruleset, definitions = self.cited_documents()
+            next(iter(ruleset["sources"].values()))["url"] = unsafe_url
+            cases.append((f"unsafe URL {unsafe_url}", ruleset, definitions))
+        ruleset, definitions = self.cited_documents()
+        source = next(iter(ruleset["sources"].values()))
+        source["publicationDate"] = "2026-99"
+        cases.append(("invalid date", ruleset, definitions))
+
+        ruleset, definitions = self.cited_documents()
+        next(iter(ruleset["sources"].values()))["publicationDate"] = "0000"
+        cases.append(("year zero", ruleset, definitions))
+
+        for label, ruleset, definitions in cases:
+            with self.subTest(label=label), self.assertRaises(SystemExit):
+                validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_unlocalized_package_metadata(self) -> None:
+        ruleset, definitions = self.cited_documents()
+        ruleset["package"]["name"] = "Not localized"
+        with self.assertRaises(SystemExit):
+            validate.bind_ruleset(ruleset, [definitions], "test")
 
     def test_rejects_unknown_definition(self) -> None:
         ruleset, definitions = self.copies()
@@ -157,9 +254,9 @@ class BindingTests(unittest.TestCase):
 
     def test_rejects_unknown_object_type_concept(self) -> None:
         ruleset, definitions = self.copies()
-        ruleset["root"]["rules"][0]["applicability"]["groups"]["walls"][
-            "selector"
-        ]["objectType"] = "axioval:unknown.object-type"
+        ruleset["root"]["rules"][0]["applicability"]["groups"]["walls"]["selector"][
+            "objectType"
+        ] = "axioval:unknown.object-type"
         with self.assertRaises(SystemExit):
             validate.bind_ruleset(ruleset, [definitions], "test")
 
@@ -257,7 +354,10 @@ class BindingTests(unittest.TestCase):
             ruleset, definitions = self.copies()
             rule = self.rich_rule(ruleset)
             rule["requirements"][0]["targetGroups"] = target_groups
-            with self.subTest(target_groups=target_groups), self.assertRaises(SystemExit):
+            with (
+                self.subTest(target_groups=target_groups),
+                self.assertRaises(SystemExit),
+            ):
                 validate.bind_ruleset(ruleset, [definitions], "test")
 
     def test_rejects_invalid_target_group_map_or_selector(self) -> None:
@@ -282,7 +382,7 @@ class BindingTests(unittest.TestCase):
         cases = (
             (
                 '<svg xmlns="http://www.w3.org/2000/svg">'
-                '<style>@import url(https://attacker.invalid/x.css)</style></svg>'
+                "<style>@import url(https://attacker.invalid/x.css)</style></svg>"
             ),
             (
                 '<?xml-stylesheet href="https://attacker.invalid/x.css" '
@@ -351,35 +451,27 @@ class BindingTests(unittest.TestCase):
                 '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
             )
             with self.assertRaises(SystemExit):
-                validate.bind_ruleset(
-                    ruleset, [definitions], "test", asset_root=root
-                )
+                validate.bind_ruleset(ruleset, [definitions], "test", asset_root=root)
 
             svg_path.write_text(
                 '<svg xmlns="http://www.w3.org/2000/svg">'
                 '<animate attributeName="opacity" values="0;1"/></svg>'
             )
             with self.assertRaises(SystemExit):
-                validate.bind_ruleset(
-                    ruleset, [definitions], "test", asset_root=root
-                )
+                validate.bind_ruleset(ruleset, [definitions], "test", asset_root=root)
 
             svg_path.write_text(
                 '<svg xmlns="http://www.w3.org/2000/svg">'
                 '<rect style="fill:url(data:image/svg+xml,bad)"/></svg>'
             )
             with self.assertRaises(SystemExit):
-                validate.bind_ruleset(
-                    ruleset, [definitions], "test", asset_root=root
-                )
+                validate.bind_ruleset(ruleset, [definitions], "test", asset_root=root)
 
             rule["explanatoryImages"][0]["path"] = "assets/diagram.png"
             rule["explanatoryImages"][0]["mediaType"] = "image/png"
             (root / "assets/diagram.png").write_bytes(b"not a png")
             with self.assertRaises(SystemExit):
-                validate.bind_ruleset(
-                    ruleset, [definitions], "test", asset_root=root
-                )
+                validate.bind_ruleset(ruleset, [definitions], "test", asset_root=root)
 
     def test_accepts_compatible_default_and_allowed_value(self) -> None:
         _, definitions = self.copies()

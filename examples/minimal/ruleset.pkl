@@ -4,13 +4,32 @@ import "../../schema/Types.pkl"
 import "../../schema/Values.pkl"
 import "../../schema/Selectors.pkl"
 import "../../schema/RuleSets.pkl"
+import "../../schema/Citations.pkl"
 
 package = new Types.PackageMetadata {
   id = "axioval:example.ruleset"
-  name = "Example ruleset"
+  name = new Types.LocalizedText {
+    default = "Example ruleset"
+    translations { ["de"] = "Beispielregelsatz" }
+  }
   version = "0.1.0"
-  description = "Non-production example of a modular Axioval ruleset."
+  description = new Types.LocalizedText {
+    default = "Non-production example of a modular Axioval ruleset."
+    translations { ["de"] = "Nicht produktives Beispiel eines modularen Axioval-Regelsatzes." }
+  }
   repository = "https://github.com/axioval/schema"
+}
+
+sources {
+  ["axioval:example.project-policy"] = new Citations.Source {
+    id = "axioval:example.project-policy"
+    kind = "projectPolicy"
+    designation = "AXV-EXAMPLE-POLICY"
+    title = new Types.LocalizedText {
+      default = "Axioval schema example policy"
+      translations { ["de"] = "Axioval-Schemabeispielrichtlinie" }
+    }
+  }
 }
 
 definitionPackages {
@@ -54,6 +73,16 @@ root = new RuleSets.RuleFolder {
             translations { ["de"] = "Jede ausgewählte Wand hat eine Referenz." }
           }
           targetGroups { "walls" }
+          citations {
+            new Citations.Citation {
+              id = "reference-policy"
+              sourceId = "axioval:example.project-policy"
+              note = new Types.LocalizedText {
+                default = "The example policy supplies the expected state."
+                translations { ["de"] = "Die Beispielrichtlinie liefert den erwarteten Zustand." }
+              }
+            }
+          }
         }
       }
       explanatoryImages {

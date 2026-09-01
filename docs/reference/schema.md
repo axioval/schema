@@ -13,10 +13,28 @@ folded by default so you can scan the concepts first.
 | Module | Owns |
 | --- | --- |
 | `Types.pkl` | identifiers, semantic versions, localized text, package metadata |
+| `Citations.pkl` | bibliographic sources, locators, citations, parameter targets |
 | `Values.pkl` | tagged scalar/list values plus object/property references |
 | `Selectors.pkl` | object type, property, classification, boolean-composition selectors |
 | `Definitions.pkl` | vocabularies and reusable capability templates |
 | `RuleSets.pkl` | concrete rule instances and cosmetic folders |
+
+## Package metadata and citations
+
+`PackageMetadata.name` and `description` use `LocalizedText`; package authors no
+longer combine languages in one string. Each definition or ruleset document owns
+a `sources` catalog. A source records a kind, formal designation, localized
+title, and optional publisher, edition, ISO publication date, and HTTPS URL.
+
+A `Citation` points to one source and may add ordered locators such as part,
+clause, paragraph, table, figure, or page. Definition components, rules, and
+requirements can carry citations. `parameterCitations` applies one citation to
+explicit parameters that are actually bound by that rule. Unknown source IDs,
+unsafe URLs, invalid dates, duplicate citation IDs or locators, and unknown
+parameter targets fail closed.
+
+Citations are provenance metadata only. They do not change applicability,
+evidence, evaluation, verdicts, legal force, or compliance claims.
 
 ## Definition package
 
@@ -27,6 +45,7 @@ A normalized definition document has these top-level fields:
     {
       "schemaVersion": "0.1.0",
       "package": {},
+      "sources": {},
       "objectTypes": {},
       "properties": {},
       "propertySets": {},

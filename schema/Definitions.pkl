@@ -2,6 +2,7 @@ module axioval.schema.Definitions
 
 import "Types.pkl"
 import "Values.pkl"
+import "Citations.pkl"
 
 typealias ParameterKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "objectTypeReference" | "propertyReference" | "selector" | "stringList" | "referenceList"
 typealias PropertyValueKind = "string" | "boolean" | "integer" | "number" | "quantity" | "enum" | "reference" | "stringList" | "referenceList"
@@ -18,6 +19,7 @@ class ObjectTypeDefinition {
   name: Types.LocalizedText
   description: Types.LocalizedText?
   externalNames: Listing<ExternalName>(length > 0)
+  citations: Listing<Citations.Citation> = new {}
 }
 
 /// A reusable semantic property. It is not owned by any property set.
@@ -28,6 +30,7 @@ class PropertyDefinition {
   valueKind: PropertyValueKind
   unitDimension: Types.QualifiedIdentifier?
   externalNames: Listing<ExternalName>(length > 0)
+  citations: Listing<Citations.Citation> = new {}
 }
 
 /// A reusable external container qualifier. This does not own properties;
@@ -37,6 +40,7 @@ class PropertySetDefinition {
   name: Types.LocalizedText
   description: Types.LocalizedText?
   externalNames: Listing<ExternalName>(length > 0)
+  citations: Listing<Citations.Citation> = new {}
 }
 
 class ParameterDefinition {
@@ -50,6 +54,7 @@ class ParameterDefinition {
   defaultValue: Values.ParameterValue?
   allowedValues: Listing<Values.ParameterValue> = new {}
   unitDimension: String?
+  citations: Listing<Citations.Citation> = new {}
 }
 
 /// Declares a rule template. `capability` is the stable semantic operation that
@@ -63,12 +68,16 @@ class RuleDefinition {
   parameters: Mapping<String, ParameterDefinition>(
     toMap().every((key, value) -> key == value.id)
   ) = new {}
+  citations: Listing<Citations.Citation> = new {}
   tags: Listing<String> = new {}
 }
 
 /// Terminology package (TBox-like): definitions only, no rule instances.
 schemaVersion: String = Types.schemaVersion
 package: Types.PackageMetadata
+sources: Mapping<String, Citations.Source>(
+  toMap().every((key, value) -> key == value.id)
+) = new {}
 objectTypes: Mapping<String, ObjectTypeDefinition>(
   toMap().every((key, value) -> key == value.id)
 ) = new {}

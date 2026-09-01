@@ -26,9 +26,9 @@ class PackageMetadata {
   /// Globally unique package identifier, normally a reverse-DNS URI.
   id: QualifiedIdentifier
 
-  name: String
+  name: LocalizedText
   version: SemanticVersion
-  description: String?
+  description: LocalizedText?
   repository: String?
   license: String?
   authors: Listing<String> = new {}

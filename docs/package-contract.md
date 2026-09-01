@@ -39,9 +39,9 @@ The order is part of the security contract:
 4. evaluate Pkl with only `file:`/`pkl:` modules and `file:`/`prop:` resources,
    under CPU, memory, output, and time limits;
 5. validate every candidate definition document;
-6. bind declared packages, object types, properties, property-set qualifiers,
-   templates, applicability groups, requirements, selectors, typed parameter
-   values, and explanatory image assets;
+6. bind declared packages, source catalogs, citations, object types, properties,
+   property-set qualifiers, templates, applicability groups, requirements,
+   selectors, typed parameter values, and explanatory image assets;
 7. reject duplicate, missing, unknown, conflicting, malformed, or unsupported
    declarations; and
 8. compare semantically validated output with checked normalized snapshots.
@@ -96,6 +96,25 @@ The normalized value has `type: "selector"` and a nested selector object. The
 binder recursively validates that object and resolves every object-type and
 property concept through the loaded definition packages. Unknown concepts,
 malformed operands, and unsupported value combinations fail closed.
+
+## Citation contract
+
+Every ruleset and definition document declares its own source catalog. Citations
+must resolve inside that catalog. Definition components, rules, and requirements
+may cite a source directly; `parameterCitations` must name non-empty, unique
+parameter IDs that the same rule actually binds. Citation IDs are unique within
+their containing rule or definition component, and duplicate locators are
+rejected.
+
+Source URLs are optional. When present, they must be absolute HTTPS URLs without
+embedded credentials. Publication dates use valid ISO `YYYY`, `YYYY-MM`, or
+`YYYY-MM-DD` forms. Localized source titles and notes use the same fail-closed
+localization contract as rule text.
+
+A citation records provenance only. It must never alter selectors, requirements,
+evidence, pass or fail outcomes, legal status, or conformance claims. Store
+bibliographic metadata and pinpoint locators rather than copyrighted normative
+text.
 
 ## Package image assets
 

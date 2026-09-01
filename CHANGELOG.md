@@ -10,6 +10,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Added
 
+- Structured package source catalogs, citations, ordered bibliographic locators,
+  requirement citations, and explicit bound-parameter citation targets.
 - Targetable applicability groups and rule requirements that bind localized
   expected-state statements to named element populations.
 - Package-contained explanatory images with localized alternative text and
@@ -36,6 +38,7 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Changed
 
+- `PackageMetadata.name` and `description` now use `LocalizedText`.
 - Entity-type selectors now reference reusable object-type concepts instead of
   repeating raw external type-system/name pairs.
 - The minimal property example uses one canonical property reference rather than
@@ -66,6 +69,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Security
 
+- Citation binding rejects unknown source and parameter references, duplicate IDs
+  and locators, malformed publication dates, and non-HTTPS or credential-bearing
+  source URLs.
 - Normalization rejects unknown object/property/property-set IDs, mismatched
   referenced property kinds, and unresolved strict container qualifiers.
 

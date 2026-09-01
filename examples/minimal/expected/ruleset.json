@@ -1,17 +1,40 @@
 {
+  "schemaVersion": "0.1.0",
+  "package": {
+    "id": "axioval:example.ruleset",
+    "name": {
+      "default": "Example ruleset",
+      "translations": {
+        "de": "Beispielregelsatz"
+      }
+    },
+    "version": "0.1.0",
+    "description": {
+      "default": "Non-production example of a modular Axioval ruleset.",
+      "translations": {
+        "de": "Nicht produktives Beispiel eines modularen Axioval-Regelsatzes."
+      }
+    },
+    "repository": "https://github.com/axioval/schema",
+    "authors": []
+  },
+  "sources": {
+    "axioval:example.project-policy": {
+      "id": "axioval:example.project-policy",
+      "kind": "projectPolicy",
+      "designation": "AXV-EXAMPLE-POLICY",
+      "title": {
+        "default": "Axioval schema example policy",
+        "translations": {
+          "de": "Axioval-Schemabeispielrichtlinie"
+        }
+      }
+    }
+  },
   "definitionPackages": [
     "axioval:example.definitions"
   ],
-  "package": {
-    "authors": [],
-    "description": "Non-production example of a modular Axioval ruleset.",
-    "id": "axioval:example.ruleset",
-    "name": "Example ruleset",
-    "repository": "https://github.com/axioval/schema",
-    "version": "0.1.0"
-  },
   "root": {
-    "folders": [],
     "id": "root",
     "name": {
       "default": "Example checks",
@@ -19,6 +42,21 @@
     },
     "rules": [
       {
+        "id": "wall-reference-required",
+        "definitionId": "axioval:example.property-exists",
+        "name": {
+          "default": "Walls require a reference",
+          "translations": {}
+        },
+        "enabled": true,
+        "severity": "error",
+        "parameters": {
+          "property": {
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.reference",
+            "propertySet": "axioval:example.ifc.pset-wall-common"
+          }
+        },
         "applicability": {
           "groups": {
             "walls": {
@@ -30,44 +68,11 @@
                 }
               },
               "selector": {
-                "includeSubtypes": true,
                 "kind": "entityType",
-                "objectType": "axioval:example.ifc.wall"
+                "objectType": "axioval:example.ifc.wall",
+                "includeSubtypes": true
               }
             }
-          }
-        },
-        "definitionId": "axioval:example.property-exists",
-        "enabled": true,
-        "explanatoryImages": [
-          {
-            "alternativeText": {
-              "default": "A selected wall linked to its required reference.",
-              "translations": {
-                "de": "Eine ausgewählte Wand mit ihrer erforderlichen Referenz."
-              }
-            },
-            "caption": {
-              "default": "Applicability selects the wall; the requirement targets that group.",
-              "translations": {
-                "de": "Die Anwendbarkeit wählt die Wand aus; die Anforderung zielt auf diese Gruppe."
-              }
-            },
-            "id": "wall-reference",
-            "mediaType": "image/svg+xml",
-            "path": "assets/wall-reference.svg"
-          }
-        ],
-        "id": "wall-reference-required",
-        "name": {
-          "default": "Walls require a reference",
-          "translations": {}
-        },
-        "parameters": {
-          "property": {
-            "property": "axioval:example.ifc.reference",
-            "propertySet": "axioval:example.ifc.pset-wall-common",
-            "type": "propertyReference"
           }
         },
         "requirements": [
@@ -81,15 +86,48 @@
             },
             "targetGroups": [
               "walls"
+            ],
+            "citations": [
+              {
+                "id": "reference-policy",
+                "sourceId": "axioval:example.project-policy",
+                "locators": [],
+                "note": {
+                  "default": "The example policy supplies the expected state.",
+                  "translations": {
+                    "de": "Die Beispielrichtlinie liefert den erwarteten Zustand."
+                  }
+                }
+              }
             ]
           }
         ],
-        "severity": "error",
+        "citations": [],
+        "parameterCitations": [],
+        "explanatoryImages": [
+          {
+            "id": "wall-reference",
+            "path": "assets/wall-reference.svg",
+            "mediaType": "image/svg+xml",
+            "alternativeText": {
+              "default": "A selected wall linked to its required reference.",
+              "translations": {
+                "de": "Eine ausgewählte Wand mit ihrer erforderlichen Referenz."
+              }
+            },
+            "caption": {
+              "default": "Applicability selects the wall; the requirement targets that group.",
+              "translations": {
+                "de": "Die Anwendbarkeit wählt die Wand aus; die Anforderung zielt auf diese Gruppe."
+              }
+            }
+          }
+        ],
         "tags": [
           "example"
         ]
       }
-    ]
-  },
-  "schemaVersion": "0.1.0"
+    ],
+    "folders": []
+  }
 }

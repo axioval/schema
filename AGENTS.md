@@ -17,8 +17,11 @@ Pkl is the authoring frontend. Evaluation produces candidate JSON; `scripts/vali
 
 Named applicability groups and requirement target IDs describe participating
 populations and expected states; they do not replace trusted capability
-execution. Explanatory images are inert package-contained data with localized
-accessibility text and must pass path, media, and content validation.
+execution. Structured sources and citations are declarative provenance metadata;
+unknown references fail binding, and resolved citations never affect applicability,
+evidence, verdicts, or legal status. Explanatory images are inert
+package-contained data with localized accessibility text and must pass path,
+media, and content validation.
 
 ## Validation
 

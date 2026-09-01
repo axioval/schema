@@ -20,6 +20,15 @@ class SelectorParameterTests(unittest.TestCase):
     def candidate(self) -> tuple[dict, dict]:
         ruleset = copy.deepcopy(self.ruleset)
         definitions = copy.deepcopy(self.definitions)
+        for document in (ruleset, definitions):
+            package = document["package"]
+            if isinstance(package["name"], str):
+                package["name"] = {"default": package["name"], "translations": {}}
+                package["description"] = {
+                    "default": package["description"],
+                    "translations": {},
+                }
+            document.setdefault("sources", {})
         definition = definitions["definitions"]["axioval:example.property-exists"]
         definition["parameters"]["compared"] = {
             "id": "compared",
@@ -50,7 +59,9 @@ class SelectorParameterTests(unittest.TestCase):
             document = (validate.ROOT / relative).read_text()
             blocks = [
                 textwrap.dedent(block)
-                for block in re.findall(r"    ```pkl\n(.*?)\n    ```", document, re.DOTALL)
+                for block in re.findall(
+                    r"    ```pkl\n(.*?)\n    ```", document, re.DOTALL
+                )
                 if "SelectorValues.SelectorValue" in block
             ]
             self.assertEqual(len(blocks), 1, relative)

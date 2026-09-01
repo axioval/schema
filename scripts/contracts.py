@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import math
 import re
+from datetime import date
 from pathlib import Path, PurePosixPath
 from typing import Any
+from urllib.parse import urlsplit
 from xml.parsers import expat
 
 QUALIFIED_ID = re.compile(r"^[a-z][a-z0-9+.-]*:.+$")
@@ -52,6 +54,29 @@ IMAGE_MEDIA_TYPES = {
     ".svg": "image/svg+xml",
     ".webp": "image/webp",
 }
+SOURCE_KINDS = {
+    "standard",
+    "regulation",
+    "technicalSpecification",
+    "contract",
+    "projectPolicy",
+    "guidance",
+    "other",
+}
+LOCATOR_KINDS = {
+    "part",
+    "chapter",
+    "section",
+    "clause",
+    "paragraph",
+    "annex",
+    "table",
+    "figure",
+    "page",
+    "item",
+    "other",
+}
+PUBLICATION_DATE = re.compile(r"^[0-9]{4}(?:-[0-9]{2}(?:-[0-9]{2})?)?$")
 
 
 def fail(context: str, message: str) -> None:
@@ -109,17 +134,134 @@ def package_metadata(value: Any, context: str) -> str:
     )
     if type(value["id"]) is not str or not QUALIFIED_ID.fullmatch(value["id"]):
         fail(context, "invalid package id")
-    if type(value["name"]) is not str or not value["name"]:
-        fail(context, "package name must be non-empty")
+    localized_text(value["name"], f"{context}.name")
     if type(value["version"]) is not str or not SEMVER.fullmatch(value["version"]):
         fail(context, "invalid package version")
     authors = string_list(value["authors"], f"{context}.authors")
     if any(not author for author in authors):
         fail(context, "authors must be non-empty strings")
-    for field in ("description", "repository", "license"):
+    if "description" in value:
+        localized_text(value["description"], f"{context}.description")
+    for field in ("repository", "license"):
         if field in value and (type(value[field]) is not str or not value[field]):
             fail(context, f"{field} must be a non-empty string")
     return value["id"]
+
+
+def validate_publication_date(value: Any, context: str) -> None:
+    if type(value) is not str or not PUBLICATION_DATE.fullmatch(value):
+        fail(context, "publicationDate must be ISO YYYY, YYYY-MM, or YYYY-MM-DD")
+    parts = [int(part) for part in value.split("-")]
+    try:
+        if len(parts) == 1:
+            date(parts[0], 1, 1)
+        elif len(parts) == 2:
+            date(parts[0], parts[1], 1)
+        elif len(parts) == 3:
+            date(*parts)
+    except ValueError:
+        fail(context, "publicationDate is not a valid calendar date")
+
+
+def validate_https_url(value: Any, context: str) -> None:
+    if type(value) is not str or any(
+        character.isspace() or character == "\\" or ord(character) < 32
+        for character in value
+    ):
+        fail(
+            context,
+            "URL must not contain whitespace, control characters, or backslashes",
+        )
+    try:
+        parsed = urlsplit(value)
+        hostname = parsed.hostname
+        _port = parsed.port
+    except ValueError:
+        fail(context, "URL host or port is malformed")
+    if (
+        parsed.scheme != "https"
+        or hostname is None
+        or not parsed.netloc
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        fail(context, "URL must be absolute HTTPS without credentials")
+
+
+def validate_sources(value: Any, context: str) -> dict[str, dict[str, Any]]:
+    sources = object_value(value, context)
+    for key, candidate in sources.items():
+        source_context = f"{context}[{key!r}]"
+        source = object_value(candidate, source_context)
+        exact_keys(
+            source,
+            {"id", "kind", "designation", "title"},
+            {"publisher", "edition", "publicationDate", "url"},
+            source_context,
+        )
+        if (
+            type(key) is not str
+            or key != source["id"]
+            or not QUALIFIED_ID.fullmatch(key)
+        ):
+            fail(source_context, "source map key must equal its qualified id")
+        if type(source["kind"]) is not str or source["kind"] not in SOURCE_KINDS:
+            fail(source_context, "unknown source kind")
+        localized_text(source["title"], f"{source_context}.title")
+        for field in ("designation", "publisher", "edition"):
+            if field in source and (
+                type(source[field]) is not str or not source[field]
+            ):
+                fail(source_context, f"{field} must be a non-empty string")
+        if "publicationDate" in source:
+            validate_publication_date(
+                source["publicationDate"], f"{source_context}.publicationDate"
+            )
+        if "url" in source:
+            validate_https_url(source["url"], f"{source_context}.url")
+    return sources
+
+
+def validate_citations(
+    value: Any,
+    sources: dict[str, dict[str, Any]],
+    context: str,
+    seen_ids: set[str] | None = None,
+) -> set[str]:
+    seen = seen_ids if seen_ids is not None else set()
+    for index, candidate in enumerate(list_value(value, context)):
+        citation_context = f"{context}[{index}]"
+        citation = object_value(candidate, citation_context)
+        exact_keys(citation, {"id", "sourceId", "locators"}, {"note"}, citation_context)
+        citation_id = citation["id"]
+        source_id = citation["sourceId"]
+        if type(citation_id) is not str or not IDENTIFIER.fullmatch(citation_id):
+            fail(citation_context, "invalid citation id")
+        if citation_id in seen:
+            fail(citation_context, f"duplicate citation id {citation_id!r}")
+        seen.add(citation_id)
+        if type(source_id) is not str or source_id not in sources:
+            fail(citation_context, f"unknown sourceId {source_id!r}")
+        if "note" in citation:
+            localized_text(citation["note"], f"{citation_context}.note")
+        locators: set[tuple[str, str]] = set()
+        for locator_index, candidate_locator in enumerate(
+            list_value(citation["locators"], f"{citation_context}.locators")
+        ):
+            locator_context = f"{citation_context}.locators[{locator_index}]"
+            locator = object_value(candidate_locator, locator_context)
+            exact_keys(locator, {"kind", "value"}, set(), locator_context)
+            kind = locator["kind"]
+            locator_value = locator["value"]
+            if type(kind) is not str or kind not in LOCATOR_KINDS:
+                fail(locator_context, "unknown locator kind")
+            if type(locator_value) is not str or not locator_value:
+                fail(locator_context, "locator value must be non-empty")
+            locator_key = (kind, locator_value)
+            if locator_key in locators:
+                fail(locator_context, "duplicate locator")
+            locators.add(locator_key)
+    return seen
 
 
 def parameter_value(
@@ -226,7 +368,9 @@ def resolve_selector_value(
     context: str,
 ) -> None:
     if value["type"] == "selector":
-        validate_selector(value["value"], context, object_types, properties, property_sets)
+        validate_selector(
+            value["value"], context, object_types, properties, property_sets
+        )
 
 
 def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
@@ -234,7 +378,13 @@ def validate_parameter_definition(value: Any, context: str) -> dict[str, Any]:
     exact_keys(
         value,
         {"id", "name", "kind", "required", "allowedValues"},
-        {"defaultValue", "unitDimension", "description", "referencedValueKind"},
+        {
+            "defaultValue",
+            "unitDimension",
+            "description",
+            "referencedValueKind",
+            "citations",
+        },
         context,
     )
     if type(value["id"]) is not str or not IDENTIFIER.fullmatch(value["id"]):
@@ -307,7 +457,9 @@ def validate_concept(
     if property_definition:
         required.add("valueKind")
     optional = (
-        {"description", "unitDimension"} if property_definition else {"description"}
+        {"description", "unitDimension", "citations"}
+        if property_definition
+        else {"description", "citations"}
     )
     exact_keys(value, required, optional, context)
     if value["id"] != expected_id or not QUALIFIED_ID.fullmatch(expected_id):
@@ -346,6 +498,7 @@ def validate_definition_document(
         {
             "schemaVersion",
             "package",
+            "sources",
             "objectTypes",
             "properties",
             "propertySets",
@@ -355,6 +508,7 @@ def validate_definition_document(
         context,
     )
     package_id = package_metadata(value["package"], f"{context}.package")
+    sources = validate_sources(value["sources"], f"{context}.sources")
     object_types = object_value(value["objectTypes"], f"{context}.objectTypes")
     properties = object_value(value["properties"], f"{context}.properties")
     property_sets = object_value(value["propertySets"], f"{context}.propertySets")
@@ -362,25 +516,40 @@ def validate_definition_document(
     if not (object_types or properties or property_sets or definitions):
         fail(context, "definition package is empty")
     for object_type_id, object_type in object_types.items():
-        validate_concept(
+        checked = validate_concept(
             object_type,
             object_type_id,
             f"{context}.objectTypes[{object_type_id!r}]",
             property_definition=False,
         )
+        validate_citations(
+            checked.get("citations", []),
+            sources,
+            f"{context}.objectTypes[{object_type_id!r}].citations",
+        )
     for property_id, property_definition in properties.items():
-        validate_concept(
+        checked = validate_concept(
             property_definition,
             property_id,
             f"{context}.properties[{property_id!r}]",
             property_definition=True,
         )
+        validate_citations(
+            checked.get("citations", []),
+            sources,
+            f"{context}.properties[{property_id!r}].citations",
+        )
     for property_set_id, property_set in property_sets.items():
-        validate_concept(
+        checked = validate_concept(
             property_set,
             property_set_id,
             f"{context}.propertySets[{property_set_id!r}]",
             property_definition=False,
+        )
+        validate_citations(
+            checked.get("citations", []),
+            sources,
+            f"{context}.propertySets[{property_set_id!r}].citations",
         )
     for definition_id, definition in definitions.items():
         definition_context = f"{context}.definitions[{definition_id!r}]"
@@ -388,7 +557,7 @@ def validate_definition_document(
         exact_keys(
             definition,
             {"id", "name", "capability", "parameters", "tags"},
-            {"description"},
+            {"description", "citations"},
             definition_context,
         )
         if definition_id != definition["id"] or not QUALIFIED_ID.fullmatch(
@@ -413,7 +582,17 @@ def validate_definition_document(
             )
             if parameter_id != validated["id"]:
                 fail(definition_context, "parameter map key and id must match")
+            validate_citations(
+                validated.get("citations", []),
+                sources,
+                f"{definition_context}.parameters[{parameter_id!r}].citations",
+            )
         string_list(definition["tags"], f"{definition_context}.tags")
+        validate_citations(
+            definition.get("citations", []),
+            sources,
+            f"{definition_context}.citations",
+        )
     return package_id, definitions, object_types, properties, property_sets
 
 
@@ -560,7 +739,45 @@ def validate_applicability(
     return group_ids
 
 
-def validate_requirements(value: Any, target_groups: set[str], context: str) -> None:
+def validate_parameter_citations(
+    value: Any,
+    bound_parameter_ids: set[str],
+    sources: dict[str, dict[str, Any]],
+    context: str,
+    citation_ids: set[str],
+) -> None:
+    for index, candidate in enumerate(list_value(value, context)):
+        entry_context = f"{context}[{index}]"
+        entry = object_value(candidate, entry_context)
+        exact_keys(entry, {"parameterIds", "citation"}, set(), entry_context)
+        parameter_ids = string_list(
+            entry["parameterIds"], f"{entry_context}.parameterIds"
+        )
+        if not parameter_ids or len(parameter_ids) != len(set(parameter_ids)):
+            fail(entry_context, "parameterIds must be non-empty and unique")
+        invalid = {
+            parameter_id
+            for parameter_id in parameter_ids
+            if not IDENTIFIER.fullmatch(parameter_id)
+            or parameter_id not in bound_parameter_ids
+        }
+        if invalid:
+            fail(entry_context, f"unknown bound parameters {sorted(invalid)}")
+        validate_citations(
+            [entry["citation"]],
+            sources,
+            f"{entry_context}.citation",
+            citation_ids,
+        )
+
+
+def validate_requirements(
+    value: Any,
+    target_groups: set[str],
+    sources: dict[str, dict[str, Any]],
+    context: str,
+    citation_ids: set[str],
+) -> None:
     requirements = list_value(value, context)
     if requirements and not target_groups:
         fail(context, "requirements require rich applicability target groups")
@@ -571,7 +788,7 @@ def validate_requirements(value: Any, target_groups: set[str], context: str) -> 
         exact_keys(
             requirement,
             {"id", "statement", "targetGroups"},
-            {"description"},
+            {"description", "citations"},
             requirement_context,
         )
         requirement_id = requirement["id"]
@@ -597,6 +814,12 @@ def validate_requirements(value: Any, target_groups: set[str], context: str) -> 
         }
         if invalid:
             fail(requirement_context, f"unknown target groups {sorted(invalid)}")
+        validate_citations(
+            requirement.get("citations", []),
+            sources,
+            f"{requirement_context}.citations",
+            citation_ids,
+        )
 
 
 def validate_image_content(candidate: Path, media_type: str, context: str) -> None:
@@ -641,9 +864,11 @@ def validate_image_content(candidate: Path, media_type: str, context: str) -> No
                     raise ValueError("active SVG attribute")
                 if attribute == "href" and value and not value.startswith("#"):
                     raise ValueError("external SVG reference")
-                if "url(" in value and re.fullmatch(
-                    r"url\(#[A-Za-z_][A-Za-z0-9_.:-]*\)", value
-                ) is None:
+                if (
+                    "url(" in value
+                    and re.fullmatch(r"url\(#[A-Za-z_][A-Za-z0-9_.:-]*\)", value)
+                    is None
+                ):
                     raise ValueError("external SVG URL")
                 if any(
                     token in value
@@ -721,15 +946,16 @@ def validate_explanatory_images(
         expected_media_type = IMAGE_MEDIA_TYPES.get(relative.suffix.lower())
         if expected_media_type is None or media_type != expected_media_type:
             fail(image_context, "image extension and mediaType do not match")
-        localized_text(
-            image["alternativeText"], f"{image_context}.alternativeText"
-        )
+        localized_text(image["alternativeText"], f"{image_context}.alternativeText")
         if "caption" in image:
             localized_text(image["caption"], f"{image_context}.caption")
         if resolved_root is not None:
             candidate = (resolved_root / path).resolve()
             if not candidate.is_relative_to(resolved_root) or not candidate.is_file():
-                fail(image_context, "referenced package image is missing or escapes package")
+                fail(
+                    image_context,
+                    "referenced package image is missing or escapes package",
+                )
             validate_image_content(candidate, media_type, image_context)
 
 
@@ -743,11 +969,12 @@ def bind_ruleset(
     value = object_value(value, context)
     exact_keys(
         value,
-        {"schemaVersion", "package", "definitionPackages", "root"},
+        {"schemaVersion", "package", "sources", "definitionPackages", "root"},
         set(),
         context,
     )
     package_metadata(value["package"], f"{context}.package")
+    sources = validate_sources(value["sources"], f"{context}.sources")
     declared_list = string_list(
         value["definitionPackages"], f"{context}.definitionPackages"
     )
@@ -894,6 +1121,8 @@ def bind_ruleset(
                     "description",
                     "message",
                     "requirements",
+                    "citations",
+                    "parameterCitations",
                     "explanatoryImages",
                 },
                 rule_context,
@@ -968,6 +1197,20 @@ def bind_ruleset(
                         rule_context,
                         f"parameter {parameter_id!r} is outside allowedValues",
                     )
+            citation_ids: set[str] = set()
+            validate_citations(
+                rule.get("citations", []),
+                sources,
+                f"{rule_context}.citations",
+                citation_ids,
+            )
+            validate_parameter_citations(
+                rule.get("parameterCitations", []),
+                set(bindings),
+                sources,
+                f"{rule_context}.parameterCitations",
+                citation_ids,
+            )
             target_groups = validate_applicability(
                 rule["applicability"],
                 f"{rule_context}.applicability",
@@ -978,7 +1221,9 @@ def bind_ruleset(
             validate_requirements(
                 rule.get("requirements", []),
                 target_groups,
+                sources,
                 f"{rule_context}.requirements",
+                citation_ids,
             )
             validate_explanatory_images(
                 rule.get("explanatoryImages", []),

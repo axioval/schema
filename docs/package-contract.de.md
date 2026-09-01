@@ -35,7 +35,7 @@ Die Reihenfolge ist Teil des Sicherheitsvertrags:
 3. **alle** Regelwerk- und Definitionspfade innerhalb der Repository-Wurzel auflösen;
 4. Pkl nur mit `file:`-/`pkl:`-Modulen und `file:`-/`prop:`-Ressourcen sowie CPU-, Speicher-, Ausgabe- und Zeitlimits auswerten;
 5. jedes Kandidaten-Definitionsdokument validieren;
-6. deklarierte Pakete, Objekttypen, Eigenschaften,
+6. deklarierte Pakete, Quellenkataloge, Zitate, Objekttypen, Eigenschaften,
    Property-Set-Qualifizierer, Vorlagen, Anwendbarkeitsgruppen, Anforderungen,
    Selektoren, typisierte Parameterwerte und erklärende Bilddateien binden;
 7. doppelte, fehlende, unbekannte, widersprüchliche, fehlerhafte oder nicht unterstützte Deklarationen ablehnen; und
@@ -90,6 +90,26 @@ Selektorobjekt. Der Binder prüft dieses Objekt rekursiv und löst alle Objekt-
 typen und Eigenschaftskonzepte über die geladenen Definitionspakete auf.
 Unbekannte Konzepte, fehlerhafte Operanden und nicht unterstützte
 Wertkombinationen werden geschlossen abgelehnt.
+
+## Vertrag für Quellenangaben
+
+Jedes Regelsatz- und Definitionsdokument deklariert einen eigenen
+Quellenkatalog. Zitate müssen innerhalb dieses Katalogs aufgelöst werden.
+Definitionskomponenten, Regeln und Anforderungen dürfen Quellen direkt zitieren.
+`parameterCitations` muss nicht leere, eindeutige Parameter-IDs nennen, die
+dieselbe Regel tatsächlich bindet. Zitat-IDs sind innerhalb ihrer Regel oder
+Definitionskomponente eindeutig. Doppelte Fundstellen werden abgelehnt.
+
+Quellen-URLs sind optional. Wenn sie vorhanden sind, müssen sie absolute
+HTTPS-URLs ohne eingebettete Zugangsdaten sein. Veröffentlichungsdaten verwenden
+gültige ISO-Formen `YYYY`, `YYYY-MM` oder `YYYY-MM-DD`. Lokalisierte Quellentitel
+und Hinweise folgen demselben geschlossen geprüften Lokalisierungsvertrag wie
+Regeltexte.
+
+Ein Zitat dokumentiert ausschließlich die Herkunft. Es darf Selektoren,
+Anforderungen, Nachweise, Ergebnisse, Rechtsstatus oder Konformitätsaussagen
+niemals verändern. Speichern Sie bibliografische Metadaten und genaue
+Fundstellen, nicht urheberrechtlich geschützten Normentext.
 
 ## Bilddateien im Paket
 

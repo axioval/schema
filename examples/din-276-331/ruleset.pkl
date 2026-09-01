@@ -4,15 +4,42 @@ import "../../schema/Types.pkl"
 import "../../schema/Values.pkl"
 import "../../schema/Selectors.pkl"
 import "../../schema/RuleSets.pkl"
+import "../../schema/Citations.pkl"
+
+local function text(en: String, de: String): Types.LocalizedText = new Types.LocalizedText {
+  default = en
+  translations { ["de"] = de }
+}
 
 package = new Types.PackageMetadata {
   id = "axioval:example.din-276-331"
   version = "0.1.0"
-  name = "DIN 276 KG 331 load-bearing external wall example"
-  description = "Instructional DIN 276 KG 331 rule instances."
+  name = new Types.LocalizedText {
+    default = "DIN 276 KG 331 load-bearing external wall example"
+    translations { ["de"] = "DIN-276-KG-331-Beispiel für tragende Außenwände" }
+  }
+  description = new Types.LocalizedText {
+    default = "Instructional DIN 276 KG 331 rule instances."
+    translations { ["de"] = "Lehrbeispiele für Regelinstanzen zur DIN 276 KG 331." }
+  }
   repository = "https://github.com/axioval/schema"
   license = "AGPL-3.0-or-later"
   authors { "Axioval contributors" }
+}
+
+sources {
+  ["urn:din:276:2018-12"] = new Citations.Source {
+    id = "urn:din:276:2018-12"
+    kind = "standard"
+    designation = "DIN 276:2018-12"
+    title = new Types.LocalizedText {
+      default = "Building costs"
+      translations { ["de"] = "Kosten im Bauwesen" }
+    }
+    publisher = "DIN"
+    edition = "2018-12"
+    publicationDate = "2018-12"
+  }
 }
 
 definitionPackages {
@@ -25,22 +52,33 @@ local kg331Objects = new Selectors.ClassificationSelector {
   includeDescendants = false
 }
 
+local projectMappingNote = text(
+  "KG 331 is the cited classification item; the IFC mapping is project-defined.",
+  "KG 331 ist die zitierte Kostengruppe; die IFC-Zuordnung ist projektdefiniert."
+)
+
 root = new RuleSets.RuleFolder {
   id = "din-276-331"
-  name = new Types.LocalizedText {
-    default = "DIN 276 KG 331 — load-bearing external walls"
-  }
-  description = new Types.LocalizedText {
-    default = "Example requirements for wall objects classified as KG 331."
-  }
+  name = text(
+    "Instructional project profile for DIN 276 KG 331",
+    "Lehrbeispiel eines Projektprofils für DIN 276 KG 331"
+  )
+  description = text(
+    "Project-defined IFC checks for objects classified as KG 331.",
+    "Projektdefinierte IFC-Prüfungen für als KG 331 klassifizierte Objekte."
+  )
   rules {
     new RuleSets.RuleInstance {
       id = "kg331-is-wall"
       definitionId = "axioval:example.entity-type-equals"
-      name = new Types.LocalizedText { default = "KG 331 objects are walls" }
-      message = new Types.LocalizedText {
-        default = "DIN 276 KG 331 object must be an IfcWall."
-      }
+      name = text(
+        "Project profile maps KG 331 objects to walls",
+        "Projektprofil ordnet KG-331-Objekte Wänden zu"
+      )
+      message = text(
+        "The instructional project profile expects a KG 331 object to map to IfcWall.",
+        "Das beispielhafte Projektprofil erwartet für ein KG-331-Objekt die Zuordnung zu IfcWall."
+      )
       severity = "error"
       parameters {
         ["objectType"] = new Values.ObjectTypeReferenceValue {
@@ -49,15 +87,27 @@ root = new RuleSets.RuleFolder {
         }
       }
       applicability = kg331Objects
+      citations {
+        new Citations.Citation {
+          id = "kg331-object-kind-source"
+          sourceId = "urn:din:276:2018-12"
+          locators { new Citations.Locator { kind = "item"; value = "KG 331" } }
+          note = projectMappingNote
+        }
+      }
       tags { "din-276"; "cost-group-331"; "object-type" }
     }
     new RuleSets.RuleInstance {
       id = "kg331-load-bearing"
       definitionId = "axioval:example.boolean-property-equals"
-      name = new Types.LocalizedText { default = "KG 331 walls are load bearing" }
-      message = new Types.LocalizedText {
-        default = "DIN 276 KG 331 wall must have LoadBearing = TRUE in Pset_WallCommon."
-      }
+      name = text(
+        "Project profile marks KG 331 walls as load bearing",
+        "Projektprofil kennzeichnet KG-331-Wände als tragend"
+      )
+      message = text(
+        "The instructional project profile expects LoadBearing = TRUE in Pset_WallCommon.",
+        "Das beispielhafte Projektprofil erwartet LoadBearing = TRUE in Pset_WallCommon."
+      )
       severity = "error"
       parameters {
         ["property"] = new Values.PropertyReferenceValue {
@@ -67,15 +117,27 @@ root = new RuleSets.RuleFolder {
         ["expected"] = new Values.BooleanValue { value = true }
       }
       applicability = kg331Objects
+      citations {
+        new Citations.Citation {
+          id = "kg331-load-bearing-source"
+          sourceId = "urn:din:276:2018-12"
+          locators { new Citations.Locator { kind = "item"; value = "KG 331" } }
+          note = projectMappingNote
+        }
+      }
       tags { "din-276"; "cost-group-331"; "strict-container" }
     }
     new RuleSets.RuleInstance {
       id = "kg331-is-external"
       definitionId = "axioval:example.boolean-property-equals"
-      name = new Types.LocalizedText { default = "KG 331 walls are external" }
-      message = new Types.LocalizedText {
-        default = "DIN 276 KG 331 wall must have IsExternal = TRUE."
-      }
+      name = text(
+        "Project profile marks KG 331 walls as external",
+        "Projektprofil kennzeichnet KG-331-Wände als außenliegend"
+      )
+      message = text(
+        "The instructional project profile expects IsExternal = TRUE.",
+        "Das beispielhafte Projektprofil erwartet IsExternal = TRUE."
+      )
       severity = "error"
       parameters {
         ["property"] = new Values.PropertyReferenceValue {
@@ -84,6 +146,14 @@ root = new RuleSets.RuleFolder {
         ["expected"] = new Values.BooleanValue { value = true }
       }
       applicability = kg331Objects
+      citations {
+        new Citations.Citation {
+          id = "kg331-external-source"
+          sourceId = "urn:din:276:2018-12"
+          locators { new Citations.Locator { kind = "item"; value = "KG 331" } }
+          note = projectMappingNote
+        }
+      }
       tags { "din-276"; "cost-group-331"; "container-agnostic" }
     }
   }
