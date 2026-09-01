@@ -65,7 +65,13 @@ Eine `RuleDefinition` deklariert:
 
 ## 3. Instanz
 
-Eine `RuleInstance` bindet eine bekannte Definition an konkrete Werte und einen Anwendbarkeitsselektor. Instanzen sind Politik, die ABox-ähnliche Ebene, und gehören in externe Regelwerk-Repositories. Dieses Schema-Repository enthält sie nur unter `examples/`.
+Eine `RuleInstance` bindet eine bekannte Definition an konkrete Werte. Ihre
+Anwendbarkeit kann aus einem Selektor oder aus benannten Zielgruppen bestehen,
+während Anforderungen festhalten, was für diese Gruppen gelten muss. Optionale
+erklärende Bilder erleichtern das Verständnis, beeinflussen aber niemals die
+Ausführung. Instanzen sind Politik, die ABox-ähnliche Ebene, und gehören in
+externe Regelwerk-Repositories. Dieses Schema-Repository enthält sie nur unter
+`examples/`.
 
 ## 4. Paket und Normalisierung
 

@@ -15,6 +15,11 @@ This repository owns the vendor-neutral authoring schema and normalized intercha
 
 Pkl is the authoring frontend. Evaluation produces candidate JSON; `scripts/validate.py` resolves definition packages and performs fail-closed parameter/selector binding before the result is considered portable normalized data. Authoring functions and templates must lower to declarative data; applications must never depend on executing package-specific logic during model checking.
 
+Named applicability groups and requirement target IDs describe participating
+populations and expected states; they do not replace trusted capability
+execution. Explanatory images are inert package-contained data with localized
+accessibility text and must pass path, media, and content validation.
+
 ## Validation
 
 Run `./scripts/check.sh` for schema, binder, and snapshot validation. The repository pins Pkl in `.pkl-version` and CI uses the same version.

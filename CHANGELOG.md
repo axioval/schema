@@ -10,6 +10,11 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Added
 
+- Targetable applicability groups and rule requirements that bind localized
+  expected-state statements to named element populations.
+- Package-contained explanatory images with localized alternative text and
+  captions, safe relative paths, media declarations, content validation, and a
+  10 MB per-image safety limit.
 - MkDocs Material documentation site and GitHub Pages deployment.
 - Reusable `ObjectTypeDefinition`, `PropertyDefinition`, and independent
   `PropertySetDefinition` vocabulary components.

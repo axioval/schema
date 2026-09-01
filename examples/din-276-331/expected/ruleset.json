@@ -1,56 +1,58 @@
 {
-  "schemaVersion": "0.1.0",
-  "package": {
-    "id": "axioval:example.din-276-331",
-    "name": "DIN 276 KG 331 load-bearing external wall example",
-    "version": "0.1.0",
-    "description": "Instructional DIN 276 KG 331 rule instances.",
-    "repository": "https://github.com/axioval/schema",
-    "license": "AGPL-3.0-or-later",
-    "authors": [
-      "Axioval contributors"
-    ]
-  },
   "definitionPackages": [
     "axioval:example.din-276-331-definitions"
   ],
+  "package": {
+    "authors": [
+      "Axioval contributors"
+    ],
+    "description": "Instructional DIN 276 KG 331 rule instances.",
+    "id": "axioval:example.din-276-331",
+    "license": "AGPL-3.0-or-later",
+    "name": "DIN 276 KG 331 load-bearing external wall example",
+    "repository": "https://github.com/axioval/schema",
+    "version": "0.1.0"
+  },
   "root": {
+    "description": {
+      "default": "Example requirements for wall objects classified as KG 331.",
+      "translations": {}
+    },
+    "folders": [],
     "id": "din-276-331",
     "name": {
       "default": "DIN 276 KG 331 — load-bearing external walls",
       "translations": {}
     },
-    "description": {
-      "default": "Example requirements for wall objects classified as KG 331.",
-      "translations": {}
-    },
     "rules": [
       {
-        "id": "kg331-is-wall",
-        "definitionId": "axioval:example.entity-type-equals",
-        "name": {
-          "default": "KG 331 objects are walls",
-          "translations": {}
+        "applicability": {
+          "code": "331",
+          "includeDescendants": false,
+          "kind": "classification",
+          "system": "DIN 276:2018-12"
         },
+        "definitionId": "axioval:example.entity-type-equals",
         "enabled": true,
-        "severity": "error",
+        "explanatoryImages": [],
+        "id": "kg331-is-wall",
         "message": {
           "default": "DIN 276 KG 331 object must be an IfcWall.",
           "translations": {}
         },
+        "name": {
+          "default": "KG 331 objects are walls",
+          "translations": {}
+        },
         "parameters": {
           "objectType": {
-            "type": "objectTypeReference",
+            "includeSubtypes": true,
             "objectType": "axioval:example.ifc.wall",
-            "includeSubtypes": true
+            "type": "objectTypeReference"
           }
         },
-        "applicability": {
-          "kind": "classification",
-          "system": "DIN 276:2018-12",
-          "code": "331",
-          "includeDescendants": false
-        },
+        "requirements": [],
+        "severity": "error",
         "tags": [
           "din-276",
           "cost-group-331",
@@ -58,35 +60,37 @@
         ]
       },
       {
-        "id": "kg331-load-bearing",
-        "definitionId": "axioval:example.boolean-property-equals",
-        "name": {
-          "default": "KG 331 walls are load bearing",
-          "translations": {}
+        "applicability": {
+          "code": "331",
+          "includeDescendants": false,
+          "kind": "classification",
+          "system": "DIN 276:2018-12"
         },
+        "definitionId": "axioval:example.boolean-property-equals",
         "enabled": true,
-        "severity": "error",
+        "explanatoryImages": [],
+        "id": "kg331-load-bearing",
         "message": {
           "default": "DIN 276 KG 331 wall must have LoadBearing = TRUE in Pset_WallCommon.",
           "translations": {}
         },
+        "name": {
+          "default": "KG 331 walls are load bearing",
+          "translations": {}
+        },
         "parameters": {
-          "property": {
-            "type": "propertyReference",
-            "property": "axioval:example.ifc.load-bearing",
-            "propertySet": "axioval:example.ifc.pset-wall-common"
-          },
           "expected": {
             "type": "boolean",
             "value": true
+          },
+          "property": {
+            "property": "axioval:example.ifc.load-bearing",
+            "propertySet": "axioval:example.ifc.pset-wall-common",
+            "type": "propertyReference"
           }
         },
-        "applicability": {
-          "kind": "classification",
-          "system": "DIN 276:2018-12",
-          "code": "331",
-          "includeDescendants": false
-        },
+        "requirements": [],
+        "severity": "error",
         "tags": [
           "din-276",
           "cost-group-331",
@@ -94,41 +98,43 @@
         ]
       },
       {
-        "id": "kg331-is-external",
-        "definitionId": "axioval:example.boolean-property-equals",
-        "name": {
-          "default": "KG 331 walls are external",
-          "translations": {}
+        "applicability": {
+          "code": "331",
+          "includeDescendants": false,
+          "kind": "classification",
+          "system": "DIN 276:2018-12"
         },
+        "definitionId": "axioval:example.boolean-property-equals",
         "enabled": true,
-        "severity": "error",
+        "explanatoryImages": [],
+        "id": "kg331-is-external",
         "message": {
           "default": "DIN 276 KG 331 wall must have IsExternal = TRUE.",
           "translations": {}
         },
+        "name": {
+          "default": "KG 331 walls are external",
+          "translations": {}
+        },
         "parameters": {
-          "property": {
-            "type": "propertyReference",
-            "property": "axioval:example.ifc.is-external"
-          },
           "expected": {
             "type": "boolean",
             "value": true
+          },
+          "property": {
+            "property": "axioval:example.ifc.is-external",
+            "type": "propertyReference"
           }
         },
-        "applicability": {
-          "kind": "classification",
-          "system": "DIN 276:2018-12",
-          "code": "331",
-          "includeDescendants": false
-        },
+        "requirements": [],
+        "severity": "error",
         "tags": [
           "din-276",
           "cost-group-331",
           "container-agnostic"
         ]
       }
-    ],
-    "folders": []
-  }
+    ]
+  },
+  "schemaVersion": "0.1.0"
 }

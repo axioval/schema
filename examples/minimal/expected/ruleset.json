@@ -1,17 +1,17 @@
 {
-  "schemaVersion": "0.1.0",
-  "package": {
-    "id": "axioval:example.ruleset",
-    "name": "Example ruleset",
-    "version": "0.1.0",
-    "description": "Non-production example of a modular Axioval ruleset.",
-    "repository": "https://github.com/axioval/schema",
-    "authors": []
-  },
   "definitionPackages": [
     "axioval:example.definitions"
   ],
+  "package": {
+    "authors": [],
+    "description": "Non-production example of a modular Axioval ruleset.",
+    "id": "axioval:example.ruleset",
+    "name": "Example ruleset",
+    "repository": "https://github.com/axioval/schema",
+    "version": "0.1.0"
+  },
   "root": {
+    "folders": [],
     "id": "root",
     "name": {
       "default": "Example checks",
@@ -19,31 +19,77 @@
     },
     "rules": [
       {
-        "id": "wall-reference-required",
+        "applicability": {
+          "groups": {
+            "walls": {
+              "id": "walls",
+              "name": {
+                "default": "Walls",
+                "translations": {
+                  "de": "Wände"
+                }
+              },
+              "selector": {
+                "includeSubtypes": true,
+                "kind": "entityType",
+                "objectType": "axioval:example.ifc.wall"
+              }
+            }
+          }
+        },
         "definitionId": "axioval:example.property-exists",
+        "enabled": true,
+        "explanatoryImages": [
+          {
+            "alternativeText": {
+              "default": "A selected wall linked to its required reference.",
+              "translations": {
+                "de": "Eine ausgewählte Wand mit ihrer erforderlichen Referenz."
+              }
+            },
+            "caption": {
+              "default": "Applicability selects the wall; the requirement targets that group.",
+              "translations": {
+                "de": "Die Anwendbarkeit wählt die Wand aus; die Anforderung zielt auf diese Gruppe."
+              }
+            },
+            "id": "wall-reference",
+            "mediaType": "image/svg+xml",
+            "path": "assets/wall-reference.svg"
+          }
+        ],
+        "id": "wall-reference-required",
         "name": {
           "default": "Walls require a reference",
           "translations": {}
         },
-        "enabled": true,
-        "severity": "error",
         "parameters": {
           "property": {
-            "type": "propertyReference",
             "property": "axioval:example.ifc.reference",
-            "propertySet": "axioval:example.ifc.pset-wall-common"
+            "propertySet": "axioval:example.ifc.pset-wall-common",
+            "type": "propertyReference"
           }
         },
-        "applicability": {
-          "kind": "entityType",
-          "objectType": "axioval:example.ifc.wall",
-          "includeSubtypes": true
-        },
+        "requirements": [
+          {
+            "id": "reference-required",
+            "statement": {
+              "default": "Every selected wall has a reference.",
+              "translations": {
+                "de": "Jede ausgewählte Wand hat eine Referenz."
+              }
+            },
+            "targetGroups": [
+              "walls"
+            ]
+          }
+        ],
+        "severity": "error",
         "tags": [
           "example"
         ]
       }
-    ],
-    "folders": []
-  }
+    ]
+  },
+  "schemaVersion": "0.1.0"
 }

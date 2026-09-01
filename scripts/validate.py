@@ -175,7 +175,12 @@ def main() -> None:
             validate_definition_document(definitions, str(definition.relative_to(ROOT)))
             definition_values.append(definitions)
             check_snapshot(definition, definitions)
-        bind_ruleset(value, definition_values, str(module.relative_to(ROOT)))
+        bind_ruleset(
+            value,
+            definition_values,
+            str(module.relative_to(ROOT)),
+            asset_root=manifest_path.parent,
+        )
         check_snapshot(module, value)
     for module in ROOT.glob("**/*.pkl"):
         if "examples" not in module.relative_to(ROOT).parts and re.search(

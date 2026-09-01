@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import math
 import re
+from pathlib import Path, PurePosixPath
 from typing import Any
+from xml.parsers import expat
 
 QUALIFIED_ID = re.compile(r"^[a-z][a-z0-9+.-]*:.+$")
 IDENTIFIER = re.compile(r"^[a-z][A-Za-z0-9]*(?:[._-][A-Za-z0-9]+)*$")
@@ -42,6 +44,13 @@ SELECTOR_OPERATORS = {
     "greaterThanOrEquals",
     "matches",
     "exists",
+}
+IMAGE_MEDIA_TYPES = {
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+    ".webp": "image/webp",
 }
 
 
@@ -507,8 +516,229 @@ def validate_selector(
         fail(context, f"unknown selector kind {kind!r}")
 
 
+def validate_applicability(
+    value: Any,
+    context: str,
+    object_types: dict[str, dict[str, Any]],
+    properties: dict[str, dict[str, Any]],
+    property_sets: dict[str, dict[str, Any]],
+) -> set[str]:
+    value = object_value(value, context)
+    if "kind" in value:
+        validate_selector(value, context, object_types, properties, property_sets)
+        return set()
+    exact_keys(value, {"groups"}, set(), context)
+    groups = object_value(value["groups"], f"{context}.groups")
+    if not groups:
+        fail(context, "rich applicability requires at least one target group")
+    group_ids: set[str] = set()
+    for key, group in groups.items():
+        group_context = f"{context}.groups[{key!r}]"
+        group = object_value(group, group_context)
+        exact_keys(
+            group,
+            {"id", "name", "selector"},
+            {"description"},
+            group_context,
+        )
+        group_id = group["id"]
+        if type(key) is not str or type(group_id) is not str:
+            fail(group_context, "target-group key and id must be strings")
+        if key != group_id or not IDENTIFIER.fullmatch(group_id):
+            fail(group_context, "target-group map key and id must match and be valid")
+        localized_text(group["name"], f"{group_context}.name")
+        if "description" in group:
+            localized_text(group["description"], f"{group_context}.description")
+        validate_selector(
+            group["selector"],
+            f"{group_context}.selector",
+            object_types,
+            properties,
+            property_sets,
+        )
+        group_ids.add(group_id)
+    return group_ids
+
+
+def validate_requirements(value: Any, target_groups: set[str], context: str) -> None:
+    requirements = list_value(value, context)
+    if requirements and not target_groups:
+        fail(context, "requirements require rich applicability target groups")
+    seen_ids: set[str] = set()
+    for index, requirement in enumerate(requirements):
+        requirement_context = f"{context}[{index}]"
+        requirement = object_value(requirement, requirement_context)
+        exact_keys(
+            requirement,
+            {"id", "statement", "targetGroups"},
+            {"description"},
+            requirement_context,
+        )
+        requirement_id = requirement["id"]
+        if type(requirement_id) is not str or not IDENTIFIER.fullmatch(requirement_id):
+            fail(requirement_context, "invalid requirement id")
+        if requirement_id in seen_ids:
+            fail(requirement_context, f"duplicate requirement id {requirement_id!r}")
+        seen_ids.add(requirement_id)
+        localized_text(requirement["statement"], f"{requirement_context}.statement")
+        if "description" in requirement:
+            localized_text(
+                requirement["description"], f"{requirement_context}.description"
+            )
+        referenced = string_list(
+            requirement["targetGroups"], f"{requirement_context}.targetGroups"
+        )
+        if not referenced or len(set(referenced)) != len(referenced):
+            fail(requirement_context, "targetGroups must be non-empty and unique")
+        invalid = {
+            group_id
+            for group_id in referenced
+            if not IDENTIFIER.fullmatch(group_id) or group_id not in target_groups
+        }
+        if invalid:
+            fail(requirement_context, f"unknown target groups {sorted(invalid)}")
+
+
+def validate_image_content(candidate: Path, media_type: str, context: str) -> None:
+    if candidate.stat().st_size > 10_000_000:
+        fail(context, "package image exceeds the 10 MB safety limit")
+    content = candidate.read_bytes()
+    if media_type == "image/svg+xml":
+        if b"<!DOCTYPE" in content.upper():
+            fail(context, "SVG must not contain a document type")
+        blocked_elements = {
+            "a",
+            "animate",
+            "animatemotion",
+            "animatetransform",
+            "embed",
+            "foreignobject",
+            "iframe",
+            "object",
+            "script",
+            "set",
+            "style",
+        }
+        root_name: str | None = None
+
+        def local_name(name: str) -> str:
+            return name.rsplit("}", 1)[-1].lower()
+
+        def reject_declaration(*_args: Any) -> None:
+            raise ValueError("active SVG declaration")
+
+        def start_element(name: str, attributes: dict[str, str]) -> None:
+            nonlocal root_name
+            element_name = local_name(name)
+            if root_name is None:
+                root_name = element_name
+            if element_name in blocked_elements:
+                raise ValueError("active SVG element")
+            for raw_attribute, raw_value in attributes.items():
+                attribute = local_name(raw_attribute)
+                value = raw_value.strip().lower()
+                if attribute.startswith("on") or attribute in {"base", "style"}:
+                    raise ValueError("active SVG attribute")
+                if attribute == "href" and value and not value.startswith("#"):
+                    raise ValueError("external SVG reference")
+                if "url(" in value and re.fullmatch(
+                    r"url\(#[A-Za-z_][A-Za-z0-9_.:-]*\)", value
+                ) is None:
+                    raise ValueError("external SVG URL")
+                if any(
+                    token in value
+                    for token in (
+                        "data:",
+                        "javascript:",
+                        "http://",
+                        "https://",
+                        "//",
+                    )
+                ):
+                    raise ValueError("external or executable SVG value")
+
+        parser = expat.ParserCreate(namespace_separator="}")
+        parser.StartElementHandler = start_element
+        parser.StartDoctypeDeclHandler = reject_declaration
+        parser.EntityDeclHandler = reject_declaration
+        parser.ProcessingInstructionHandler = reject_declaration
+        parser.ExternalEntityRefHandler = reject_declaration
+        try:
+            parser.Parse(content, True)
+        except ValueError:
+            fail(context, "SVG contains active or foreign content")
+        except expat.ExpatError:
+            fail(context, "SVG is not well-formed XML")
+        if root_name != "svg":
+            fail(context, "SVG document has the wrong root element")
+        return
+    signatures = {
+        "image/jpeg": content.startswith(b"\xff\xd8\xff"),
+        "image/png": content.startswith(b"\x89PNG\r\n\x1a\n"),
+        "image/webp": len(content) >= 12
+        and content.startswith(b"RIFF")
+        and content[8:12] == b"WEBP",
+    }
+    if not signatures.get(media_type, False):
+        fail(context, "image bytes do not match the declared media type")
+
+
+def validate_explanatory_images(
+    value: Any, context: str, asset_root: Path | None
+) -> None:
+    images = list_value(value, context)
+    if images and asset_root is None:
+        fail(context, "package asset root is required for explanatory images")
+    seen_ids: set[str] = set()
+    resolved_root = asset_root.resolve() if asset_root is not None else None
+    for index, image in enumerate(images):
+        image_context = f"{context}[{index}]"
+        image = object_value(image, image_context)
+        exact_keys(
+            image,
+            {"id", "path", "mediaType", "alternativeText"},
+            {"caption"},
+            image_context,
+        )
+        image_id = image["id"]
+        if type(image_id) is not str or not IDENTIFIER.fullmatch(image_id):
+            fail(image_context, "invalid explanatory-image id")
+        if image_id in seen_ids:
+            fail(image_context, f"duplicate explanatory-image id {image_id!r}")
+        seen_ids.add(image_id)
+        path = image["path"]
+        media_type = image["mediaType"]
+        if type(path) is not str or type(media_type) is not str or "\\" in path:
+            fail(image_context, "image path and mediaType must be strings")
+        relative = PurePosixPath(path)
+        if (
+            relative.is_absolute()
+            or not relative.parts
+            or any(part in {"", ".", ".."} for part in relative.parts)
+            or relative.as_posix() != path
+        ):
+            fail(image_context, "image path must be a normalized relative path")
+        expected_media_type = IMAGE_MEDIA_TYPES.get(relative.suffix.lower())
+        if expected_media_type is None or media_type != expected_media_type:
+            fail(image_context, "image extension and mediaType do not match")
+        localized_text(
+            image["alternativeText"], f"{image_context}.alternativeText"
+        )
+        if "caption" in image:
+            localized_text(image["caption"], f"{image_context}.caption")
+        if resolved_root is not None:
+            candidate = (resolved_root / path).resolve()
+            if not candidate.is_relative_to(resolved_root) or not candidate.is_file():
+                fail(image_context, "referenced package image is missing or escapes package")
+            validate_image_content(candidate, media_type, image_context)
+
+
 def bind_ruleset(
-    value: Any, definition_documents: list[dict[str, Any]], context: str
+    value: Any,
+    definition_documents: list[dict[str, Any]],
+    context: str,
+    *,
+    asset_root: Path | None = None,
 ) -> None:
     value = object_value(value, context)
     exact_keys(
@@ -660,7 +890,12 @@ def bind_ruleset(
                     "applicability",
                     "tags",
                 },
-                {"description", "message"},
+                {
+                    "description",
+                    "message",
+                    "requirements",
+                    "explanatoryImages",
+                },
                 rule_context,
             )
             rule_id = rule["id"]
@@ -733,12 +968,22 @@ def bind_ruleset(
                         rule_context,
                         f"parameter {parameter_id!r} is outside allowedValues",
                     )
-            validate_selector(
+            target_groups = validate_applicability(
                 rule["applicability"],
                 f"{rule_context}.applicability",
                 object_types,
                 properties,
                 property_sets,
+            )
+            validate_requirements(
+                rule.get("requirements", []),
+                target_groups,
+                f"{rule_context}.requirements",
+            )
+            validate_explanatory_images(
+                rule.get("explanatoryImages", []),
+                f"{rule_context}.explanatoryImages",
+                asset_root,
             )
         for index, child in enumerate(
             list_value(folder["folders"], f"{folder_context}.folders")

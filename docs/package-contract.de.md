@@ -35,7 +35,9 @@ Die Reihenfolge ist Teil des Sicherheitsvertrags:
 3. **alle** Regelwerk- und Definitionspfade innerhalb der Repository-Wurzel auflösen;
 4. Pkl nur mit `file:`-/`pkl:`-Modulen und `file:`-/`prop:`-Ressourcen sowie CPU-, Speicher-, Ausgabe- und Zeitlimits auswerten;
 5. jedes Kandidaten-Definitionsdokument validieren;
-6. deklarierte Pakete, Objekttypen, Eigenschaften, Property-Set-Qualifizierer, Vorlagen, Selektoren und typisierte Parameterwerte binden;
+6. deklarierte Pakete, Objekttypen, Eigenschaften,
+   Property-Set-Qualifizierer, Vorlagen, Anwendbarkeitsgruppen, Anforderungen,
+   Selektoren, typisierte Parameterwerte und erklärende Bilddateien binden;
 7. doppelte, fehlende, unbekannte, widersprüchliche, fehlerhafte oder nicht unterstützte Deklarationen ablehnen; und
 8. semantisch validierte Ausgabe mit geprüften normalisierten Snapshots vergleichen.
 
@@ -88,6 +90,18 @@ Selektorobjekt. Der Binder prüft dieses Objekt rekursiv und löst alle Objekt-
 typen und Eigenschaftskonzepte über die geladenen Definitionspakete auf.
 Unbekannte Konzepte, fehlerhafte Operanden und nicht unterstützte
 Wertkombinationen werden geschlossen abgelehnt.
+
+## Bilddateien im Paket
+
+Erklärende Bilder sind Daten und keine ausführbaren Erweiterungen. Ihre Pfade
+müssen im Paket bleiben. Aufrufer müssen bei Regelsätzen mit Bildreferenzen die
+Paketwurzel übergeben; ohne sie lehnt der Binder solche Regelsätze ab. Er löst
+jede referenzierte Datei auf, prüft Größe, Erweiterung, deklarierten Medientyp
+und Dateisignatur und parst SVG als inertes XML. Aktive Elemente,
+Ereignisbehandler, externe Links, Dokumenttypen, Verarbeitungsanweisungen,
+Stilinhalte und fremde SVG-Inhalte werden geschlossen abgelehnt. Verbraucher
+sollen dennoch eine eigene Sandbox für Bilddekodierung und Darstellung
+verwenden.
 
 ## Quell- und kompilierte Formen
 

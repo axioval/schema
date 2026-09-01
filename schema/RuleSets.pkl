@@ -4,6 +4,48 @@ import "Types.pkl"
 import "Values.pkl"
 import "Selectors.pkl"
 
+typealias ImageMediaType = "image/png" | "image/jpeg" | "image/webp" | "image/svg+xml"
+
+/// One named population participating in a rule. Requirements and capability
+/// adapters target groups by `id`; folders never change this scope.
+class TargetGroup {
+  id: Types.Identifier
+  name: Types.LocalizedText
+  description: Types.LocalizedText?
+  selector: Selectors.Selector
+}
+
+/// Rich applicability for rules involving one or more independently selected
+/// populations, such as hosts, services, and openings.
+class Applicability {
+  groups: Mapping<String, TargetGroup>(
+    length > 0 && toMap().every((key, value) -> key == value.id)
+  )
+}
+
+/// A human-readable expected state tied to named applicability groups. Runtime
+/// behavior remains owned by the rule definition's declared capability.
+class Requirement {
+  id: Types.Identifier
+  statement: Types.LocalizedText
+  description: Types.LocalizedText?
+  targetGroups: Listing<Types.Identifier>(length > 0)
+}
+
+/// A package-contained explanatory image. `path` is validated after evaluation
+/// as a traversal-safe relative path whose extension matches `mediaType`.
+class ExplanatoryImage {
+  id: Types.Identifier
+  path: String(length > 0)
+  mediaType: ImageMediaType
+  alternativeText: Types.LocalizedText
+  caption: Types.LocalizedText?
+}
+
+/// Legacy single selectors remain valid so existing `0.1.0` packages continue
+/// to evaluate. New multi-population rules should use `Applicability`.
+typealias RuleApplicability = Selectors.Selector | Applicability
+
 class RuleInstance {
   id: Types.Identifier
   definitionId: Types.QualifiedIdentifier
@@ -13,7 +55,9 @@ class RuleInstance {
   severity: Types.Severity = "error"
   message: Types.LocalizedText?
   parameters: Mapping<String, Values.ParameterValue> = new {}
-  applicability: Selectors.Selector = new Selectors.AllSelector {}
+  applicability: RuleApplicability = new Selectors.AllSelector {}
+  requirements: Listing<Requirement> = new {}
+  explanatoryImages: Listing<ExplanatoryImage> = new {}
   tags: Listing<String> = new {}
 }
 

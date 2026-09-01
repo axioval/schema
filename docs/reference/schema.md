@@ -107,6 +107,42 @@ A comparison value on a property selector must match the referenced property's
 catalogued `valueKind`. `exists` rejects a comparison value; every other
 operator requires one.
 
+## Rich applicability
+
+A rule that involves several populations uses an `Applicability` object. Its
+`groups` map gives every population a stable local ID, localized name, optional
+description, and recursively validated selector. Requirements and trusted host
+adapters can target these groups by ID.
+
+For example, an opening-coordination rule can name separate groups for
+penetrated elements, penetrating elements, and openings without pretending they
+are one flat selection. Group-map keys must equal group IDs. Empty group maps,
+unknown concepts, and malformed selectors are rejected.
+
+Legacy rules may still provide one selector directly. Requirements need rich
+applicability because a flat selector has no targetable group IDs.
+
+## Requirements
+
+A `Requirement` records a stable ID, localized statement, optional description,
+and one or more `targetGroups`. Every referenced group must exist in the same
+rule. Requirement IDs and group references must be unique.
+
+Requirements explain the expected state. They do not execute package code or
+replace the `RuleDefinition.capability` contract used by a trusted application.
+
+## Explanatory images
+
+A rule can carry `ExplanatoryImage` entries with localized alternative text and
+an optional localized caption. Images are package-contained assets referenced by
+a normalized relative path and declared media type. PNG, JPEG, WebP, and SVG are
+supported.
+
+Normalization rejects absolute paths, traversal, backslashes, extension and
+media-type mismatches, duplicate image IDs, missing files, symlink escapes,
+active SVG content, external SVG references, and raster signature mismatches.
+Images are explanatory only and never change applicability or execution.
+
 ## Folders are cosmetic
 
 `RuleFolder` exists for presentation and organization. Its position does not

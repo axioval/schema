@@ -96,6 +96,48 @@ Selektoren sind deklarativ und werden rekursiv validiert:
 
 Ein Vergleichswert auf einem Eigenschaftsselektor muss zur katalogisierten `valueKind` der referenzierten Eigenschaft passen. `exists` lehnt einen Vergleichswert ab. Jeder andere Operator benötigt einen.
 
+## Umfangreiche Anwendbarkeit
+
+Eine Regel mit mehreren Populationen verwendet ein `Applicability`-Objekt. Die
+Map `groups` gibt jeder Population eine stabile lokale ID, einen lokalisierten
+Namen, eine optionale Beschreibung und einen rekursiv validierten Selektor.
+Anforderungen und vertrauenswürdige Host-Adapter können diese Gruppen über ihre
+ID ansprechen.
+
+Eine Regel für die Schlitz- und Durchbruchsplanung kann zum Beispiel getrennte
+Gruppen für durchdrungene Bauteile, durchdringende Bauteile und Öffnungen
+benennen, statt sie als eine flache Auswahl darzustellen. Map-Schlüssel müssen
+den Gruppen-IDs entsprechen. Leere Gruppen-Maps, unbekannte Begriffe und
+fehlerhafte Selektoren werden abgelehnt.
+
+Bestehende Regeln dürfen weiterhin direkt einen einzelnen Selektor angeben.
+Anforderungen benötigen die umfangreiche Form, weil ein flacher Selektor keine
+adressierbaren Gruppen-IDs hat.
+
+## Anforderungen
+
+Eine `Requirement` besitzt eine stabile ID, eine lokalisierte Aussage, eine
+optionale Beschreibung und eine oder mehrere `targetGroups`. Jede referenzierte
+Gruppe muss in derselben Regel vorhanden sein. Anforderungs-IDs und
+Gruppenreferenzen müssen eindeutig sein.
+
+Anforderungen erklären den erwarteten Zustand. Sie führen keinen Paketcode aus
+und ersetzen nicht den Vertrag `RuleDefinition.capability`, den eine
+vertrauenswürdige Anwendung umsetzt.
+
+## Erklärende Bilder
+
+Eine Regel kann `ExplanatoryImage`-Einträge mit lokalisiertem Alternativtext und
+einer optionalen lokalisierten Bildunterschrift enthalten. Bilder sind im Paket
+enthaltene Dateien mit normalisiertem relativem Pfad und deklariertem Medientyp.
+PNG, JPEG, WebP und SVG werden unterstützt.
+
+Die Normalisierung lehnt absolute Pfade, Traversierung, Rückwärtsschrägstriche,
+Abweichungen zwischen Erweiterung und Medientyp, doppelte Bild-IDs, fehlende
+Dateien, aus dem Paket führende symbolische Links, aktive SVG-Inhalte, externe
+SVG-Referenzen und falsche Raster-Signaturen ab. Bilder erklären nur und ändern
+weder Anwendbarkeit noch Ausführung.
+
 ## Ordner sind kosmetisch
 
 `RuleFolder` dient Darstellung und Organisation. Seine Position ändert weder Selektorumfang, Regelidentität, Ausführungssemantik noch Vertrauen. Verbraucher können alternative Ansichten darstellen, ohne die Regeln umzuschreiben.

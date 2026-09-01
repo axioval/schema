@@ -58,7 +58,10 @@ class BindingTests(unittest.TestCase):
         cls.din_ruleset = json.loads((din_expected / "ruleset.json").read_text())
 
     def copies(self) -> tuple[dict, dict]:
-        return copy.deepcopy(self.ruleset), copy.deepcopy(self.definitions)
+        ruleset = copy.deepcopy(self.ruleset)
+        for rule in ruleset["root"]["rules"]:
+            rule.pop("explanatoryImages", None)
+        return ruleset, copy.deepcopy(self.definitions)
 
     def test_accepts_fully_bound_ruleset(self) -> None:
         ruleset, definitions = self.copies()
@@ -154,9 +157,9 @@ class BindingTests(unittest.TestCase):
 
     def test_rejects_unknown_object_type_concept(self) -> None:
         ruleset, definitions = self.copies()
-        ruleset["root"]["rules"][0]["applicability"]["objectType"] = (
-            "axioval:unknown.object-type"
-        )
+        ruleset["root"]["rules"][0]["applicability"]["groups"]["walls"][
+            "selector"
+        ]["objectType"] = "axioval:unknown.object-type"
         with self.assertRaises(SystemExit):
             validate.bind_ruleset(ruleset, [definitions], "test")
 
@@ -198,6 +201,185 @@ class BindingTests(unittest.TestCase):
         rule["description"] = text
         rule["message"] = text
         validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def rich_rule(self, ruleset: dict) -> dict:
+        rule = ruleset["root"]["rules"][0]
+        selector = {
+            "kind": "entityType",
+            "objectType": "axioval:example.ifc.wall",
+            "includeSubtypes": True,
+        }
+        text = {"default": "Subjects", "translations": {"de": "Prüfobjekte"}}
+        rule["applicability"] = {
+            "groups": {
+                "subjects": {
+                    "id": "subjects",
+                    "name": text,
+                    "selector": selector,
+                }
+            }
+        }
+        rule["requirements"] = [
+            {
+                "id": "has-reference",
+                "statement": {
+                    "default": "Subjects have a reference.",
+                    "translations": {"de": "Prüfobjekte haben eine Referenz."},
+                },
+                "targetGroups": ["subjects"],
+            }
+        ]
+        rule["explanatoryImages"] = [
+            {
+                "id": "target-groups",
+                "path": "assets/target-groups.svg",
+                "mediaType": "image/svg+xml",
+                "alternativeText": {
+                    "default": "Subjects selected by the rule.",
+                    "translations": {"de": "Von der Regel ausgewählte Prüfobjekte."},
+                },
+                "caption": text,
+            }
+        ]
+        return rule
+
+    def test_accepts_target_groups_requirements_and_existing_image(self) -> None:
+        ruleset, definitions = self.copies()
+        self.rich_rule(ruleset)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = validate.Path(tmp)
+            (root / "assets").mkdir()
+            (root / "assets/target-groups.svg").write_text("<svg/>")
+            validate.bind_ruleset(ruleset, [definitions], "test", asset_root=root)
+
+    def test_rejects_requirement_for_unknown_or_duplicate_target_group(self) -> None:
+        for target_groups in (["missing"], ["subjects", "subjects"], []):
+            ruleset, definitions = self.copies()
+            rule = self.rich_rule(ruleset)
+            rule["requirements"][0]["targetGroups"] = target_groups
+            with self.subTest(target_groups=target_groups), self.assertRaises(SystemExit):
+                validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_invalid_target_group_map_or_selector(self) -> None:
+        mutations = (
+            lambda group: group.update(id="different"),
+            lambda group: group["selector"].update(objectType="axioval:unknown"),
+        )
+        for mutate in mutations:
+            ruleset, definitions = self.copies()
+            rule = self.rich_rule(ruleset)
+            mutate(rule["applicability"]["groups"]["subjects"])
+            with self.subTest(mutate=mutate), self.assertRaises(SystemExit):
+                validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_image_without_asset_root(self) -> None:
+        ruleset, definitions = self.copies()
+        self.rich_rule(ruleset)
+        with self.assertRaisesRegex(SystemExit, "asset root is required"):
+            validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_svg_external_loading_vectors(self) -> None:
+        cases = (
+            (
+                '<svg xmlns="http://www.w3.org/2000/svg">'
+                '<style>@import url(https://attacker.invalid/x.css)</style></svg>'
+            ),
+            (
+                '<?xml-stylesheet href="https://attacker.invalid/x.css" '
+                'type="text/css"?>'
+                '<svg xmlns="http://www.w3.org/2000/svg"/>'
+            ),
+            (
+                '<svg xmlns="http://www.w3.org/2000/svg">'
+                '<rect fill="url(other.svg#gradient)"/></svg>'
+            ),
+            (
+                '<svg xmlns="http://www.w3.org/2000/svg" '
+                'xml:base="../outside.svg"><use href="#shape"/></svg>'
+            ),
+        )
+        for content in cases:
+            ruleset, definitions = self.copies()
+            rule = self.rich_rule(ruleset)
+            with tempfile.TemporaryDirectory() as temporary:
+                root = validate.Path(temporary)
+                image_path = root / rule["explanatoryImages"][0]["path"]
+                image_path.parent.mkdir(parents=True)
+                image_path.write_text(content)
+                with self.subTest(content=content), self.assertRaises(SystemExit):
+                    validate.bind_ruleset(
+                        ruleset, [definitions], "test", asset_root=root
+                    )
+
+    def test_rejects_unsafe_missing_or_mistyped_explanatory_image(self) -> None:
+        cases = (
+            ("../outside.svg", "image/svg+xml", False),
+            ("/absolute.svg", "image/svg+xml", False),
+            ("assets\\diagram.svg", "image/svg+xml", False),
+            ("assets/diagram.png", "image/svg+xml", False),
+            ("assets/missing.svg", "image/svg+xml", True),
+        )
+        for path, media_type, check_existence in cases:
+            ruleset, definitions = self.copies()
+            rule = self.rich_rule(ruleset)
+            image = rule["explanatoryImages"][0]
+            image["path"] = path
+            image["mediaType"] = media_type
+            with tempfile.TemporaryDirectory() as tmp:
+                root = validate.Path(tmp) if check_existence else None
+                with self.subTest(path=path), self.assertRaises(SystemExit):
+                    validate.bind_ruleset(
+                        ruleset, [definitions], "test", asset_root=root
+                    )
+
+    def test_rejects_duplicate_requirement_or_image_ids(self) -> None:
+        for field in ("requirements", "explanatoryImages"):
+            ruleset, definitions = self.copies()
+            rule = self.rich_rule(ruleset)
+            rule[field].append(copy.deepcopy(rule[field][0]))
+            with self.subTest(field=field), self.assertRaises(SystemExit):
+                validate.bind_ruleset(ruleset, [definitions], "test")
+
+    def test_rejects_active_svg_or_spoofed_raster_image(self) -> None:
+        ruleset, definitions = self.copies()
+        rule = self.rich_rule(ruleset)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = validate.Path(temporary)
+            (root / "assets").mkdir()
+            svg_path = root / rule["explanatoryImages"][0]["path"]
+            svg_path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
+            )
+            with self.assertRaises(SystemExit):
+                validate.bind_ruleset(
+                    ruleset, [definitions], "test", asset_root=root
+                )
+
+            svg_path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg">'
+                '<animate attributeName="opacity" values="0;1"/></svg>'
+            )
+            with self.assertRaises(SystemExit):
+                validate.bind_ruleset(
+                    ruleset, [definitions], "test", asset_root=root
+                )
+
+            svg_path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg">'
+                '<rect style="fill:url(data:image/svg+xml,bad)"/></svg>'
+            )
+            with self.assertRaises(SystemExit):
+                validate.bind_ruleset(
+                    ruleset, [definitions], "test", asset_root=root
+                )
+
+            rule["explanatoryImages"][0]["path"] = "assets/diagram.png"
+            rule["explanatoryImages"][0]["mediaType"] = "image/png"
+            (root / "assets/diagram.png").write_bytes(b"not a png")
+            with self.assertRaises(SystemExit):
+                validate.bind_ruleset(
+                    ruleset, [definitions], "test", asset_root=root
+                )
 
     def test_accepts_compatible_default_and_allowed_value(self) -> None:
         _, definitions = self.copies()

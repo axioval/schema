@@ -32,8 +32,44 @@ root = new RuleSets.RuleFolder {
           propertySet = "axioval:example.ifc.pset-wall-common"
         }
       }
-      applicability = new Selectors.EntityTypeSelector {
-        objectType = "axioval:example.ifc.wall"
+      applicability = new RuleSets.Applicability {
+        groups {
+          ["walls"] = new RuleSets.TargetGroup {
+            id = "walls"
+            name = new Types.LocalizedText {
+              default = "Walls"
+              translations { ["de"] = "Wände" }
+            }
+            selector = new Selectors.EntityTypeSelector {
+              objectType = "axioval:example.ifc.wall"
+            }
+          }
+        }
+      }
+      requirements {
+        new RuleSets.Requirement {
+          id = "reference-required"
+          statement = new Types.LocalizedText {
+            default = "Every selected wall has a reference."
+            translations { ["de"] = "Jede ausgewählte Wand hat eine Referenz." }
+          }
+          targetGroups { "walls" }
+        }
+      }
+      explanatoryImages {
+        new RuleSets.ExplanatoryImage {
+          id = "wall-reference"
+          path = "assets/wall-reference.svg"
+          mediaType = "image/svg+xml"
+          alternativeText = new Types.LocalizedText {
+            default = "A selected wall linked to its required reference."
+            translations { ["de"] = "Eine ausgewählte Wand mit ihrer erforderlichen Referenz." }
+          }
+          caption = new Types.LocalizedText {
+            default = "Applicability selects the wall; the requirement targets that group."
+            translations { ["de"] = "Die Anwendbarkeit wählt die Wand aus; die Anforderung zielt auf diese Gruppe." }
+          }
+        }
       }
       tags { "example" }
     }

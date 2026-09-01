@@ -66,7 +66,12 @@ class SelectorParameterTests(unittest.TestCase):
 
     def test_accepts_bound_selector_parameter(self) -> None:
         ruleset, definitions = self.candidate()
-        validate.bind_ruleset(ruleset, [definitions], "test")
+        validate.bind_ruleset(
+            ruleset,
+            [definitions],
+            "test",
+            asset_root=validate.ROOT / "examples/minimal",
+        )
 
     def test_selector_defaults_and_allowed_values_bind_concepts(self) -> None:
         invalid = {
@@ -87,7 +92,12 @@ class SelectorParameterTests(unittest.TestCase):
             ]["compared"]
             parameter[field] = value
             with self.subTest(field=field), self.assertRaises(SystemExit):
-                validate.bind_ruleset(ruleset, [definitions], "test")
+                validate.bind_ruleset(
+                    ruleset,
+                    [definitions],
+                    "test",
+                    asset_root=validate.ROOT / "examples/minimal",
+                )
 
     def test_rejects_malformed_or_unbound_nested_selector(self) -> None:
         for selector in (
@@ -101,4 +111,9 @@ class SelectorParameterTests(unittest.TestCase):
             ruleset, definitions = self.candidate()
             ruleset["root"]["rules"][0]["parameters"]["compared"]["value"] = selector
             with self.subTest(selector=selector), self.assertRaises(SystemExit):
-                validate.bind_ruleset(ruleset, [definitions], "test")
+                validate.bind_ruleset(
+                    ruleset,
+                    [definitions],
+                    "test",
+                    asset_root=validate.ROOT / "examples/minimal",
+                )

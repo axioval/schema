@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" role="img" aria-labelledby="title description">
+  <title id="title">Applicability group and requirement</title>
+  <desc id="description">A wall selected into a target group points to a required reference value.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset="1" stop-color="#17253d"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+  <rect width="800" height="420" rx="24" fill="url(#background)"/>
+  <rect x="56" y="72" width="270" height="276" rx="18" fill="#1f334f" stroke="#7dd3fc" stroke-width="3"/>
+  <text x="84" y="116" fill="#e2e8f0" font-family="sans-serif" font-size="25" font-weight="700">Applicability / Anwendbarkeit</text>
+  <rect x="94" y="154" width="194" height="146" rx="12" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+  <path d="M126 182h130v90H126z" fill="#64748b"/>
+  <path d="M150 182v90M178 182v90M206 182v90M234 182v90" stroke="#cbd5e1" stroke-width="4"/>
+  <text x="191" y="326" fill="#bae6fd" text-anchor="middle" font-family="sans-serif" font-size="20">walls / Wände</text>
+  <path d="M340 210h116" stroke="#7dd3fc" stroke-width="5" marker-end="url(#arrow)"/>
+  <rect x="474" y="112" width="270" height="196" rx="18" fill="#243b32" stroke="#86efac" stroke-width="3"/>
+  <text x="609" y="158" fill="#dcfce7" text-anchor="middle" font-family="sans-serif" font-size="25" font-weight="700">Requirement</text>
+  <text x="609" y="190" fill="#dcfce7" text-anchor="middle" font-family="sans-serif" font-size="21">Anforderung</text>
+  <rect x="520" y="220" width="178" height="48" rx="10" fill="#166534"/>
+  <text x="609" y="251" fill="#f0fdf4" text-anchor="middle" font-family="monospace" font-size="20">Reference ✓</text>
+  <text x="400" y="388" fill="#cbd5e1" text-anchor="middle" font-family="sans-serif" font-size="18">Named groups are stable targets for requirements.</text>
+</svg>

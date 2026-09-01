@@ -40,7 +40,8 @@ The order is part of the security contract:
    under CPU, memory, output, and time limits;
 5. validate every candidate definition document;
 6. bind declared packages, object types, properties, property-set qualifiers,
-   templates, selectors, and typed parameter values;
+   templates, applicability groups, requirements, selectors, typed parameter
+   values, and explanatory image assets;
 7. reject duplicate, missing, unknown, conflicting, malformed, or unsupported
    declarations; and
 8. compare semantically validated output with checked normalized snapshots.
@@ -95,6 +96,17 @@ The normalized value has `type: "selector"` and a nested selector object. The
 binder recursively validates that object and resolves every object-type and
 property concept through the loaded definition packages. Unknown concepts,
 malformed operands, and unsupported value combinations fail closed.
+
+## Package image assets
+
+Explanatory images are data, not executable extensions. Their paths must remain
+inside the package. Callers must provide the package root whenever a ruleset
+references images; the binder rejects image-bearing rulesets when that root is
+missing. It resolves every referenced file, checks the size, extension, declared
+media type, and file signature, and parses SVG as inert XML. Active elements,
+event handlers, external links, document types, processing instructions, style
+content, and foreign SVG content fail closed. Consumers should still apply their
+own image decoding and rendering sandbox.
 
 ## Source and compiled forms
 
