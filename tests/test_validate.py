@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 from scripts import validate
 
@@ -35,6 +36,35 @@ class LocalModuleTests(unittest.TestCase):
             (base / "rules.pkl").symlink_to(target)
             with self.assertRaises(SystemExit):
                 validate.local_module(base, "rules.pkl")
+
+
+class EvaluateTests(unittest.TestCase):
+    def test_uses_explicit_root_for_sandbox_and_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            module = root / "package/rules.pkl"
+            module.parent.mkdir()
+            module.write_text("value = 1\n")
+            completed = Mock(returncode=0, stdout="{}", stderr="")
+            with patch.object(
+                validate.subprocess, "run", return_value=completed
+            ) as run:
+                self.assertEqual(validate.evaluate(module, root), {})
+            command = run.call_args.args[0]
+            self.assertEqual(command[command.index("--root-dir") + 1], str(root))
+            self.assertEqual(
+                command[command.index("--allowed-resources") + 1],
+                "prop:pkl.outputFormat",
+            )
+
+    def test_denies_file_resources(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / "secret.txt").write_text("secret", encoding="utf-8")
+            module = root / "rules.pkl"
+            module.write_text('value = read("secret.txt")\n', encoding="utf-8")
+            with self.assertRaises(SystemExit):
+                validate.evaluate(module, root)
 
 
 class IdentityTests(unittest.TestCase):

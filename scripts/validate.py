@@ -47,18 +47,19 @@ def pkl_executable() -> str:
     return executable
 
 
-def evaluate(module: Path) -> dict:
+def evaluate(module: Path, root: Path = ROOT) -> dict:
+    root = root.resolve()
     command = [
         pkl_executable(),
         "eval",
         "-f",
         "json",
         "--root-dir",
-        str(ROOT),
+        str(root),
         "--allowed-modules",
         "file:,pkl:",
         "--allowed-resources",
-        "file:,prop:",
+        "prop:pkl.outputFormat",
         "--timeout",
         "10",
         str(module),
@@ -67,11 +68,11 @@ def evaluate(module: Path) -> dict:
         command, cwd=module.parent, text=True, capture_output=True, check=False
     )
     if proc.returncode:
-        fail(f"{module.relative_to(ROOT)}: Pkl evaluation failed\n{proc.stderr}")
+        fail(f"{module.relative_to(root)}: Pkl evaluation failed\n{proc.stderr}")
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
-        fail(f"{module.relative_to(ROOT)} did not render JSON: {exc}")
+        fail(f"{module.relative_to(root)} did not render JSON: {exc}")
 
 
 def local_module(base: Path, value: str) -> Path:

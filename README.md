@@ -112,8 +112,20 @@ uvx --with-requirements requirements-docs.txt mkdocs build --strict
 ```
 
 The first command validates every example manifest, evaluates all declared
-entrypoints under the repository boundary, binds the result, and compares it to
-checked snapshots.
+entrypoints under the repository boundary, binds the result, compares it to
+checked snapshots, and packs and certifies a deterministic temporary MCS file.
+
+To create a transport artifact directly:
+
+```bash
+python3 scripts/mcs.py pack examples/minimal /tmp/minimal.mcs --repository-root .
+python3 scripts/mcs.py inspect /tmp/minimal.mcs
+python3 scripts/mcs.py verify /tmp/minimal.mcs
+```
+
+`inspect` checks container structure and embedded hashes without executing Pkl; it
+does not authenticate a publisher. `verify` is the authoring-side certification
+step; model-checking applications consume only the declarative normalized JSON.
 
 </details>
 

@@ -57,6 +57,7 @@ nav:
   - For tool builders:
       - How Axioval fits together: concepts/layers.md
       - Safe sharing checks: package-contract.md
+      - MCS container format: mcs-format.md
       - Full reference: reference/schema.md
   - Source and community:
       - GitHub home: https://github.com/axioval/schema
@@ -119,6 +120,7 @@ plugins:
             For tool builders: Für Werkzeugentwickler
             How Axioval fits together: So hängt Axioval zusammen
             Safe sharing checks: Sicheres Teilen
+            MCS container format: MCS-Containerformat
             Full reference: Vollständige Referenz
             Source and community: Quellcode und Gemeinschaft
             GitHub home: GitHub-Startseite

@@ -25,6 +25,6 @@ media, and content validation.
 
 ## Validation
 
-Run `./scripts/check.sh` for schema, binder, and snapshot validation. The repository pins Pkl in `.pkl-version` and CI uses the same version.
+Run `./scripts/check.sh` for schema, binder, snapshot, and deterministic MCS transport validation. The repository pins Pkl in `.pkl-version` and CI uses the same version. `scripts/mcs.py` packs source plus normalized declarative JSON; `inspect` never executes Pkl, while `verify` re-evaluates and binds extracted source before certification.
 
 Run `npx --yes markdownlint-cli2@0.18.1`, install `requirements-docs.txt`, and run `mkdocs build --strict` for documentation. GitHub Pages deploys only the linted, strict bilingual build from `main`; the build hook verifies that every Pkl fence contains syntax tokens.

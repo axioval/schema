@@ -10,6 +10,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Added
 
+- Deterministic, fail-closed `.mcs` transport tooling with exact source topology,
+  normalized declarative payloads, complete checksummed inventory, bounded ZIP
+  parsing, sandboxed source re-evaluation, and bilingual format documentation.
 - Structured package source catalogs, citations, ordered bibliographic locators,
   requirement citations, and explicit bound-parameter citation targets.
 - Targetable applicability groups and rule requirements that bind localized
