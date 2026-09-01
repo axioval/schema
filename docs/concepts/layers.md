@@ -72,7 +72,7 @@ A `RuleInstance` binds a known definition to concrete values. Its applicability
 can be one selector or named target groups, while requirements state what must
 hold for those groups. Optional explanatory images make the intent easier to
 understand but never affect execution. Instances are policy, the ABox-like
-layer, and belong in external ruleset repositories. This schema repository
+layer, and belong in external ruleset repositories. This MCS repository
 contains them only under `examples/`.
 
 ## 4. Package and normalization

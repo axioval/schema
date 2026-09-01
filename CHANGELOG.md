@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Axioval Schema are documented here.
+All notable changes to Axioval MCS are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 package/schema compatibility follows [Semantic Versioning](https://semver.org/)
@@ -89,5 +89,5 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Fail-closed cross-document package, definition, selector, and parameter binder.
 - Minimal non-production package and CI validation workflow.
 
-[Unreleased]: https://github.com/axioval/schema/compare/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3...HEAD
-[0.1.0]: https://github.com/axioval/schema/commit/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3
+[Unreleased]: https://github.com/axioval/mcs/compare/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3...HEAD
+[0.1.0]: https://github.com/axioval/mcs/commit/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3

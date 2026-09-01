@@ -5,14 +5,14 @@ hide:
 
 # Lizenz
 
-Axioval Schema ist unter der [GNU Affero General Public License, Version 3 oder später](https://spdx.org/licenses/AGPL-3.0-or-later.html) lizenziert.
+Axioval MCS ist unter der [GNU Affero General Public License, Version 3 oder später](https://spdx.org/licenses/AGPL-3.0-or-later.html) lizenziert.
 
 !!! warning "Maßgeblicher Lizenztext"
-    Lizenztexte sind rechtlich verbindliche Dokumente. Die maßgebliche, unveränderte Fassung befindet sich in der Repository-Datei [`LICENSE`](https://github.com/axioval/schema/blob/main/LICENSE) und auf der [Seite der Free Software Foundation](https://www.gnu.org/licenses/agpl-3.0.html). Diese deutsche Seite ist eine verständliche Orientierung und ersetzt nicht den Lizenztext.
+    Lizenztexte sind rechtlich verbindliche Dokumente. Die maßgebliche, unveränderte Fassung befindet sich in der Repository-Datei [`LICENSE`](https://github.com/axioval/mcs/blob/main/LICENSE) und auf der [Seite der Free Software Foundation](https://www.gnu.org/licenses/agpl-3.0.html). Diese deutsche Seite ist eine verständliche Orientierung und ersetzt nicht den Lizenztext.
 
 ## Kurz erklärt
 
-Sie dürfen Axioval Schema verwenden, kopieren, weitergeben und verändern, sofern Sie die Bedingungen der AGPL-3.0-or-later einhalten. Bei Weitergabe müssen Lizenz- und Urheberrechtshinweise erhalten bleiben und der entsprechende Quelltext verfügbar sein. Veränderte Fassungen müssen als solche gekennzeichnet werden und insgesamt unter derselben Lizenz stehen.
+Sie dürfen Axioval MCS verwenden, kopieren, weitergeben und verändern, sofern Sie die Bedingungen der AGPL-3.0-or-later einhalten. Bei Weitergabe müssen Lizenz- und Urheberrechtshinweise erhalten bleiben und der entsprechende Quelltext verfügbar sein. Veränderte Fassungen müssen als solche gekennzeichnet werden und insgesamt unter derselben Lizenz stehen.
 
 Wenn eine veränderte Fassung über ein Computernetz interaktiv genutzt wird, verlangt Abschnitt 13 der AGPL, den Nutzenden Zugang zum entsprechenden Quelltext dieser Fassung anzubieten.
 
@@ -24,7 +24,7 @@ Soweit gesetzlich zulässig wird das Programm ohne jede Gewährleistung bereitge
 
 ??? example "Quelltext oder Befehle anzeigen"
     ```text
-    Axioval Schema
+    Axioval MCS
     Copyright (C) 2026 Axioval contributors
     SPDX-License-Identifier: AGPL-3.0-or-later
     ```

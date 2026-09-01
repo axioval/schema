@@ -15,7 +15,7 @@ package = new Types.PackageMetadata {
     default = "Non-production terminology used by the schema examples."
     translations { ["de"] = "Nicht produktive Terminologie für die Schemabeispiele." }
   }
-  repository = "https://github.com/axioval/schema"
+  repository = "https://github.com/axioval/mcs"
 }
 
 sources {

@@ -20,7 +20,7 @@
         "de": "DIN-276-KG-331-Beispiel f\u00fcr tragende Au\u00dfenw\u00e4nde"
       }
     },
-    "repository": "https://github.com/axioval/schema",
+    "repository": "https://github.com/axioval/mcs",
     "version": "0.1.0"
   },
   "root": {

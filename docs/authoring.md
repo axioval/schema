@@ -6,7 +6,7 @@ to read source code unless you want to: every technical example is folded away
 by default.
 
 This guide is for package authors. Concrete project rules live in their own
-repository; this schema repository carries only checked teaching examples.
+repository; this MCS repository carries only checked teaching examples.
 
 !!! tip "New to Axioval?"
     Read the [four building blocks](guide/building-blocks.md) and the

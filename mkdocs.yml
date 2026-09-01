@@ -1,6 +1,6 @@
-site_name: Axioval
-site_description: A shared way to describe and exchange building checks
-site_url: https://axioval.github.io/schema/
+site_name: Axioval MCS
+site_description: Model Checking Specification for portable building checks
+site_url: https://axioval.github.io/mcs/
 copyright: Copyright &copy; Axioval contributors · AGPL-3.0-or-later
 
 docs_dir: docs
@@ -60,7 +60,7 @@ nav:
       - MCS container format: mcs-format.md
       - Full reference: reference/schema.md
   - Source and community:
-      - GitHub home: https://github.com/axioval/schema
+      - GitHub home: https://github.com/axioval/mcs
       - How to help: community/contributing.md
       - What changed: community/changelog.md
       - What comes next: community/roadmap.md

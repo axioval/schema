@@ -3,13 +3,13 @@ hide:
   - edit
 ---
 
-# Zu Axioval Schema beitragen
+# Zu Axioval MCS beitragen
 
 Vielen Dank, dass Sie den herstellerneutralen Vertrag für Erstellung und Austausch verbessern. Vertragsänderungen betreffen Paketautoren, Registries und prüfende Anwendungen. Beiträge brauchen daher ausführbare Nachweise, nicht nur Text.
 
 ## Vor einer Änderung
 
-1. Suchen Sie bestehende Issues und die [Roadmap](https://github.com/axioval/schema/blob/main/ROADMAP.md).
+1. Suchen Sie bestehende Issues und die [Roadmap](https://github.com/axioval/mcs/blob/main/ROADMAP.md).
 2. Erläutern Sie, welche Schicht sich ändert: Vokabular, Vorlage, Instanz, Manifest, Normalisierung oder Anwendungsfähigkeit.
 3. Beschreiben Sie Folgen für Kompatibilität und Sicherheit.
 4. Verlinken Sie bei fachlichen Behauptungen nach Möglichkeit eine maßgebliche öffentliche Quelle und unterscheiden Sie normative Anforderungen von Beispielen.
@@ -102,4 +102,4 @@ Halten Sie Änderungen prüfbar und atomar. Beschreiben Sie:
 - ausgeführte Befehle und ihre echten Ergebnisse; und
 - Migrations- oder Rollback-Überlegungen.
 
-Mit einem Beitrag stimmen Sie zu, dass Ihr Beitrag unter [AGPL-3.0-or-later](https://github.com/axioval/schema/blob/main/LICENSE) lizenziert ist.
+Mit einem Beitrag stimmen Sie zu, dass Ihr Beitrag unter [AGPL-3.0-or-later](https://github.com/axioval/mcs/blob/main/LICENSE) lizenziert ist.

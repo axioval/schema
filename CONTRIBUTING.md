@@ -1,4 +1,4 @@
-# Contributing to Axioval Schema
+# Contributing to Axioval MCS
 
 Thank you for improving the vendor-neutral authoring and interchange contract.
 Contract changes affect package authors, registries, and checking applications,
@@ -6,7 +6,7 @@ so contributions need executable evidence, not only prose.
 
 ## Before opening a change
 
-1. Search existing issues and the [roadmap](https://github.com/axioval/schema/blob/main/ROADMAP.md).
+1. Search existing issues and the [roadmap](https://github.com/axioval/mcs/blob/main/ROADMAP.md).
 2. Explain which layer changes: vocabulary, template, instance, manifest,
    normalization, or application capability.
 3. State compatibility and security implications.
@@ -108,4 +108,4 @@ Keep changes reviewable and atomic. Describe:
 - migration or rollback considerations.
 
 By contributing, you agree that your contribution is licensed under
-[AGPL-3.0-or-later](https://github.com/axioval/schema/blob/main/LICENSE).
+[AGPL-3.0-or-later](https://github.com/axioval/mcs/blob/main/LICENSE).

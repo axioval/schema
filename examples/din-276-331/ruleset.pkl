@@ -22,7 +22,7 @@ package = new Types.PackageMetadata {
     default = "Instructional DIN 276 KG 331 rule instances."
     translations { ["de"] = "Lehrbeispiele für Regelinstanzen zur DIN 276 KG 331." }
   }
-  repository = "https://github.com/axioval/schema"
+  repository = "https://github.com/axioval/mcs"
   license = "AGPL-3.0-or-later"
   authors { "Axioval contributors" }
 }

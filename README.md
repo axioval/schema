@@ -1,15 +1,15 @@
 <div align="center">
 
-# Axioval Schema
+# Axioval MCS
 
-**Vendor-neutral, typed authoring and deterministic interchange for model-validation rules.**
+**Model Checking Specification for vendor-neutral, typed authoring and deterministic interchange.**
 
-[![CI](https://github.com/axioval/schema/actions/workflows/validate.yml/badge.svg)](https://github.com/axioval/schema/actions/workflows/validate.yml)
-[![Pages](https://github.com/axioval/schema/actions/workflows/pages.yml/badge.svg)](https://axioval.github.io/schema/)
+[![CI](https://github.com/axioval/mcs/actions/workflows/validate.yml/badge.svg)](https://github.com/axioval/mcs/actions/workflows/validate.yml)
+[![Pages](https://github.com/axioval/mcs/actions/workflows/pages.yml/badge.svg)](https://axioval.github.io/mcs/)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GeneralPawz-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/GeneralPawz)
 
-[Documentation](https://axioval.github.io/schema/) · [Worked DIN 276 example](https://axioval.github.io/schema/tutorials/din-276-331/) · [Package contract](https://axioval.github.io/schema/package-contract/) · [Roadmap](ROADMAP.md)
+[Documentation](https://axioval.github.io/mcs/) · [Worked DIN 276 example](https://axioval.github.io/mcs/tutorials/din-276-331/) · [Package contract](https://axioval.github.io/mcs/package-contract/) · [Roadmap](ROADMAP.md)
 
 </div>
 
@@ -70,7 +70,7 @@ This is still IFC-aware: an adapter traverses the IFC relationship through the
 property set to reach the property. The rule simply declines to treat that
 container's name as normative.
 
-[Read the complete tutorial →](https://axioval.github.io/schema/tutorials/din-276-331/)
+[Read the complete tutorial →](https://axioval.github.io/mcs/tutorials/din-276-331/)
 
 ## Trust boundary
 

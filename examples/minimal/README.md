@@ -1,6 +1,6 @@
 # Minimal package example
 
-This directory is the only place in the schema repository containing concrete rule instances.
+This directory is the only place in the MCS repository containing concrete rule instances.
 
 - `definitions.pkl` demonstrates a terminology package.
 - `ruleset.pkl` demonstrates a concrete package that references that terminology.

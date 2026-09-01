@@ -5,7 +5,7 @@ hide:
 
 # Änderungsprotokoll
 
-Alle wichtigen Änderungen an Axioval Schema werden hier dokumentiert.
+Alle wichtigen Änderungen an Axioval MCS werden hier dokumentiert.
 
 Das Format folgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Paket- und Schemakompatibilität folgt nach einem Release [Semantic Versioning](https://semver.org/). Der aktuelle Vertrag `0.1.0` ist noch nicht stabil.
 
@@ -51,5 +51,5 @@ Das Format folgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Paket
 - Fail-closed Binder für paket-, definitions-, selektor- und parameterübergreifende Dokumente.
 - Minimales Nicht-Produktionspaket und CI-Validierungsablauf.
 
-[Unveröffentlicht]: https://github.com/axioval/schema/compare/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3...HEAD
-[0.1.0]: https://github.com/axioval/schema/commit/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3
+[Unveröffentlicht]: https://github.com/axioval/mcs/compare/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3...HEAD
+[0.1.0]: https://github.com/axioval/mcs/commit/49a2d765fe9a6a5b2f9cbf650500c30b9d6068d3

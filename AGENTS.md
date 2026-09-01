@@ -1,6 +1,6 @@
-# Axioval schema
+# Axioval MCS
 
-This repository owns the vendor-neutral authoring schema and normalized interchange contract used by Axioval-compatible validation applications.
+This repository owns the Model Checking Specification: the vendor-neutral authoring schema, deterministic transport, and normalized interchange contract used by Axioval-compatible validation applications.
 
 ## Boundaries
 

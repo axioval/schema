@@ -17,7 +17,7 @@ package = new Types.PackageMetadata {
     default = "Non-production example of a modular Axioval ruleset."
     translations { ["de"] = "Nicht produktives Beispiel eines modularen Axioval-Regelsatzes." }
   }
-  repository = "https://github.com/axioval/schema"
+  repository = "https://github.com/axioval/mcs"
 }
 
 sources {

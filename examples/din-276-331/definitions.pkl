@@ -15,7 +15,7 @@ package = new Types.PackageMetadata {
     default = "Instructional property vocabulary and reusable rule definition."
     translations { ["de"] = "Lehrvokabular für Eigenschaften und wiederverwendbare Regeldefinitionen." }
   }
-  repository = "https://github.com/axioval/schema"
+  repository = "https://github.com/axioval/mcs"
   license = "AGPL-3.0-or-later"
   authors { "Axioval contributors" }
 }
