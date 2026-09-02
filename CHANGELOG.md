@@ -81,8 +81,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 ### Security
 
 - Sandboxed Pkl evaluation permits checksum-locked package/project-package modules
-  and their required HTTPS metadata and release assets while retaining file and
-  environment resource denial plus the repository root boundary.
+  and their required host-scoped HTTPS metadata and release assets while retaining
+  arbitrary HTTPS, file, and environment resource denial plus the repository root
+  boundary.
 - Citation binding rejects unknown source and parameter references, duplicate IDs
   and locators, malformed publication dates, and non-HTTPS or credential-bearing
   source URLs.

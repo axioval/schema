@@ -58,8 +58,24 @@ class EvaluateTests(unittest.TestCase):
             )
             self.assertEqual(
                 command[command.index("--allowed-resources") + 1],
-                "https:,prop:pkl.outputFormat",
+                (
+                    r"https://openbimrs\.github\.io/pkl/.*,"
+                    r"https://github\.com/openbimrs/pkl/releases/download/.*,"
+                    r"https://release-assets\.githubusercontent\.com/.*,"
+                    "prop:pkl.outputFormat"
+                ),
             )
+
+    def test_denies_unrelated_https_resources(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            module = root / "rules.pkl"
+            module.write_text(
+                'value = read("https://example.com/")\n', encoding="utf-8"
+            )
+            with self.assertRaises(SystemExit) as failure:
+                validate.evaluate(module, root=root)
+            self.assertIn("Pkl evaluation failed", str(failure.exception))
 
     def test_denies_file_resources(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -214,7 +214,7 @@ def _fresh_resolve_dependency_lock(root: Path) -> None:
             "--allowed-modules",
             "file:,pkl:,package:,projectpackage:",
             "--allowed-resources",
-            "https:,prop:pkl.outputFormat",
+            validate.PKL_PACKAGE_RESOURCE_ALLOWLIST,
             "--timeout",
             "30",
             ".",

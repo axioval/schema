@@ -33,7 +33,10 @@ Die Reihenfolge ist Teil des Sicherheitsvertrags:
 1. `axioval.json` als nicht vertrauenswürdige statische Daten parsen;
 2. jedes Feld gegen das Manifest-JSON-Schema validieren;
 3. **alle** Regelwerk- und Definitionspfade innerhalb der Repository-Wurzel auflösen;
-4. Pkl nur mit `file:`-/`pkl:`-Modulen und `file:`-/`prop:`-Ressourcen sowie CPU-, Speicher-, Ausgabe- und Zeitlimits auswerten;
+4. Pkl mit lokalen Modulen, Standardbibliothek und prüfsummengebundenen
+   Paketmodulen auswerten; HTTPS-Ressourcen sind auf OpenBIM-Paketmetadaten,
+   stabile Releases und signierte Release-Asset-Hosts beschränkt. Beliebige
+   HTTPS-, Datei- und Umgebungsressourcen bleiben verboten;
 5. jedes Kandidaten-Definitionsdokument validieren;
 6. deklarierte Pakete, Quellenkataloge, Zitate, Objekttypen, Eigenschaften,
    Property-Set-Qualifizierer, Vorlagen, Anwendbarkeitsgruppen, Anforderungen,

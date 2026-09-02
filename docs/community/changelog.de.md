@@ -40,7 +40,7 @@ Das Format folgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Paket
 
 ### Sicherheit
 
-- Die sandboxgeschützte Pkl-Auswertung erlaubt prüfsummengebundene Paketmodule und deren erforderliche HTTPS-Metadaten und Release-Assets. Datei- und Umgebungsressourcen sowie Zugriffe außerhalb des Repository-Stammverzeichnisses bleiben gesperrt.
+- Die sandboxgeschützte Pkl-Auswertung erlaubt prüfsummengebundene Paketmodule und deren erforderliche, auf Paket-Hosts begrenzte HTTPS-Metadaten und Release-Assets. Beliebige HTTPS-, Datei- und Umgebungsressourcen sowie Zugriffe außerhalb des Repository-Stammverzeichnisses bleiben gesperrt.
 - Die Normalisierung lehnt unbekannte Objekt-, Eigenschafts- und Property-Set-IDs, nicht passende referenzierte Eigenschaftsarten und nicht aufgelöste strenge Container-Qualifizierer ab.
 
 ## [0.1.0] - 2026-08-31

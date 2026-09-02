@@ -34,6 +34,18 @@ REQUIRED = {
 }
 ALLOWED = REQUIRED | {"$schema", "description", "license"}
 PKL_ENTRYPOINT = re.compile(r"^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+\.pkl$")
+# Pkl checks metadata, the stable GitHub release URL, and its signed redirect even
+# when package bytes are cached. Keep that transport access scoped to the two
+# checksum-locked OpenBIM packages rather than granting package code arbitrary
+# HTTPS reads.
+PKL_PACKAGE_RESOURCE_ALLOWLIST = ",".join(
+    (
+        r"https://openbimrs\.github\.io/pkl/.*",
+        r"https://github\.com/openbimrs/pkl/releases/download/.*",
+        r"https://release-assets\.githubusercontent\.com/.*",
+        "prop:pkl.outputFormat",
+    )
+)
 
 
 def fail(message: str) -> None:
@@ -61,7 +73,7 @@ def evaluate(module: Path, root: Path = ROOT) -> dict:
         "--allowed-modules",
         "file:,pkl:,package:,projectpackage:",
         "--allowed-resources",
-        "https:,prop:pkl.outputFormat",
+        PKL_PACKAGE_RESOURCE_ALLOWLIST,
         "--timeout",
         "10",
         str(module),

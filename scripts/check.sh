@@ -11,7 +11,7 @@ export PATH="$HOME/.local/bin:$PATH"
 pkl project resolve \
   --root-dir "$repo_root" \
   --allowed-modules 'file:,pkl:,package:,projectpackage:' \
-  --allowed-resources 'https:,prop:pkl.outputFormat' \
+  --allowed-resources 'https://openbimrs\.github\.io/pkl/.*,https://github\.com/openbimrs/pkl/releases/download/.*,https://release-assets\.githubusercontent\.com/.*,prop:pkl.outputFormat' \
   --timeout 30 \
   .
 
