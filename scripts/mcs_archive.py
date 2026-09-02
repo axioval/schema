@@ -53,6 +53,10 @@ MAX_RATIO = 100
 MAX_METADATA = 256 * 1024
 NAME_MAX = 240
 SHA256 = re.compile(r"[0-9a-f]{64}")
+PACKAGE_URI = re.compile(
+    r"package://(?P<path>[^@\s]+)@(?P<major>0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
+)
+PACKAGE_LOCK_KEY = re.compile(r"package://[^@\s]+@(0|[1-9][0-9]*)")
 DIRECTIVE = re.compile(r"^\s*(import\*?|amends|extends)\b(.*)$")
 LITERAL_DIRECTIVE = re.compile(
     r'^\s*(import|amends|extends)\s+"([^"\\]+)"(?:\s+as\s+[A-Za-z_][A-Za-z0-9_]*)?\s*(?://.*)?$'
@@ -87,6 +91,144 @@ def _strict_json(data: bytes, context: str) -> Any:
         return json.loads(data.decode("utf-8"), object_pairs_hook=no_duplicates)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         _fail(f"{context}: invalid JSON: {exc}")
+
+
+def _expected_lock_binding(uri: str) -> tuple[str, str]:
+    match = PACKAGE_URI.fullmatch(uri)
+    if match is None:
+        _fail(f"Pkl dependency must use an exact package version: {uri!r}")
+    path = match.group("path")
+    major = match.group("major")
+    return f"package://{path}@{major}", "project" + uri
+
+
+def _validate_lock_entry(key: str, entry: Any) -> None:
+    if (
+        type(key) is not str
+        or PACKAGE_LOCK_KEY.fullmatch(key) is None
+        or type(entry) is not dict
+        or set(entry) != {"type", "uri", "checksums"}
+        or entry.get("type") != "remote"
+        or type(entry.get("uri")) is not str
+        or not entry["uri"].startswith("projectpackage://")
+        or PACKAGE_URI.fullmatch(entry["uri"].removeprefix("project")) is None
+    ):
+        _fail(f"invalid Pkl lock entry: {key!r}")
+    checksums = entry["checksums"]
+    if (
+        type(checksums) is not dict
+        or set(checksums) != {"sha256"}
+        or type(checksums.get("sha256")) is not str
+        or SHA256.fullmatch(checksums["sha256"]) is None
+    ):
+        _fail(f"invalid Pkl lock checksum: {key!r}")
+
+
+def _validate_dependency_lock(root: Path, dependencies: dict[str, str]) -> set[str]:
+    if not dependencies:
+        return set()
+    lock_file = _inside(root, root / "PklProject.deps.json", "Pkl dependency lock")
+    lock = _strict_json(lock_file.read_bytes(), str(lock_file))
+    if (
+        type(lock) is not dict
+        or set(lock) != {"schemaVersion", "resolvedDependencies"}
+        or lock.get("schemaVersion") != 1
+    ):
+        _fail("invalid Pkl dependency lock envelope")
+    resolved = lock["resolvedDependencies"]
+    if type(resolved) is not dict:
+        _fail("invalid Pkl resolvedDependencies")
+    for key, entry in resolved.items():
+        _validate_lock_entry(key, entry)
+    for alias, uri in dependencies.items():
+        key, resolved_uri = _expected_lock_binding(uri)
+        entry = resolved.get(key)
+        if entry is None or entry["uri"] != resolved_uri:
+            _fail(f"Pkl dependency lock does not bind alias {alias!r}")
+    return set(dependencies)
+
+
+def _project_dependencies(root: Path) -> dict[str, str]:
+    project = _inside(root, root / "PklProject", "Pkl project")
+    command = [
+        validate.pkl_executable(),
+        "eval",
+        "-f",
+        "json",
+        "--root-dir",
+        str(root),
+        "--allowed-modules",
+        "file:,pkl:",
+        "--allowed-resources",
+        "prop:pkl.outputFormat",
+        "--timeout",
+        "10",
+        str(project),
+    ]
+    result = subprocess.run(
+        command, cwd=root, text=False, capture_output=True, check=False
+    )  # nosec B603
+    if result.returncode:
+        _fail(
+            "cannot evaluate PklProject: "
+            + result.stderr.decode(errors="replace").strip()
+        )
+    value = _strict_json(result.stdout, "PklProject evaluation")
+    raw = value.get("dependencies") if type(value) is dict else None
+    if type(raw) is not dict:
+        _fail("PklProject dependencies must be an object")
+    dependencies: dict[str, str] = {}
+    for alias, item in raw.items():
+        if (
+            type(alias) is not str
+            or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*", alias) is None
+        ):
+            _fail(f"invalid Pkl dependency alias: {alias!r}")
+        if (
+            type(item) is not dict
+            or set(item) != {"uri"}
+            or type(item.get("uri")) is not str
+        ):
+            _fail(f"invalid Pkl dependency declaration: {alias!r}")
+        _expected_lock_binding(item["uri"])
+        dependencies[alias] = item["uri"]
+    return dependencies
+
+
+def _fresh_resolve_dependency_lock(root: Path) -> None:
+    lock = _inside(root, root / "PklProject.deps.json", "Pkl dependency lock")
+    expected = lock.read_bytes()
+    with tempfile.TemporaryDirectory(prefix="mcs-pkl-lock-") as temporary:
+        project_root = Path(temporary) / "project"
+        project_root.mkdir()
+        shutil.copy2(root / "PklProject", project_root / "PklProject")
+        shutil.copy2(lock, project_root / "PklProject.deps.json")
+        command = [
+            validate.pkl_executable(),
+            "project",
+            "resolve",
+            "--cache-dir",
+            str(Path(temporary) / "cache"),
+            "--root-dir",
+            str(project_root),
+            "--allowed-modules",
+            "file:,pkl:,package:,projectpackage:",
+            "--allowed-resources",
+            "https:,prop:pkl.outputFormat",
+            "--timeout",
+            "30",
+            ".",
+        ]
+        result = subprocess.run(
+            command, cwd=project_root, text=True, capture_output=True, check=False
+        )  # nosec B603
+        if result.returncode:
+            _fail(
+                "fresh Pkl dependency resolution failed: "
+                + (result.stderr or result.stdout).strip()
+            )
+        if (project_root / "PklProject.deps.json").read_bytes() != expected:
+            _fail("Pkl dependency lock is stale or does not match PklProject")
 
 
 def _safe_name(name: str) -> None:
@@ -143,7 +285,10 @@ def _source_name(root: Path, file: Path) -> str:
     return "source/" + file.resolve().relative_to(root.resolve()).as_posix()
 
 
-def _pkl_closure(root: Path, starts: list[Path]) -> set[Path]:
+def _pkl_closure(
+    root: Path, starts: list[Path], declared_aliases: set[str] | None = None
+) -> set[Path]:
+    declared_aliases = declared_aliases or set()
     pending, found = list(starts), set()
     while pending:
         current = _inside(root, pending.pop(), "Pkl dependency")
@@ -183,6 +328,9 @@ def _pkl_closure(root: Path, starts: list[Path]) -> set[Path]:
                     )
                 ):
                     _fail(f"unsafe Pkl package reference {target!r} in {current}")
+                alias = parts[0][1:]
+                if alias not in declared_aliases:
+                    _fail(f"undeclared Pkl package alias {alias!r} in {current}")
                 continue
             if ":" in target or target.startswith("/") or "\\" in target:
                 _fail(
@@ -197,7 +345,7 @@ def _pkl_closure(root: Path, starts: list[Path]) -> set[Path]:
     return found
 
 
-def _support_files(root: Path, package: Path) -> set[Path]:
+def _support_files(root: Path, package: Path, require_lock: bool = False) -> set[Path]:
     files = {
         _inside(root, root / "PklProject", "Pkl project"),
         _inside(root, root / ".pkl-version", "Pkl version"),
@@ -205,6 +353,8 @@ def _support_files(root: Path, package: Path) -> set[Path]:
     lock = root / "PklProject.deps.json"
     if lock.exists() or lock.is_symlink():
         files.add(_inside(root, lock, "Pkl dependency lock"))
+    elif require_lock:
+        _fail("PklProject.deps.json is required for declared package dependencies")
     licenses = sorted(path for path in root.glob("LICENSE*") if path.is_file())
     if not licenses:
         _fail("repository root must contain license text")
@@ -287,7 +437,13 @@ def pack(
     except SystemExit as exc:
         _fail(str(exc))
     _check_pkl_version(_pkl_version(root))
-    closure = _pkl_closure(root, [ruleset_module, *definition_modules])
+    dependencies = _project_dependencies(root)
+    declared_aliases = _validate_dependency_lock(root, dependencies)
+    if dependencies:
+        _fresh_resolve_dependency_lock(root)
+    closure = _pkl_closure(
+        root, [ruleset_module, *definition_modules], declared_aliases
+    )
     # The manifest schema is a source dependency even when its declared path changes.
     schema_value = manifest.get("$schema")
     if not isinstance(schema_value, str) or ":" in schema_value:
@@ -318,7 +474,10 @@ def pack(
         _fail(str(exc))
     assets = _asset_paths(ruleset, package, root)
     source_files = (
-        closure | {manifest_file, schema_file} | assets | _support_files(root, package)
+        closure
+        | {manifest_file, schema_file}
+        | assets
+        | _support_files(root, package, require_lock=bool(dependencies))
     )
     members: dict[str, tuple[bytes, str]] = {}
     for file in source_files:
@@ -669,11 +828,15 @@ def _read_verified(path: Path) -> tuple[dict[str, Any], dict[str, bytes]]:
         expected_role = (
             "source"
             if name.startswith("source/")
-            else "ruleset"
-            if name == "normalized/ruleset.json"
-            else "definition"
-            if re.fullmatch(r"normalized/definitions/[0-9a-f]{16}\.json", name)
-            else None
+            else (
+                "ruleset"
+                if name == "normalized/ruleset.json"
+                else (
+                    "definition"
+                    if re.fullmatch(r"normalized/definitions/[0-9a-f]{16}\.json", name)
+                    else None
+                )
+            )
         )
         if expected_role != role:
             _fail("invalid inventory member topology or role")
@@ -761,6 +924,8 @@ def verify(path: Path) -> dict[str, Any]:
         source_root = root / "source"
         if (source_root / ".pkl-version").read_text().strip() != metadata["pklVersion"]:
             _fail("source .pkl-version disagrees with metadata")
+        dependencies = _project_dependencies(source_root)
+        declared_aliases = _validate_dependency_lock(source_root, dependencies)
         manifest_path = root / metadata["manifest"]
         manifest = _strict_json(manifest_path.read_bytes(), "manifest")
         try:
@@ -823,10 +988,12 @@ def verify(path: Path) -> dict[str, Any]:
                 asset_root=package_root,
             )
             expected_source_files = (
-                _pkl_closure(source_root, [ruleset_module, *defs])
+                _pkl_closure(source_root, [ruleset_module, *defs], declared_aliases)
                 | {manifest_path, schema_file}
                 | _asset_paths(ruleset, package_root, source_root)
-                | _support_files(source_root, package_root)
+                | _support_files(
+                    source_root, package_root, require_lock=bool(dependencies)
+                )
             )
             expected_source_names = {
                 _source_name(source_root, file) for file in expected_source_files

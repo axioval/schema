@@ -50,8 +50,9 @@ Gesamtnutzlast, 256 KiB Metadaten und ein Entpackverhältnis von 100:1 pro Eleme
 `mimetype` verwendet `ZIP_STORED`; alle anderen Elemente verwenden DEFLATE der
 Stufe 9.
 
-Beim Packen werden Manifest, Root-`PklProject`, `.pkl-version`, die optionale
-`PklProject.deps.json`, mindestens eine direkte Root-`LICENSE*`-Datei, die genaue
+Beim Packen werden Manifest, Root-`PklProject`, `.pkl-version` und bei
+Paketabhängigkeiten die verpflichtende `PklProject.deps.json`, mindestens eine
+direkte Root-`LICENSE*`-Datei und die genaue
 lokale Pkl-Abhängigkeit über `import`/`amends`/`extends`, relatives Manifestschema,
 deklarierte Assets und direkte `README*`/`LICENSE*`/`NOTICE*`-Dateien des Pakets
 aufgenommen. Abhängigkeitsdirektiven müssen genau ein gewöhnliches Zeichenketten-
@@ -60,3 +61,10 @@ externe, entweichende oder verlinkte Abhängigkeiten sowie alle Pkl-Ressourcen-
 Leseaufrufe (`read`, `read?`, `read*` und `readGlob`) werden abgelehnt. Ein
 passendes normalisiertes Ergebnis kann Quellauswertung, Prüfung des exakten
 Abschlusses und Bindung nicht umgehen.
+
+Ein Paketimport bleibt nur dann extern, wenn sein `@alias` im `PklProject`
+deklariert ist und die Sperrdatei dessen exakte `package:`-URI an einen
+prüfsummengebundenen `projectpackage:`-Eintrag bindet. Beim Packen wird das
+kopierte Projekt mit leerem Cache aufgelöst. Fehlende, veraltete oder remote
+ungültige Prüfsummen werden abgelehnt. Offline bestätigt `verify` nur die
+strukturelle Bindung und die inventarisierten Bytes, nicht das Remote-Paket.

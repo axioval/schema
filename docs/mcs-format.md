@@ -47,11 +47,20 @@ member, 64 MiB total compressed and uncompressed payload, 256 KiB metadata, and
 a 100:1 per-member expansion ratio. `mimetype` uses `ZIP_STORED`; every other
 member uses raw DEFLATE at level 9.
 
-Packing includes the manifest, root `PklProject`, `.pkl-version`, optional
-`PklProject.deps.json`, at least one direct root `LICENSE*` file, the exact local
+Packing includes the manifest, root `PklProject`, `.pkl-version`, and the
+required `PklProject.deps.json` when the project declares package dependencies,
+at least one direct root `LICENSE*` file, and the exact local
 Pkl import/`amends`/`extends` closure, relative manifest schema, declared assets,
 and direct package `README*`/`LICENSE*`/`NOTICE*` files. Dependency directives
 must use one ordinary quoted literal on one line. Dynamic, globbed, custom-string,
 external, escaping, or symlinked dependencies and all Pkl resource-read calls
 (`read`, `read?`, `read*`, and `readGlob`) are rejected. A matching normalized
 payload cannot bypass source evaluation, exact-closure checking, and binding.
+
+A package import remains external only when its `@alias` exists in `PklProject`
+and the lock binds that alias's exact `package:` URI to a checksum-bearing
+`projectpackage:` entry. Packing resolves the copied project with an empty cache
+and rejects missing, stale, or remotely invalid checksums. Offline verification
+proves that the archived project and lock are structurally bound and that their
+exact bytes match the signed inventory; it does not claim to reauthenticate the
+remote package without network access.

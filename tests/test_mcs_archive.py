@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import stat
 import tempfile
 import unittest
@@ -137,9 +138,11 @@ class MCSArchiveTests(unittest.TestCase):
             return [
                 (
                     n,
-                    d.replace(b'"sha256":"', b'"sha256":"0', 1)
-                    if n == mcs_archive.METADATA
-                    else d,
+                    (
+                        d.replace(b'"sha256":"', b'"sha256":"0', 1)
+                        if n == mcs_archive.METADATA
+                        else d
+                    ),
                 )
                 for n, d in items
             ]
@@ -272,6 +275,52 @@ class MCSArchiveTests(unittest.TestCase):
                 with self.assertRaises(mcs_archive.MCSError):
                     mcs_archive._pkl_closure(root, [entry])
 
+    def test_dependency_lock_is_required_for_declared_packages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dependencies = {"ifc": "package://example.com/openbim.ifc@0.1.0"}
+            with self.assertRaises(mcs_archive.MCSError):
+                mcs_archive._validate_dependency_lock(root, dependencies)
+
+    def test_dependency_lock_validates_declared_package_binding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dependencies = {"ifc": "package://example.com/openbim.ifc@0.1.0"}
+            lock = {
+                "schemaVersion": 1,
+                "resolvedDependencies": {
+                    "package://example.com/openbim.ifc@0": {
+                        "type": "remote",
+                        "uri": "projectpackage://example.com/openbim.ifc@0.1.0",
+                        "checksums": {"sha256": "a" * 64},
+                    }
+                },
+            }
+            (root / "PklProject.deps.json").write_text(json.dumps(lock))
+            self.assertEqual(
+                mcs_archive._validate_dependency_lock(root, dependencies), {"ifc"}
+            )
+            lock["resolvedDependencies"]["package://example.com/openbim.ifc@0"][
+                "checksums"
+            ]["sha256"] = "0"
+            (root / "PklProject.deps.json").write_text(json.dumps(lock))
+            with self.assertRaises(mcs_archive.MCSError):
+                mcs_archive._validate_dependency_lock(root, dependencies)
+
+    def test_fresh_resolve_rejects_tampered_remote_checksum(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shutil.copy2(ROOT / "PklProject", root / "PklProject")
+            lock = json.loads((ROOT / "PklProject.deps.json").read_text())
+            entry = next(iter(lock["resolvedDependencies"].values()))
+            checksum = entry["checksums"]["sha256"]
+            entry["checksums"]["sha256"] = (
+                "0" if checksum[0] != "0" else "1"
+            ) + checksum[1:]
+            (root / "PklProject.deps.json").write_text(json.dumps(lock))
+            with self.assertRaises(mcs_archive.MCSError):
+                mcs_archive._fresh_resolve_dependency_lock(root)
+
     def test_dependency_closure_keeps_declared_package_imports_external(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -279,7 +328,15 @@ class MCSArchiveTests(unittest.TestCase):
             entry.write_text(
                 'import "@ifc/versions/Ifc4x3.pkl" as ifc4x3\n', encoding="utf-8"
             )
-            self.assertEqual(mcs_archive._pkl_closure(root, [entry]), {entry})
+            self.assertEqual(mcs_archive._pkl_closure(root, [entry], {"ifc"}), {entry})
+
+    def test_dependency_closure_rejects_undeclared_package_alias(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entry = root / "entry.pkl"
+            entry.write_text('import "@ifc/versions/Ifc4.pkl"\n', encoding="utf-8")
+            with self.assertRaises(mcs_archive.MCSError):
+                mcs_archive._pkl_closure(root, [entry], {"geometry"})
 
     def test_dependency_closure_rejects_package_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -338,9 +395,11 @@ class MCSArchiveTests(unittest.TestCase):
                 for name, data in contents:
                     info = mcs_archive._zipinfo(
                         name,
-                        zipfile.ZIP_STORED
-                        if name == "mimetype"
-                        else zipfile.ZIP_DEFLATED,
+                        (
+                            zipfile.ZIP_STORED
+                            if name == "mimetype"
+                            else zipfile.ZIP_DEFLATED
+                        ),
                     )
                     if name == "normalized/ruleset.json":
                         setattr(info, attribute, value)

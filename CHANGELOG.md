@@ -13,7 +13,8 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 - Authoring adapters for version-bound `openbim.ifc` references and closed
   `openbim.geometry` capability IDs, plus an IFC4X3 directional-clearance example.
 - MCS source-closure support for checksum-locked Pkl package imports, with
-  explicit package-path traversal rejection.
+  declared-alias binding, required lock coverage, fresh-cache checksum
+  reauthentication during packing, and explicit package-path traversal rejection.
 - Deterministic, fail-closed `.mcs` transport tooling with exact source topology,
   normalized declarative payloads, complete checksummed inventory, bounded ZIP
   parsing, sandboxed source re-evaluation, and bilingual format documentation.
