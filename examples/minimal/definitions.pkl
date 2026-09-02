@@ -59,7 +59,10 @@ properties {
     name = new Types.LocalizedText { default = "Reference" }
     valueKind = "string"
     externalNames {
-      ifcAdapter.propertyExternalName(ifc4x3.property("Pset_WallCommon", "Reference"))
+      new Definitions.ExternalName {
+        typeSystem = "https://github.com/axioval/mcs/tree/main/examples"
+        name = "axioval:example.ifc.reference"
+      }
     }
     citations {
       new Citations.Citation {
@@ -76,7 +79,10 @@ propertySets {
     id = "axioval:example.ifc.pset-wall-common"
     name = new Types.LocalizedText { default = "Pset_WallCommon" }
     externalNames {
-      ifcAdapter.propertySetExternalName(ifc4x3.propertySet("Pset_WallCommon"))
+      new Definitions.ExternalName {
+        typeSystem = "https://github.com/axioval/mcs/tree/main/examples"
+        name = "axioval:example.ifc.pset-wall-common"
+      }
     }
     citations {
       new Citations.Citation {

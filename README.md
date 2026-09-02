@@ -25,7 +25,7 @@ Validation requirements mix four concerns that should remain independently reusa
 | Layer | Question | Axioval construct |
 | --- | --- | --- |
 | Vocabulary | What does “load bearing” mean, and what type is it? | `PropertyDefinition` with `valueKind = "boolean"` |
-| External binding | What is that concept called in IFC? | `ExternalName(openbim.ifc release URI, "LoadBearing")` |
+| External binding | What is a verified concept called in another system? | `ExternalName` only from package-owned or otherwise authenticated identifiers; no free-form IFC template claims |
 | Template | What operation can a checker perform? | `RuleDefinition` + typed parameters + stable `capability` |
 | Instance | What must be true for which objects? | `RuleInstance` + selector + concrete parameter values |
 
@@ -109,7 +109,7 @@ kernel vocabularies. `schema/adapters/` accepts version-bound references from
 only their stable identifiers into normalized MCS data. The project imports the
 published packages as `@ifc` and `@geometry`; `PklProject.deps.json` locks the
 resolved metadata checksums for
-`package://openbimrs.github.io/pkl/openbim.ifc@0.1.0` and
+`package://openbimrs.github.io/pkl/openbim.ifc@0.2.0` and
 `package://openbimrs.github.io/pkl/openbim.geometry@0.1.0`. See
 [`examples/geometry-clearance`](examples/geometry-clearance/) for an IFC4X3
 rule that does not duplicate either package's domain catalog.

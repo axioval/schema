@@ -66,5 +66,9 @@ Ein Paketimport bleibt nur dann extern, wenn sein `@alias` im `PklProject`
 deklariert ist und die Sperrdatei dessen exakte `package:`-URI an einen
 prüfsummengebundenen `projectpackage:`-Eintrag bindet. Beim Packen wird das
 kopierte Projekt mit leerem Cache aufgelöst. Fehlende, veraltete oder remote
-ungültige Prüfsummen werden abgelehnt. Offline bestätigt `verify` nur die
-strukturelle Bindung und die inventarisierten Bytes, nicht das Remote-Paket.
+ungültige Prüfsummen werden abgelehnt. Die vollständige Prüfung wertet die Quelle
+erneut aus und darf auf prüfsummengebundene Paketmetadaten und Release-Assets
+zugreifen, weil Pkl Paketressourcen beim Import validiert. Zusätzlich bestätigt
+sie die strukturelle Bindung und die exakt inventarisierten Bytes. Nur `inspect`
+ist eine reine Offline-Strukturprüfung und behauptet keine erneute Remote-
+Authentifizierung.

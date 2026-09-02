@@ -61,7 +61,7 @@ def evaluate(module: Path, root: Path = ROOT) -> dict:
         "--allowed-modules",
         "file:,pkl:,package:,projectpackage:",
         "--allowed-resources",
-        "prop:pkl.outputFormat",
+        "https:,prop:pkl.outputFormat",
         "--timeout",
         "10",
         str(module),

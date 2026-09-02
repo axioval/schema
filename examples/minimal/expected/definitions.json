@@ -43,7 +43,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "IfcWall"
         }
       ],
@@ -71,8 +71,8 @@
       "valueKind": "string",
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
-          "name": "Reference"
+          "typeSystem": "https://github.com/axioval/mcs/tree/main/examples",
+          "name": "axioval:example.ifc.reference"
         }
       ],
       "citations": [
@@ -98,8 +98,8 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
-          "name": "Pset_WallCommon"
+          "typeSystem": "https://github.com/axioval/mcs/tree/main/examples",
+          "name": "axioval:example.ifc.pset-wall-common"
         }
       ],
       "citations": [

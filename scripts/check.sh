@@ -5,6 +5,16 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 export PATH="$HOME/.local/bin:$PATH"
 
+# Resolve checksum-pinned remote packages before sandboxed evaluation. Pkl still
+# requires HTTPS resource permission for metadata and redirected release assets;
+# file and environment resources remain denied.
+pkl project resolve \
+  --root-dir "$repo_root" \
+  --allowed-modules 'file:,pkl:,package:,projectpackage:' \
+  --allowed-resources 'https:,prop:pkl.outputFormat' \
+  --timeout 30 \
+  .
+
 python3 -m unittest discover -s tests -v
 python3 scripts/validate.py
 

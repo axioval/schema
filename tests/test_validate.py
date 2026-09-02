@@ -58,7 +58,7 @@ class EvaluateTests(unittest.TestCase):
             )
             self.assertEqual(
                 command[command.index("--allowed-resources") + 1],
-                "prop:pkl.outputFormat",
+                "https:,prop:pkl.outputFormat",
             )
 
     def test_denies_file_resources(self) -> None:

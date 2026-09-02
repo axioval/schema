@@ -53,6 +53,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
   treating `propertySet` and `property` as peer string parameters.
 - Definition-package normalized output now includes object, property, and
   property-set catalogs.
+- IFC entity bindings now use the release's semantic HTTPS type-system identity
+  from `openbim.ifc@0.2.0`; project property/set examples use their own
+  namespace until package-owned PSD/QTO occurrences ship.
 - The public site now opens with a plain-language, three-page picture tour and
   keeps tool-builder reference material in a separate path.
 - Tutorial source and validation commands are collapsed by default, while
@@ -77,8 +80,9 @@ once a release is tagged. The current `0.1.0` contract is pre-stable.
 
 ### Security
 
-- Sandboxed Pkl evaluation permits declared package/project-package modules while
-  retaining the resource denylist and repository root boundary.
+- Sandboxed Pkl evaluation permits checksum-locked package/project-package modules
+  and their required HTTPS metadata and release assets while retaining file and
+  environment resource denial plus the repository root boundary.
 - Citation binding rejects unknown source and parameter references, duplicate IDs
   and locators, malformed publication dates, and non-HTTPS or credential-bearing
   source URLs.

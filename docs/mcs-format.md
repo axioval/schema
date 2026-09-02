@@ -60,7 +60,9 @@ payload cannot bypass source evaluation, exact-closure checking, and binding.
 A package import remains external only when its `@alias` exists in `PklProject`
 and the lock binds that alias's exact `package:` URI to a checksum-bearing
 `projectpackage:` entry. Packing resolves the copied project with an empty cache
-and rejects missing, stale, or remotely invalid checksums. Offline verification
-proves that the archived project and lock are structurally bound and that their
-exact bytes match the signed inventory; it does not claim to reauthenticate the
-remote package without network access.
+and rejects missing, stale, or remotely invalid checksums. Full verification
+repeats source evaluation and may access checksum-pinned package metadata and
+release-asset endpoints because Pkl validates package resources during import.
+It also proves that the archived project and lock are structurally bound and that
+their exact bytes match the signed inventory. `inspect` remains the offline-only
+structural operation and makes no remote-package reauthentication claim.

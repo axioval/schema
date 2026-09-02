@@ -44,7 +44,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "IfcWall"
         }
       ],
@@ -65,8 +65,8 @@
       "valueKind": "boolean",
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
-          "name": "LoadBearing"
+          "typeSystem": "https://github.com/axioval/mcs/tree/main/examples",
+          "name": "axioval:example.ifc.load-bearing"
         }
       ],
       "citations": []
@@ -84,8 +84,8 @@
       "valueKind": "boolean",
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
-          "name": "IsExternal"
+          "typeSystem": "https://github.com/axioval/mcs/tree/main/examples",
+          "name": "axioval:example.ifc.is-external"
         }
       ],
       "citations": []
@@ -100,8 +100,8 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
-          "name": "Pset_WallCommon"
+          "typeSystem": "https://github.com/axioval/mcs/tree/main/examples",
+          "name": "axioval:example.ifc.pset-wall-common"
         }
       ],
       "citations": []

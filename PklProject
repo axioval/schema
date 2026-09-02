@@ -2,7 +2,7 @@ amends "pkl:Project"
 
 dependencies {
   ["ifc"] {
-    uri = "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0"
+    uri = "package://openbimrs.github.io/pkl/openbim.ifc@0.2.0"
   }
   ["geometry"] {
     uri = "package://openbimrs.github.io/pkl/openbim.geometry@0.1.0"

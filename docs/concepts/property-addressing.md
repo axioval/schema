@@ -24,15 +24,19 @@ A vocabulary defines the property once:
       name = new Types.LocalizedText { default = "Load bearing" }
       valueKind = "boolean"
       externalNames {
-        ifcAdapter.propertyExternalName(
-          ifc4x3.property("Pset_WallCommon", "LoadBearing")
-        )
+        new Definitions.ExternalName {
+          typeSystem = "https://github.com/axioval/mcs/tree/main/examples"
+          name = "axioval:example.ifc.load-bearing"
+        }
       }
     }
     ```
 
 The definition is not nested in a property set. Its stable ID can be reused by
-selectors, templates, and instances.
+selectors, templates, and instances. Its `ExternalName` belongs to the example
+vocabulary, so the definition remains project-local: `openbim.ifc` `0.2.0`
+intentionally bundles no verified PSD/QTO occurrences, and MCS does not attach
+an IFC external name from a free-form string.
 
 ## Loose reference: property matters, container does not
 
@@ -43,8 +47,9 @@ selectors, templates, and instances.
     }
     ```
 
-An adapter resolves the external name and traverses the model's native
-relationships. The property may be found in any supported container.
+A model-specific consumer resolves the project-local concept and traverses the
+model's native relationships. The property may be found in any supported
+container.
 
 Implementations must define deterministic conflict behavior. If the same
 canonical property resolves more than once with incompatible values, they should
@@ -60,11 +65,11 @@ return a conflict. They must not choose one silently.
     }
     ```
 
-Now both facts are normative:
+Now both local vocabulary facts are normative:
 
-1. the property is `LoadBearing`; and
-2. it is related through the external container mapped from
-   `Pset_WallCommon`.
+1. the property concept is `axioval:example.ifc.load-bearing`; and
+2. it is related through the local container concept
+   `axioval:example.ifc.pset-wall-common`.
 
 A matching property in another set is not sufficient.
 
@@ -76,7 +81,7 @@ A matching property in another set is not sufficient.
 
 === "Use a strict reference when"
 
-    - delivery requirements mandate a standard property set;
+    - project vocabulary mandates one exact property container;
     - interoperability depends on exact container placement; or
     - the check is specifically auditing schema conformance.
 
@@ -84,7 +89,7 @@ A matching property in another set is not sufficient.
 
 When `propertySet` is omitted, an adapter must:
 
-1. map the canonical property concept into the active model schema;
+1. resolve the project-local property concept for the active model adapter;
 2. collect occurrences across supported property containers;
 3. report missing when no occurrence exists;
 4. converge type-correct occurrences only when their semantic values agree; and
@@ -103,5 +108,7 @@ is significant.
 The official IFC 4.3.2
 [`Pset_WallCommon`](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_WallCommon.htm)
 documentation lists both `LoadBearing` and `IsExternal` as boolean single-value
-properties. That makes it a useful demonstration, not a reason to hard-code
-property-set ownership into the generic schema.
+properties. That supports the example's source citation, but it is not a typed
+package occurrence and does not authorize MCS to manufacture an IFC external
+identity. The package-owned template catalog must supply that binding in a
+future release.

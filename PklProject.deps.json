@@ -3,9 +3,9 @@
   "resolvedDependencies": {
     "package://openbimrs.github.io/pkl/openbim.ifc@0": {
       "type": "remote",
-      "uri": "projectpackage://openbimrs.github.io/pkl/openbim.ifc@0.1.0",
+      "uri": "projectpackage://openbimrs.github.io/pkl/openbim.ifc@0.2.0",
       "checksums": {
-        "sha256": "7d91d5ba756ca1cca56a2d4ed8807ce29b2f3384c718206be246b1ee55fff9f6"
+        "sha256": "210d948e581addec450a594efa83290e4d1435414eacd9155729eefc067a58e5"
       }
     },
     "package://openbimrs.github.io/pkl/openbim.geometry@0": {

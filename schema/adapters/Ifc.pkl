@@ -12,10 +12,4 @@ function externalName(typeSystem_: String, name_: String): definitions.ExternalN
 }
 
 function entityExternalName(reference: ifc.EntityReference): definitions.ExternalName =
-  externalName(reference.catalogTypeSystem, reference.name)
-
-function propertySetExternalName(reference: ifc.PropertySetReference): definitions.ExternalName =
-  externalName(reference.catalogTypeSystem, reference.name)
-
-function propertyExternalName(reference: ifc.PropertyReference): definitions.ExternalName =
-  externalName(reference.catalogTypeSystem, reference.name)
+  externalName(reference.externalTypeSystem, reference.name)

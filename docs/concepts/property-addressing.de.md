@@ -20,14 +20,15 @@ Ein Vokabular definiert die Eigenschaft einmal:
       name = new Types.LocalizedText { default = "Load bearing" }
       valueKind = "boolean"
       externalNames {
-        ifcAdapter.propertyExternalName(
-          ifc4x3.property("Pset_WallCommon", "LoadBearing")
-        )
+        new Definitions.ExternalName {
+          typeSystem = "https://github.com/axioval/mcs/tree/main/examples"
+          name = "axioval:example.ifc.load-bearing"
+        }
       }
     }
     ```
 
-Die Definition ist nicht in einem Property Set verschachtelt. Ihre stabile ID kann von Selektoren, Vorlagen und Instanzen wiederverwendet werden.
+Die Definition ist nicht in einem Property Set verschachtelt. Ihre stabile ID kann von Selektoren, Vorlagen und Instanzen wiederverwendet werden. Ihr `ExternalName` gehört zum Beispielvokabular; die Definition bleibt daher projektlokal: `openbim.ifc` `0.2.0` enthält absichtlich keine verifizierten PSD/QTO-Vorkommen, und MCS erzeugt keinen externen IFC-Namen aus einem freien String.
 
 ## Lose Referenz: Die Eigenschaft zählt, der Container nicht
 
@@ -38,7 +39,7 @@ Die Definition ist nicht in einem Property Set verschachtelt. Ihre stabile ID ka
     }
     ```
 
-Ein Adapter löst den externen Namen auf und durchläuft die nativen Beziehungen des Modells. Die Eigenschaft darf in jedem unterstützten Container gefunden werden.
+Ein modellspezifischer Consumer löst das projektlokale Konzept auf und durchläuft die nativen Beziehungen des Modells. Die Eigenschaft darf in jedem unterstützten Container gefunden werden.
 
 Implementierungen müssen ein deterministisches Verhalten bei Konflikten definieren. Löst dieselbe kanonische Eigenschaft mehr als einmal zu inkompatiblen Werten auf, sollen sie einen Konflikt zurückgeben. Sie dürfen nicht stillschweigend einen Wert auswählen.
 
@@ -52,10 +53,10 @@ Implementierungen müssen ein deterministisches Verhalten bei Konflikten definie
     }
     ```
 
-Jetzt sind beide Tatsachen normativ:
+Jetzt sind beide lokalen Vokabularfakten normativ:
 
-1. die Eigenschaft ist `LoadBearing`; und
-2. sie ist über den externen Container verbunden, der `Pset_WallCommon` zugeordnet ist.
+1. das Eigenschaftskonzept ist `axioval:example.ifc.load-bearing`; und
+2. es ist mit dem lokalen Containerkonzept `axioval:example.ifc.pset-wall-common` verbunden.
 
 Eine passende Eigenschaft in einem anderen Set reicht nicht aus.
 
@@ -67,7 +68,7 @@ Eine passende Eigenschaft in einem anderen Set reicht nicht aus.
 
 === "Eine strenge Referenz verwenden, wenn"
 
-    - Lieferanforderungen ein Standard-Property-Set vorschreiben;
+    - das Projektvokabular genau einen Eigenschaftscontainer vorschreibt;
     - Interoperabilität von der genauen Container-Platzierung abhängt; oder
     - die Prüfung gezielt die Schemakonformität kontrolliert.
 
@@ -75,7 +76,7 @@ Eine passende Eigenschaft in einem anderen Set reicht nicht aus.
 
 Wenn `propertySet` fehlt, muss ein Adapter:
 
-1. das kanonische Eigenschaftskonzept dem aktiven Modellschema zuordnen;
+1. das projektlokale Eigenschaftskonzept für den aktiven Modelladapter auflösen;
 2. Vorkommen über unterstützte Eigenschaftscontainer hinweg sammeln;
 3. „fehlend“ melden, wenn kein Vorkommen vorhanden ist;
 4. typkorrekte Vorkommen nur zusammenführen, wenn ihre semantischen Werte übereinstimmen; und
@@ -87,4 +88,4 @@ Er darf niemals einfach die erste gleichnamige Eigenschaft akzeptieren, auf die 
 
 In IFC ist ein Objekt über [`IfcRelDefinesByProperties`](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcRelDefinesByProperties.htm) mit Eigenschaftsdefinitionen verbunden, und ein Property Set gruppiert benannte Eigenschaften. Axioval entfernt diese Beziehung nicht. Jede Anforderung kann entscheiden, ob die **Containeridentität** wesentlich ist.
 
-Die offizielle IFC-4.3.2-Dokumentation zu [`Pset_WallCommon`](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_WallCommon.htm) führt sowohl `LoadBearing` als auch `IsExternal` als boolesche Einzelwert-Eigenschaften auf. Das macht sie zu einer guten Demonstration, aber nicht zu einem Grund, Eigentum von Eigenschaften durch Property Sets im allgemeinen Schema festzuschreiben.
+Die offizielle IFC-4.3.2-Dokumentation zu [`Pset_WallCommon`](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_WallCommon.htm) führt sowohl `LoadBearing` als auch `IsExternal` als boolesche Einzelwert-Eigenschaften auf. Das belegt die Quellenangabe des Beispiels, ist aber kein typisiertes Paketvorkommen und berechtigt MCS nicht, eine externe IFC-Identität zu erzeugen. Diese Bindung muss ein künftiger paket-eigener Template-Katalog liefern.

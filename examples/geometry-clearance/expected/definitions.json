@@ -24,7 +24,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "IfcWall"
         }
       ],
@@ -38,7 +38,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
+          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
           "name": "IfcPipeSegment"
         }
       ],

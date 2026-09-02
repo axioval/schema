@@ -26,7 +26,10 @@ Ein Definitionspaket kann drei unabhängige Konzeptkataloge deklarieren:
 | `PropertyDefinition` | Wiederverwendbare Eigenschaftsidentität und Wertart | boolesches `LoadBearing` |
 | `PropertySetDefinition` | Optionaler externer Container-Qualifizierer | `Pset_WallCommon` |
 
-Jedes Konzept hat eine stabile qualifizierte ID und eine oder mehrere `ExternalName`-Bindungen. Regeln referenzieren die stabile ID. Adapter ordnen sie jedem unterstützten Modellschema zu.
+Jedes Konzept hat eine stabile qualifizierte ID und kann verifizierte
+`ExternalName`-Bindungen besitzen. Regeln referenzieren die stabile ID. Adapter
+ordnen nur authentifizierte Bindungen unterstützten Modellschemata zu;
+projektlokale Konzepte bleiben ausdrücklich lokal.
 
 !!! important
     `PropertySetDefinition` führt Eigenschaften **nicht** auf und besitzt sie nicht. Eine Eigenschaft kann in mehreren externen Containern erscheinen. Die Containerzugehörigkeit wird erst normativ, wenn ein Selektor oder `PropertyReferenceValue` ein Set nennt.

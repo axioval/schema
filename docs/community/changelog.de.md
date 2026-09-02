@@ -29,6 +29,7 @@ Das Format folgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Paket
 - Selektoren für Entitätstypen referenzieren nun wiederverwendbare Objekttypkonzepte, statt rohe externe Typ-System-/Namenspaare zu wiederholen.
 - Das minimale Eigenschaftsbeispiel verwendet eine kanonische Eigenschaftsreferenz statt `propertySet` und `property` als gleichrangige Zeichenkettenparameter zu behandeln.
 - Die normalisierte Ausgabe eines Definitionspakets enthält nun Objekt-, Eigenschafts- und Property-Set-Kataloge.
+- IFC-Entitätsbindungen verwenden nun die semantische HTTPS-Typsystemidentität der jeweiligen Version aus `openbim.ifc@0.2.0`; Eigenschafts- und Set-Beispiele bleiben im Projekteigennamensraum, bis paket-eigene PSD/QTO-Vorkommen veröffentlicht sind.
 - Die öffentliche Seite beginnt nun mit einer dreiseitigen Bilderreise in einfacher Sprache und hält Referenzmaterial für Werkzeugentwickler getrennt.
 - Tutorial-Quelltext und Validierungsbefehle sind standardmäßig eingeklappt, bleiben aber statisch hervorgehoben und bei Bedarf verfügbar.
 
@@ -39,6 +40,7 @@ Das Format folgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Paket
 
 ### Sicherheit
 
+- Die sandboxgeschützte Pkl-Auswertung erlaubt prüfsummengebundene Paketmodule und deren erforderliche HTTPS-Metadaten und Release-Assets. Datei- und Umgebungsressourcen sowie Zugriffe außerhalb des Repository-Stammverzeichnisses bleiben gesperrt.
 - Die Normalisierung lehnt unbekannte Objekt-, Eigenschafts- und Property-Set-IDs, nicht passende referenzierte Eigenschaftsarten und nicht aufgelöste strenge Container-Qualifizierer ab.
 
 ## [0.1.0] - 2026-08-31

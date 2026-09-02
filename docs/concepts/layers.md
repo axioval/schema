@@ -24,9 +24,10 @@ A definition package can declare three independent concept catalogs:
 | `PropertyDefinition` | Reusable property identity and value kind | boolean `LoadBearing` |
 | `PropertySetDefinition` | Optional external container qualifier | `Pset_WallCommon` |
 
-Each concept has a stable qualified ID and one or more `ExternalName` bindings.
-The stable ID is what rules reference; adapters map it to each supported model
-schema.
+Each concept has a stable qualified ID and may have verified `ExternalName`
+bindings. The stable ID is what rules reference; adapters map only authenticated
+bindings to supported model schemas. Project-local concepts remain explicitly
+local.
 
 !!! important
     `PropertySetDefinition` does **not** list or own properties. A property may
