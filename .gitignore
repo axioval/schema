@@ -2,3 +2,6 @@ __pycache__/
 *.py[cod]
 site/
 *.mcs
+
+# Unpublished local Pkl package proofs; release commits use remote dependencies.
+.dev-deps/

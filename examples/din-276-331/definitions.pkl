@@ -1,8 +1,11 @@
 amends "../../schema/Definitions.pkl"
 
-import "../../schema/Types.pkl"
-import "../../schema/Definitions.pkl"
+import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+
+import "../../schema/adapters/Ifc.pkl" as ifcAdapter
 import "../../schema/Citations.pkl"
+import "../../schema/Definitions.pkl"
+import "../../schema/Types.pkl"
 
 package = new Types.PackageMetadata {
   id = "axioval:example.din-276-331-definitions"
@@ -13,7 +16,9 @@ package = new Types.PackageMetadata {
   }
   description = new Types.LocalizedText {
     default = "Instructional property vocabulary and reusable rule definition."
-    translations { ["de"] = "Lehrvokabular für Eigenschaften und wiederverwendbare Regeldefinitionen." }
+    translations {
+      ["de"] = "Lehrvokabular für Eigenschaften und wiederverwendbare Regeldefinitionen."
+    }
   }
   repository = "https://github.com/axioval/mcs"
   license = "AGPL-3.0-or-later"
@@ -21,14 +26,14 @@ package = new Types.PackageMetadata {
 }
 
 sources {
-  ["https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"] = new Citations.Source {
-    id = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
+  [ifc4x3.release.sourceUri] = new Citations.Source {
+    id = ifc4x3.release.sourceUri
     kind = "technicalSpecification"
-    designation = "IFC 4.3"
+    designation = ifc4x3.release.label
     title = new Types.LocalizedText { default = "Industry Foundation Classes 4.3" }
     publisher = "buildingSMART International"
-    edition = "4.3"
-    url = "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
+    edition = ifc4x3.release.id
+    url = ifc4x3.release.sourceUri
   }
 }
 
@@ -37,10 +42,7 @@ objectTypes {
     id = "axioval:example.ifc.wall"
     name = new Types.LocalizedText { default = "Wall" }
     externalNames {
-      new Definitions.ExternalName {
-        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-        name = "IfcWall"
-      }
+      ifcAdapter.entityExternalName(ifc4x3.entity("IfcWall"))
     }
   }
 }
@@ -54,10 +56,7 @@ properties {
     }
     valueKind = "boolean"
     externalNames {
-      new Definitions.ExternalName {
-        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-        name = "LoadBearing"
-      }
+      ifcAdapter.propertyExternalName(ifc4x3.property("Pset_WallCommon", "LoadBearing"))
     }
   }
   ["axioval:example.ifc.is-external"] = new Definitions.PropertyDefinition {
@@ -68,10 +67,7 @@ properties {
     }
     valueKind = "boolean"
     externalNames {
-      new Definitions.ExternalName {
-        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-        name = "IsExternal"
-      }
+      ifcAdapter.propertyExternalName(ifc4x3.property("Pset_WallCommon", "IsExternal"))
     }
   }
 }
@@ -81,10 +77,7 @@ propertySets {
     id = "axioval:example.ifc.pset-wall-common"
     name = new Types.LocalizedText { default = "Wall common properties" }
     externalNames {
-      new Definitions.ExternalName {
-        typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-        name = "Pset_WallCommon"
-      }
+      ifcAdapter.propertySetExternalName(ifc4x3.propertySet("Pset_WallCommon"))
     }
   }
 }

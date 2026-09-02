@@ -53,6 +53,10 @@ class EvaluateTests(unittest.TestCase):
             command = run.call_args.args[0]
             self.assertEqual(command[command.index("--root-dir") + 1], str(root))
             self.assertEqual(
+                command[command.index("--allowed-modules") + 1],
+                "file:,pkl:,package:,projectpackage:",
+            )
+            self.assertEqual(
                 command[command.index("--allowed-resources") + 1],
                 "prop:pkl.outputFormat",
             )

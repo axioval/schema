@@ -1,0 +1,55 @@
+amends "../../schema/Definitions.pkl"
+
+import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+
+import "../../schema/adapters/Geometry.pkl" as geometryAdapter
+import "../../schema/adapters/Ifc.pkl" as ifcAdapter
+import "../../schema/Definitions.pkl"
+import "../../schema/Types.pkl"
+
+package = new Types.PackageMetadata {
+  id = "axioval:example.geometry-clearance-definitions"
+  name = new Types.LocalizedText { default = "IFC geometry clearance definitions" }
+  version = "0.1.0"
+  description = new Types.LocalizedText {
+    default = "Demonstrates package-owned IFC references and geometry capability IDs."
+  }
+  repository = "https://github.com/axioval/mcs"
+}
+
+objectTypes {
+  ["axioval:example.ifc.wall"] = new Definitions.ObjectTypeDefinition {
+    id = "axioval:example.ifc.wall"
+    name = new Types.LocalizedText { default = "Wall" }
+    externalNames {
+      ifcAdapter.entityExternalName(ifc4x3.entity("IfcWall"))
+    }
+  }
+  ["axioval:example.ifc.pipe-segment"] = new Definitions.ObjectTypeDefinition {
+    id = "axioval:example.ifc.pipe-segment"
+    name = new Types.LocalizedText { default = "Pipe segment" }
+    externalNames {
+      ifcAdapter.entityExternalName(ifc4x3.entity("IfcPipeSegment"))
+    }
+  }
+}
+
+definitions {
+  ["axioval:example.geometry.directional-clearance"] = new Definitions.RuleDefinition {
+    id = "axioval:example.geometry.directional-clearance"
+    name = new Types.LocalizedText { default = "Directional clearance" }
+    description = new Types.LocalizedText {
+      default = "Requires a directional clearance operation over selected IFC entities."
+    }
+    capability = geometryAdapter.capability("openbim.geometry:clearance.directional")
+    parameters {
+      ["clearance"] = new Definitions.ParameterDefinition {
+        id = "clearance"
+        name = new Types.LocalizedText { default = "Minimum clearance" }
+        kind = "quantity"
+        unitDimension = "https://qudt.org/vocab/quantitykind/Length"
+      }
+    }
+    tags { "example"; "geometry"; "ifc" }
+  }
+}

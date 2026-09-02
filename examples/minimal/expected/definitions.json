@@ -22,7 +22,7 @@
     "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/": {
       "id": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/",
       "kind": "technicalSpecification",
-      "designation": "IFC 4.3",
+      "designation": "IFC4X3 ADD2",
       "title": {
         "default": "Industry Foundation Classes 4.3",
         "translations": {
@@ -30,7 +30,7 @@
         }
       },
       "publisher": "buildingSMART International",
-      "edition": "4.3",
+      "edition": "IFC4X3_ADD2",
       "url": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/"
     }
   },
@@ -43,7 +43,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
           "name": "IfcWall"
         }
       ],
@@ -71,7 +71,7 @@
       "valueKind": "string",
       "externalNames": [
         {
-          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
           "name": "Reference"
         }
       ],
@@ -98,7 +98,7 @@
       },
       "externalNames": [
         {
-          "typeSystem": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3",
+          "typeSystem": "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0#/releases/IFC4X3_ADD2",
           "name": "Pset_WallCommon"
         }
       ],

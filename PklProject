@@ -1,4 +1,10 @@
 amends "pkl:Project"
 
-// This is a local development project. Package publication metadata will be
-// added with the first tagged release so published URLs and checksums are real.
+dependencies {
+  ["ifc"] {
+    uri = "package://openbimrs.github.io/pkl/openbim.ifc@0.1.0"
+  }
+  ["geometry"] {
+    uri = "package://openbimrs.github.io/pkl/openbim.geometry@0.1.0"
+  }
+}

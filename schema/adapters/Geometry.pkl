@@ -1,0 +1,9 @@
+/// Authoring-only lowering from the package-owned geometry capability catalog.
+module axioval.schema.adapters.Geometry
+
+import "@geometry/capabilities/Catalog.pkl" as catalog
+
+import "../Types.pkl" as types
+
+/// Preserve the exact package-owned capability identifier in normalized MCS.
+function capability(id_: catalog.CapabilityId): types.QualifiedIdentifier = id_

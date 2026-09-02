@@ -1,0 +1,68 @@
+amends "../../schema/RuleSets.pkl"
+
+import "../../schema/RuleSets.pkl"
+import "../../schema/Selectors.pkl"
+import "../../schema/Types.pkl"
+import "../../schema/Values.pkl"
+
+package = new Types.PackageMetadata {
+  id = "axioval:example.geometry-clearance"
+  name = new Types.LocalizedText { default = "IFC wall-to-pipe clearance" }
+  version = "0.1.0"
+  description = new Types.LocalizedText {
+    default = "Instructional rule using openbim.ifc and openbim.geometry contracts."
+  }
+  repository = "https://github.com/axioval/mcs"
+}
+
+definitionPackages {
+  "axioval:example.geometry-clearance-definitions"
+}
+
+root = new RuleSets.RuleFolder {
+  id = "root"
+  name = new Types.LocalizedText { default = "Geometry checks" }
+  rules {
+    new RuleSets.RuleInstance {
+      id = "wall-to-pipe-clearance"
+      definitionId = "axioval:example.geometry.directional-clearance"
+      name = new Types.LocalizedText { default = "Walls and pipes keep 200 mm clearance" }
+      severity = "error"
+      parameters {
+        ["clearance"] = new Values.QuantityValue {
+          value = 200
+          unit = "mm"
+        }
+      }
+      applicability = new RuleSets.Applicability {
+        groups {
+          ["elements"] = new RuleSets.TargetGroup {
+            id = "elements"
+            name = new Types.LocalizedText { default = "Walls and pipe segments" }
+            selector = new Selectors.AnyOfSelector {
+              operands {
+                new Selectors.EntityTypeSelector {
+                  objectType = "axioval:example.ifc.wall"
+                }
+                new Selectors.EntityTypeSelector {
+                  objectType = "axioval:example.ifc.pipe-segment"
+                }
+              }
+            }
+          }
+        }
+      }
+      requirements {
+        new RuleSets.Requirement {
+          id = "minimum-clearance"
+          statement = new Types.LocalizedText {
+            default =
+              "Selected walls and pipe segments maintain at least 200 mm directional clearance."
+          }
+          targetGroups { "elements" }
+        }
+      }
+      tags { "example"; "geometry"; "ifc" }
+    }
+  }
+}

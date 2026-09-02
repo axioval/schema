@@ -1,54 +1,95 @@
 {
-  "definitionPackages": [
-    "axioval:example.din-276-331-definitions"
-  ],
+  "schemaVersion": "0.1.0",
   "package": {
-    "authors": [
-      "Axioval contributors"
-    ],
-    "description": {
-      "default": "Instructional DIN 276 KG 331 rule instances.",
-      "translations": {
-        "de": "Lehrbeispiele f\u00fcr Regelinstanzen zur DIN 276 KG 331."
-      }
-    },
     "id": "axioval:example.din-276-331",
-    "license": "AGPL-3.0-or-later",
     "name": {
       "default": "DIN 276 KG 331 load-bearing external wall example",
       "translations": {
-        "de": "DIN-276-KG-331-Beispiel f\u00fcr tragende Au\u00dfenw\u00e4nde"
+        "de": "DIN-276-KG-331-Beispiel für tragende Außenwände"
+      }
+    },
+    "version": "0.1.0",
+    "description": {
+      "default": "Instructional DIN 276 KG 331 rule instances.",
+      "translations": {
+        "de": "Lehrbeispiele für Regelinstanzen zur DIN 276 KG 331."
       }
     },
     "repository": "https://github.com/axioval/mcs",
-    "version": "0.1.0"
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+      "Axioval contributors"
+    ]
   },
+  "sources": {
+    "urn:din:276:2018-12": {
+      "id": "urn:din:276:2018-12",
+      "kind": "standard",
+      "designation": "DIN 276:2018-12",
+      "title": {
+        "default": "Building costs",
+        "translations": {
+          "de": "Kosten im Bauwesen"
+        }
+      },
+      "publisher": "DIN",
+      "edition": "2018-12",
+      "publicationDate": "2018-12"
+    }
+  },
+  "definitionPackages": [
+    "axioval:example.din-276-331-definitions"
+  ],
   "root": {
-    "description": {
-      "default": "Project-defined IFC checks for objects classified as KG 331.",
-      "translations": {
-        "de": "Projektdefinierte IFC-Pr\u00fcfungen f\u00fcr als KG 331 klassifizierte Objekte."
-      }
-    },
-    "folders": [],
     "id": "din-276-331",
     "name": {
       "default": "Instructional project profile for DIN 276 KG 331",
       "translations": {
-        "de": "Lehrbeispiel eines Projektprofils f\u00fcr DIN 276 KG 331"
+        "de": "Lehrbeispiel eines Projektprofils für DIN 276 KG 331"
+      }
+    },
+    "description": {
+      "default": "Project-defined IFC checks for objects classified as KG 331.",
+      "translations": {
+        "de": "Projektdefinierte IFC-Prüfungen für als KG 331 klassifizierte Objekte."
       }
     },
     "rules": [
       {
-        "applicability": {
-          "code": "331",
-          "includeDescendants": false,
-          "kind": "classification",
-          "system": "DIN 276:2018-12"
+        "id": "kg331-is-wall",
+        "definitionId": "axioval:example.entity-type-equals",
+        "name": {
+          "default": "Project profile maps KG 331 objects to walls",
+          "translations": {
+            "de": "Projektprofil ordnet KG-331-Objekte Wänden zu"
+          }
         },
+        "enabled": true,
+        "severity": "error",
+        "message": {
+          "default": "The instructional project profile expects a KG 331 object to map to IfcWall.",
+          "translations": {
+            "de": "Das beispielhafte Projektprofil erwartet für ein KG-331-Objekt die Zuordnung zu IfcWall."
+          }
+        },
+        "parameters": {
+          "objectType": {
+            "type": "objectTypeReference",
+            "objectType": "axioval:example.ifc.wall",
+            "includeSubtypes": true
+          }
+        },
+        "applicability": {
+          "kind": "classification",
+          "system": "DIN 276:2018-12",
+          "code": "331",
+          "includeDescendants": false
+        },
+        "requirements": [],
         "citations": [
           {
             "id": "kg331-object-kind-source",
+            "sourceId": "urn:din:276:2018-12",
             "locators": [
               {
                 "kind": "item",
@@ -60,36 +101,11 @@
               "translations": {
                 "de": "KG 331 ist die zitierte Kostengruppe; die IFC-Zuordnung ist projektdefiniert."
               }
-            },
-            "sourceId": "urn:din:276:2018-12"
+            }
           }
         ],
-        "definitionId": "axioval:example.entity-type-equals",
-        "enabled": true,
-        "explanatoryImages": [],
-        "id": "kg331-is-wall",
-        "message": {
-          "default": "The instructional project profile expects a KG 331 object to map to IfcWall.",
-          "translations": {
-            "de": "Das beispielhafte Projektprofil erwartet f\u00fcr ein KG-331-Objekt die Zuordnung zu IfcWall."
-          }
-        },
-        "name": {
-          "default": "Project profile maps KG 331 objects to walls",
-          "translations": {
-            "de": "Projektprofil ordnet KG-331-Objekte W\u00e4nden zu"
-          }
-        },
         "parameterCitations": [],
-        "parameters": {
-          "objectType": {
-            "includeSubtypes": true,
-            "objectType": "axioval:example.ifc.wall",
-            "type": "objectTypeReference"
-          }
-        },
-        "requirements": [],
-        "severity": "error",
+        "explanatoryImages": [],
         "tags": [
           "din-276",
           "cost-group-331",
@@ -97,15 +113,44 @@
         ]
       },
       {
-        "applicability": {
-          "code": "331",
-          "includeDescendants": false,
-          "kind": "classification",
-          "system": "DIN 276:2018-12"
+        "id": "kg331-load-bearing",
+        "definitionId": "axioval:example.boolean-property-equals",
+        "name": {
+          "default": "Project profile marks KG 331 walls as load bearing",
+          "translations": {
+            "de": "Projektprofil kennzeichnet KG-331-Wände als tragend"
+          }
         },
+        "enabled": true,
+        "severity": "error",
+        "message": {
+          "default": "The instructional project profile expects LoadBearing = TRUE in Pset_WallCommon.",
+          "translations": {
+            "de": "Das beispielhafte Projektprofil erwartet LoadBearing = TRUE in Pset_WallCommon."
+          }
+        },
+        "parameters": {
+          "property": {
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.load-bearing",
+            "propertySet": "axioval:example.ifc.pset-wall-common"
+          },
+          "expected": {
+            "type": "boolean",
+            "value": true
+          }
+        },
+        "applicability": {
+          "kind": "classification",
+          "system": "DIN 276:2018-12",
+          "code": "331",
+          "includeDescendants": false
+        },
+        "requirements": [],
         "citations": [
           {
             "id": "kg331-load-bearing-source",
+            "sourceId": "urn:din:276:2018-12",
             "locators": [
               {
                 "kind": "item",
@@ -117,40 +162,11 @@
               "translations": {
                 "de": "KG 331 ist die zitierte Kostengruppe; die IFC-Zuordnung ist projektdefiniert."
               }
-            },
-            "sourceId": "urn:din:276:2018-12"
+            }
           }
         ],
-        "definitionId": "axioval:example.boolean-property-equals",
-        "enabled": true,
-        "explanatoryImages": [],
-        "id": "kg331-load-bearing",
-        "message": {
-          "default": "The instructional project profile expects LoadBearing = TRUE in Pset_WallCommon.",
-          "translations": {
-            "de": "Das beispielhafte Projektprofil erwartet LoadBearing = TRUE in Pset_WallCommon."
-          }
-        },
-        "name": {
-          "default": "Project profile marks KG 331 walls as load bearing",
-          "translations": {
-            "de": "Projektprofil kennzeichnet KG-331-W\u00e4nde als tragend"
-          }
-        },
         "parameterCitations": [],
-        "parameters": {
-          "expected": {
-            "type": "boolean",
-            "value": true
-          },
-          "property": {
-            "property": "axioval:example.ifc.load-bearing",
-            "propertySet": "axioval:example.ifc.pset-wall-common",
-            "type": "propertyReference"
-          }
-        },
-        "requirements": [],
-        "severity": "error",
+        "explanatoryImages": [],
         "tags": [
           "din-276",
           "cost-group-331",
@@ -158,15 +174,43 @@
         ]
       },
       {
-        "applicability": {
-          "code": "331",
-          "includeDescendants": false,
-          "kind": "classification",
-          "system": "DIN 276:2018-12"
+        "id": "kg331-is-external",
+        "definitionId": "axioval:example.boolean-property-equals",
+        "name": {
+          "default": "Project profile marks KG 331 walls as external",
+          "translations": {
+            "de": "Projektprofil kennzeichnet KG-331-Wände als außenliegend"
+          }
         },
+        "enabled": true,
+        "severity": "error",
+        "message": {
+          "default": "The instructional project profile expects IsExternal = TRUE.",
+          "translations": {
+            "de": "Das beispielhafte Projektprofil erwartet IsExternal = TRUE."
+          }
+        },
+        "parameters": {
+          "property": {
+            "type": "propertyReference",
+            "property": "axioval:example.ifc.is-external"
+          },
+          "expected": {
+            "type": "boolean",
+            "value": true
+          }
+        },
+        "applicability": {
+          "kind": "classification",
+          "system": "DIN 276:2018-12",
+          "code": "331",
+          "includeDescendants": false
+        },
+        "requirements": [],
         "citations": [
           {
             "id": "kg331-external-source",
+            "sourceId": "urn:din:276:2018-12",
             "locators": [
               {
                 "kind": "item",
@@ -178,62 +222,18 @@
               "translations": {
                 "de": "KG 331 ist die zitierte Kostengruppe; die IFC-Zuordnung ist projektdefiniert."
               }
-            },
-            "sourceId": "urn:din:276:2018-12"
+            }
           }
         ],
-        "definitionId": "axioval:example.boolean-property-equals",
-        "enabled": true,
-        "explanatoryImages": [],
-        "id": "kg331-is-external",
-        "message": {
-          "default": "The instructional project profile expects IsExternal = TRUE.",
-          "translations": {
-            "de": "Das beispielhafte Projektprofil erwartet IsExternal = TRUE."
-          }
-        },
-        "name": {
-          "default": "Project profile marks KG 331 walls as external",
-          "translations": {
-            "de": "Projektprofil kennzeichnet KG-331-W\u00e4nde als au\u00dfenliegend"
-          }
-        },
         "parameterCitations": [],
-        "parameters": {
-          "expected": {
-            "type": "boolean",
-            "value": true
-          },
-          "property": {
-            "property": "axioval:example.ifc.is-external",
-            "type": "propertyReference"
-          }
-        },
-        "requirements": [],
-        "severity": "error",
+        "explanatoryImages": [],
         "tags": [
           "din-276",
           "cost-group-331",
           "container-agnostic"
         ]
       }
-    ]
-  },
-  "schemaVersion": "0.1.0",
-  "sources": {
-    "urn:din:276:2018-12": {
-      "designation": "DIN 276:2018-12",
-      "edition": "2018-12",
-      "id": "urn:din:276:2018-12",
-      "kind": "standard",
-      "publicationDate": "2018-12",
-      "publisher": "DIN",
-      "title": {
-        "default": "Building costs",
-        "translations": {
-          "de": "Kosten im Bauwesen"
-        }
-      }
-    }
+    ],
+    "folders": []
   }
 }

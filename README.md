@@ -25,7 +25,7 @@ Validation requirements mix four concerns that should remain independently reusa
 | Layer | Question | Axioval construct |
 | --- | --- | --- |
 | Vocabulary | What does “load bearing” mean, and what type is it? | `PropertyDefinition` with `valueKind = "boolean"` |
-| External binding | What is that concept called in IFC? | `ExternalName("…/ifc/4.3", "LoadBearing")` |
+| External binding | What is that concept called in IFC? | `ExternalName(openbim.ifc release URI, "LoadBearing")` |
 | Template | What operation can a checker perform? | `RuleDefinition` + typed parameters + stable `capability` |
 | Instance | What must be true for which objects? | `RuleInstance` + selector + concrete parameter values |
 
@@ -92,13 +92,27 @@ graph LR
 ## Repository layout
 
 ```text
-schema/                 Pkl contracts and static manifest JSON Schema
+schema/                 Pkl contracts, adapters, and static manifest JSON Schema
 examples/minimal/       smallest complete non-production package
 examples/din-276-331/   vocabulary → template → instance tutorial fixture
+examples/geometry-clearance/ IFC4X3 + geometry package integration
 docs/                   GitHub Pages source
 scripts/                fail-closed evaluator and normalized binder
 tests/                  positive and negative contract tests
 ```
+
+## Specialized OpenBIM contracts
+
+MCS owns rule authoring and normalized transport, not IFC schemas or geometry
+kernel vocabularies. `schema/adapters/` accepts version-bound references from
+`openbim.ifc` and closed capability IDs from `openbim.geometry`, then lowers
+only their stable identifiers into normalized MCS data. The project imports the
+published packages as `@ifc` and `@geometry`; `PklProject.deps.json` locks the
+resolved metadata checksums for
+`package://openbimrs.github.io/pkl/openbim.ifc@0.1.0` and
+`package://openbimrs.github.io/pkl/openbim.geometry@0.1.0`. See
+[`examples/geometry-clearance`](examples/geometry-clearance/) for an IFC4X3
+rule that does not duplicate either package's domain catalog.
 
 <details>
 <summary><strong>Run the complete local gate</strong></summary>

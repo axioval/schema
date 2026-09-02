@@ -1,0 +1,46 @@
+/// Proves MCS lowers package-owned IFC and geometry references without copying vocabularies.
+module axioval.tests.adapters
+
+amends "pkl:test"
+
+import "pkl:test" as test
+
+import "@geometry/capabilities/Catalog.pkl" as geometryCatalog
+import "@ifc/versions/Ifc2x3.pkl" as ifc2x3
+import "@ifc/versions/Ifc4.pkl" as ifc4
+import "@ifc/versions/Ifc4x3.pkl" as ifc4x3
+
+import "../../schema/adapters/Geometry.pkl" as geometryAdapter
+import "../../schema/adapters/Ifc.pkl" as ifcAdapter
+
+facts {
+  ["all supported IFC releases stay explicit"] {
+    ifc2x3.entity("IfcWall").release == "IFC2X3_TC1"
+    ifc4.entity("IfcWall").release == "IFC4_ADD2_TC1"
+    ifc4x3.entity("IfcWall").release == "IFC4X3_ADD2"
+    ifc2x3.release.catalogTypeSystem != ifc4.release.catalogTypeSystem
+    ifc4.release.catalogTypeSystem != ifc4x3.release.catalogTypeSystem
+  }
+
+  ["IFC entity references lower to MCS external names"] {
+    let (externalName = ifcAdapter.entityExternalName(ifc4x3.entity("IfcWall")))
+      externalName.typeSystem == ifc4x3.release.catalogTypeSystem
+        && externalName.name == "IfcWall"
+  }
+
+  ["IFC template references lower without MCS inventing identifiers"] {
+    let (
+      property = ifcAdapter.propertyExternalName(ifc4x3.property("Pset_WallCommon", "LoadBearing"))
+    )
+      property.name == "LoadBearing"
+        && property.typeSystem == ifc4x3.release.catalogTypeSystem
+    let (propertySet = ifcAdapter.propertySetExternalName(ifc4x3.propertySet("Pset_WallCommon")))
+      propertySet.name == "Pset_WallCommon"
+  }
+
+  ["geometry capability remains owned and closed by its package"] {
+    geometryCatalog.allCapabilities.contains("openbim.geometry:clearance.directional")
+    geometryAdapter.capability("openbim.geometry:clearance.directional")
+      == "openbim.geometry:clearance.directional"
+  }
+}

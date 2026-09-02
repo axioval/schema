@@ -24,10 +24,9 @@ A vocabulary defines the property once:
       name = new Types.LocalizedText { default = "Load bearing" }
       valueKind = "boolean"
       externalNames {
-        new Definitions.ExternalName {
-          typeSystem = "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
-          name = "LoadBearing"
-        }
+        ifcAdapter.propertyExternalName(
+          ifc4x3.property("Pset_WallCommon", "LoadBearing")
+        )
       }
     }
     ```

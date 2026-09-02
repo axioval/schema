@@ -49,6 +49,8 @@ def pkl_executable() -> str:
 
 def evaluate(module: Path, root: Path = ROOT) -> dict:
     root = root.resolve()
+    # Pkl resolves declared @aliases to projectpackage: URIs even when their
+    # lockfile entries are checksum-pinned remote package: dependencies.
     command = [
         pkl_executable(),
         "eval",
@@ -57,7 +59,7 @@ def evaluate(module: Path, root: Path = ROOT) -> dict:
         "--root-dir",
         str(root),
         "--allowed-modules",
-        "file:,pkl:",
+        "file:,pkl:,package:,projectpackage:",
         "--allowed-resources",
         "prop:pkl.outputFormat",
         "--timeout",

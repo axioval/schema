@@ -1,0 +1,21 @@
+/// Authoring-only lowering from package-owned IFC references to stable MCS names.
+module axioval.schema.adapters.Ifc
+
+import "@ifc/ifc.pkl" as ifc
+
+import "../Definitions.pkl" as definitions
+
+function externalName(typeSystem_: String, name_: String): definitions.ExternalName = new definitions
+  .ExternalName {
+  typeSystem = typeSystem_
+  name = name_
+}
+
+function entityExternalName(reference: ifc.EntityReference): definitions.ExternalName =
+  externalName(reference.catalogTypeSystem, reference.name)
+
+function propertySetExternalName(reference: ifc.PropertySetReference): definitions.ExternalName =
+  externalName(reference.catalogTypeSystem, reference.name)
+
+function propertyExternalName(reference: ifc.PropertyReference): definitions.ExternalName =
+  externalName(reference.catalogTypeSystem, reference.name)

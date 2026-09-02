@@ -272,6 +272,23 @@ class MCSArchiveTests(unittest.TestCase):
                 with self.assertRaises(mcs_archive.MCSError):
                     mcs_archive._pkl_closure(root, [entry])
 
+    def test_dependency_closure_keeps_declared_package_imports_external(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entry = root / "entry.pkl"
+            entry.write_text(
+                'import "@ifc/versions/Ifc4x3.pkl" as ifc4x3\n', encoding="utf-8"
+            )
+            self.assertEqual(mcs_archive._pkl_closure(root, [entry]), {entry})
+
+    def test_dependency_closure_rejects_package_traversal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entry = root / "entry.pkl"
+            entry.write_text('import "@ifc/../secret.pkl"\n', encoding="utf-8")
+            with self.assertRaises(mcs_archive.MCSError):
+                mcs_archive._pkl_closure(root, [entry])
+
     def test_dependency_closure_rejects_ancestor_symlinks(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

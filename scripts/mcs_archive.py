@@ -55,7 +55,7 @@ NAME_MAX = 240
 SHA256 = re.compile(r"[0-9a-f]{64}")
 DIRECTIVE = re.compile(r"^\s*(import\*?|amends|extends)\b(.*)$")
 LITERAL_DIRECTIVE = re.compile(
-    r'^\s*(import|amends|extends)\s+"([^"\\]+)"\s*(?://.*)?$'
+    r'^\s*(import|amends|extends)\s+"([^"\\]+)"(?:\s+as\s+[A-Za-z_][A-Za-z0-9_]*)?\s*(?://.*)?$'
 )
 RESOURCE_READ = re.compile(r"(?<![A-Za-z0-9_])read(?:\?|\*|Glob)?(?![A-Za-z0-9_])")
 
@@ -168,6 +168,21 @@ def _pkl_closure(root: Path, starts: list[Path]) -> set[Path]:
             target = literal.group(2)
             # pkl: is a standard module and deliberately not archived.
             if target.startswith("pkl:"):
+                continue
+            # Declared project dependencies are checksum-locked in the archived
+            # PklProject.deps.json and remain external to the source closure.
+            if target.startswith("@"):
+                parts = PurePosixPath(target).parts
+                if (
+                    len(parts) < 2
+                    or re.fullmatch(r"@[A-Za-z_][A-Za-z0-9_-]*", parts[0]) is None
+                    or any(
+                        part in {"", ".", ".."}
+                        or re.fullmatch(r"[A-Za-z0-9_.-]+", part) is None
+                        for part in parts[1:]
+                    )
+                ):
+                    _fail(f"unsafe Pkl package reference {target!r} in {current}")
                 continue
             if ":" in target or target.startswith("/") or "\\" in target:
                 _fail(

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "0.1.0",
+  "package": {
+    "id": "axioval:example.geometry-clearance",
+    "name": {
+      "default": "IFC wall-to-pipe clearance",
+      "translations": {}
+    },
+    "version": "0.1.0",
+    "description": {
+      "default": "Instructional rule using openbim.ifc and openbim.geometry contracts.",
+      "translations": {}
+    },
+    "repository": "https://github.com/axioval/mcs",
+    "authors": []
+  },
+  "sources": {},
+  "definitionPackages": [
+    "axioval:example.geometry-clearance-definitions"
+  ],
+  "root": {
+    "id": "root",
+    "name": {
+      "default": "Geometry checks",
+      "translations": {}
+    },
+    "rules": [
+      {
+        "id": "wall-to-pipe-clearance",
+        "definitionId": "axioval:example.geometry.directional-clearance",
+        "name": {
+          "default": "Walls and pipes keep 200 mm clearance",
+          "translations": {}
+        },
+        "enabled": true,
+        "severity": "error",
+        "parameters": {
+          "clearance": {
+            "type": "quantity",
+            "value": 200,
+            "unit": "mm"
+          }
+        },
+        "applicability": {
+          "groups": {
+            "elements": {
+              "id": "elements",
+              "name": {
+                "default": "Walls and pipe segments",
+                "translations": {}
+              },
+              "selector": {
+                "kind": "anyOf",
+                "operands": [
+                  {
+                    "kind": "entityType",
+                    "objectType": "axioval:example.ifc.wall",
+                    "includeSubtypes": true
+                  },
+                  {
+                    "kind": "entityType",
+                    "objectType": "axioval:example.ifc.pipe-segment",
+                    "includeSubtypes": true
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "requirements": [
+          {
+            "id": "minimum-clearance",
+            "statement": {
+              "default": "Selected walls and pipe segments maintain at least 200 mm directional clearance.",
+              "translations": {}
+            },
+            "targetGroups": [
+              "elements"
+            ],
+            "citations": []
+          }
+        ],
+        "citations": [],
+        "parameterCitations": [],
+        "explanatoryImages": [],
+        "tags": [
+          "example",
+          "geometry",
+          "ifc"
+        ]
+      }
+    ],
+    "folders": []
+  }
+}
