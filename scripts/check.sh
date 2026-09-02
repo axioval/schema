@@ -5,18 +5,18 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Resolve checksum-pinned remote packages before sandboxed evaluation. Pkl still
-# requires HTTPS resource permission for metadata and redirected release assets;
-# file and environment resources remain denied.
-pkl project resolve \
+# Re-resolve a copied project with an empty cache and require its generated lock
+# to match the committed bytes. The validation checkout remains read-only.
+python3 -c 'from pathlib import Path; from scripts.mcs_archive import _fresh_resolve_dependency_lock; _fresh_resolve_dependency_lock(Path.cwd())'
+
+python3 -m unittest discover -s tests -v
+python3 scripts/validate.py
+pkl test \
   --root-dir "$repo_root" \
   --allowed-modules 'file:,pkl:,package:,projectpackage:' \
   --allowed-resources 'https://openbimrs\.github\.io/pkl/.*,https://github\.com/openbimrs/pkl/releases/download/.*,https://release-assets\.githubusercontent\.com/.*,prop:pkl.outputFormat' \
   --timeout 30 \
-  .
-
-python3 -m unittest discover -s tests -v
-python3 scripts/validate.py
+  tests/pkl/adapters.pkl
 
 # Exercise the distributable MCS transport without retaining binary artifacts.
 mcs_tmp="$(mktemp -d)"

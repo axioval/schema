@@ -86,6 +86,25 @@ class EvaluateTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 validate.evaluate(module, root)
 
+    def test_project_evaluation_uses_explicit_sandbox(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / "PklProject").write_text("amends `pkl:Project`\n")
+            completed = Mock(returncode=0, stdout="", stderr="")
+            with patch.object(
+                validate.subprocess, "run", return_value=completed
+            ) as run:
+                validate.evaluate_project(root)
+            command = run.call_args.args[0]
+            self.assertEqual(command[command.index("--root-dir") + 1], str(root))
+            self.assertEqual(
+                command[command.index("--allowed-modules") + 1], "file:,pkl:"
+            )
+            self.assertEqual(
+                command[command.index("--allowed-resources") + 1],
+                "prop:pkl.outputFormat",
+            )
+
 
 class IdentityTests(unittest.TestCase):
     def test_qualified_ids_and_semver_are_fail_closed(self) -> None:

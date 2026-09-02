@@ -33,16 +33,18 @@ Die Reihenfolge ist Teil des Sicherheitsvertrags:
 1. `axioval.json` als nicht vertrauenswürdige statische Daten parsen;
 2. jedes Feld gegen das Manifest-JSON-Schema validieren;
 3. **alle** Regelwerk- und Definitionspfade innerhalb der Repository-Wurzel auflösen;
-4. Pkl mit lokalen Modulen, Standardbibliothek und prüfsummengebundenen
+4. ein kopiertes Pkl-Projekt mit leerem Cache erneut auflösen und verlangen, dass
+   seine erzeugte Abhängigkeitssperre bytegenau den eingecheckten Daten entspricht;
+5. Pkl mit lokalen Modulen, Standardbibliothek und prüfsummengebundenen
    Paketmodulen auswerten; HTTPS-Ressourcen sind auf OpenBIM-Paketmetadaten,
    stabile Releases und signierte Release-Asset-Hosts beschränkt. Beliebige
    HTTPS-, Datei- und Umgebungsressourcen bleiben verboten;
-5. jedes Kandidaten-Definitionsdokument validieren;
-6. deklarierte Pakete, Quellenkataloge, Zitate, Objekttypen, Eigenschaften,
+6. jedes Kandidaten-Definitionsdokument validieren;
+7. deklarierte Pakete, Quellenkataloge, Zitate, Objekttypen, Eigenschaften,
    Property-Set-Qualifizierer, Vorlagen, Anwendbarkeitsgruppen, Anforderungen,
    Selektoren, typisierte Parameterwerte und erklärende Bilddateien binden;
-7. doppelte, fehlende, unbekannte, widersprüchliche, fehlerhafte oder nicht unterstützte Deklarationen ablehnen; und
-8. semantisch validierte Ausgabe mit geprüften normalisierten Snapshots vergleichen.
+8. doppelte, fehlende, unbekannte, widersprüchliche, fehlerhafte oder nicht unterstützte Deklarationen ablehnen; und
+9. semantisch validierte Ausgaben mit geprüften normalisierten Snapshots vergleichen.
 
 !!! danger
     Evaluator-Ausgabe vor Schritt 6 ist **Kandidaten-JSON**, kein normalisiertes Austauschformat. Ein erfolgreicher Pkl-Prozess beweist nicht, dass ein Paket gültig ist.

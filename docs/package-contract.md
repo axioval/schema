@@ -36,17 +36,19 @@ The order is part of the security contract:
 1. parse `axioval.json` as untrusted static data;
 2. validate every field against the manifest JSON Schema;
 3. resolve **all** ruleset and definition paths inside the repository root;
-4. evaluate Pkl with repository-local, standard-library, and checksum-locked
+4. re-resolve a copied Pkl project with an empty cache and require its generated
+   dependency lock to match the committed bytes;
+5. evaluate Pkl with repository-local, standard-library, and checksum-locked
    package modules; HTTPS resources are limited to the OpenBIM package metadata,
    stable release, and signed release-asset hosts, while arbitrary HTTPS, file,
    and environment resource reads remain forbidden;
-5. validate every candidate definition document;
-6. bind declared packages, source catalogs, citations, object types, properties,
+6. validate every candidate definition document;
+7. bind declared packages, source catalogs, citations, object types, properties,
    property-set qualifiers, templates, applicability groups, requirements,
    selectors, typed parameter values, and explanatory image assets;
-7. reject duplicate, missing, unknown, conflicting, malformed, or unsupported
+8. reject duplicate, missing, unknown, conflicting, malformed, or unsupported
    declarations; and
-8. compare semantically validated output with checked normalized snapshots.
+9. compare semantically validated output with checked normalized snapshots.
 
 !!! danger
     Evaluator output before step 6 is **candidate JSON**, not normalized

@@ -89,6 +89,28 @@ def evaluate(module: Path, root: Path = ROOT) -> dict:
         fail(f"{module.relative_to(root)} did not render JSON: {exc}")
 
 
+def evaluate_project(root: Path = ROOT) -> None:
+    root = root.resolve()
+    command = [
+        pkl_executable(),
+        "eval",
+        "--root-dir",
+        str(root),
+        "--allowed-modules",
+        "file:,pkl:",
+        "--allowed-resources",
+        "prop:pkl.outputFormat",
+        "--timeout",
+        "10",
+        str(root / "PklProject"),
+    ]
+    proc = subprocess.run(
+        command, cwd=root, text=True, capture_output=True, check=False
+    )
+    if proc.returncode:
+        fail(f"PklProject evaluation failed\n{proc.stderr}")
+
+
 def local_module(base: Path, value: str) -> Path:
     if (
         not value.endswith(".pkl")
@@ -204,12 +226,7 @@ def main() -> None:
             fail(
                 f"concrete rule instance outside examples/: {module.relative_to(ROOT)}"
             )
-    subprocess.run(
-        [pkl_executable(), "eval", "PklProject"],
-        cwd=ROOT,
-        check=True,
-        stdout=subprocess.DEVNULL,
-    )
+    evaluate_project(ROOT)
     print(f"validated {len(manifests)} example package(s) with Pkl {expected_version}")
 
 
